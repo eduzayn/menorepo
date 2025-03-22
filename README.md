@@ -106,7 +106,7 @@ Este modelo permitirá que instituições realizem a contratação sem depender 
           |                          |                        |                        |                                             |                          
 [ Material Didático ]          [ Matrículas ]     [ Portal do Aluno ]            [ Comunicação ]                               [ Módulos Avançados ]
 [ IA Vídeo Generator]                                                                    |                                     
-[ Gestão de Planos ]         [ Área Acadêmica ]   [ Chat, WhatsApp ]    
+[ Gestão de Planos ]         [ Área Acadêmica ]   [ Chat, Feed Abck por IA ]    
 [ E-books e Conteúdo ]      [ Vinculação com    ]  [ Boletim, Doc.   ]           [ Notificações ]                            | Financeiro Empresarial |
                             [ Material Didático ]  [ Certificados     ]          [ E-mails, whatsapp. facebook, instagran ]  | Portal do Parceiro |
                                                     [ Tutoria ]                                                              | Portal do Polo |
