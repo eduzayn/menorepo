@@ -1,69 +1,124 @@
-import { useState, useEffect } from 'react';
-import { Conversa } from '../types/comunicacao';
-import { getConversas, getConversa } from '../services/comunicacao';
-import { ChatWindow } from '../components/chat/ChatWindow';
-import { Card, Button, Spinner } from '@edunexia/ui-components';
+import { useState } from 'react';
+import { useConversas } from '../hooks/useConversas';
+import { useChat } from '../hooks/useChat';
+import { ChatWindow } from '../components/ChatWindow';
+import { ConversationList } from '../components/ConversationList';
+import { SearchInput } from '../components/SearchInput';
+import { Pagination } from '../components/Pagination';
+import { ComunicacaoStatus } from '../types/comunicacao';
 
 export function ConversasPage() {
-  const [conversas, setConversas] = useState<Conversa[]>([]);
-  const [conversaSelecionada, setConversaSelecionada] = useState<Conversa | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [busca, setBusca] = useState('');
+  const [status, setStatus] = useState<ComunicacaoStatus | undefined>();
+  const [pagina, setPagina] = useState(1);
 
-  useEffect(() => {
-    loadConversas();
-  }, []);
+  const {
+    conversas,
+    conversaSelecionada,
+    loading,
+    error,
+    totalPaginas,
+    total,
+    buscarConversas,
+    selecionarConversa,
+    mudarPagina
+  } = useConversas({
+    busca,
+    status,
+    porPagina: 10,
+    ordenarPor: 'ultima_mensagem_at',
+    ordem: 'desc'
+  });
 
-  const loadConversas = async () => {
-    try {
-      setLoading(true);
-      const data = await getConversas();
-      setConversas(data || []);
-    } catch (error) {
-      console.error('Erro ao carregar conversas:', error);
-    } finally {
-      setLoading(false);
-    }
+  const {
+    mensagens,
+    enviarMensagem,
+    marcarComoLida,
+    indicarDigitando
+  } = useChat({ conversaId: conversaSelecionada?.id });
+
+  // Buscar conversas
+  const handleBusca = async (termo: string) => {
+    setBusca(termo);
+    setPagina(1);
+    await buscarConversas({ busca: termo });
   };
 
-  const handleSelecionarConversa = async (conversa: Conversa) => {
-    try {
-      const conversaCompleta = await getConversa(conversa.id);
-      if (conversaCompleta) {
-        setConversaSelecionada(conversaCompleta);
-      }
-    } catch (error) {
-      console.error('Erro ao carregar conversa:', error);
-    }
+  // Filtrar por status
+  const handleStatusChange = async (novoStatus: ComunicacaoStatus | undefined) => {
+    setStatus(novoStatus);
+    setPagina(1);
+    await buscarConversas({ status: novoStatus });
   };
 
-  if (loading) {
+  // Selecionar conversa
+  const handleConversaSelect = async (id: string) => {
+    await selecionarConversa(id);
+  };
+
+  // Mudar página
+  const handlePageChange = async (novaPagina: number) => {
+    setPagina(novaPagina);
+    await mudarPagina(novaPagina);
+  };
+
+  if (error) {
     return (
-      <div className="flex items-center justify-center h-full">
-        <Spinner />
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-red-500">Erro ao carregar conversas: {error.message}</div>
       </div>
     );
   }
 
   return (
-    <div className="flex h-full">
-      <Card className="w-64 p-4 border-r">
-        <h2 className="text-lg font-semibold mb-4">Conversas</h2>
-        <div className="space-y-2">
-          {conversas.map((conversa) => (
-            <Button
-              key={conversa.id}
-              variant={conversaSelecionada?.id === conversa.id ? 'primary' : 'secondary'}
-              className="w-full text-left"
-              onClick={() => handleSelecionarConversa(conversa)}
-            >
-              {conversa.titulo}
-            </Button>
-          ))}
+    <div className="flex h-screen bg-gray-100">
+      {/* Lista de Conversas */}
+      <div className="w-1/3 border-r bg-white">
+        <div className="p-4 border-b">
+          <SearchInput
+            value={busca}
+            onChange={handleBusca}
+            placeholder="Buscar conversas..."
+          />
         </div>
-      </Card>
-      <div className="flex-1">
+        <div className="p-4 border-b">
+          <select
+            value={status || ''}
+            onChange={(e) => handleStatusChange(e.target.value as ComunicacaoStatus || undefined)}
+            className="w-full p-2 border rounded"
+          >
+            <option value="">Todos os status</option>
+            <option value="ATIVO">Ativo</option>
+            <option value="ARQUIVADO">Arquivado</option>
+            <option value="FINALIZADO">Finalizado</option>
+          </select>
+        </div>
+        <ConversationList
+          conversas={conversas}
+          conversaSelecionada={conversaSelecionada}
+          onSelect={handleConversaSelect}
+          loading={loading}
+        />
+        <div className="p-4 border-t">
+          <Pagination
+            pagina={pagina}
+            totalPaginas={totalPaginas}
+            total={total}
+            onChange={handlePageChange}
+          />
+        </div>
+      </div>
+
+      {/* Área do Chat */}
+      <div className="flex-1 flex flex-col">
         {conversaSelecionada ? (
-          <ChatWindow conversaId={conversaSelecionada.id} />
+          <ChatWindow
+            conversa={conversaSelecionada}
+            mensagens={mensagens}
+            onEnviarMensagem={enviarMensagem}
+            onMarcarComoLida={marcarComoLida}
+            onIndicarDigitando={indicarDigitando}
+          />
         ) : (
           <div className="flex items-center justify-center h-full text-gray-500">
             Selecione uma conversa para começar
