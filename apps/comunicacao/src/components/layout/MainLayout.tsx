@@ -1,86 +1,91 @@
-import { ReactNode, useState } from 'react';
-import { Bars3Icon } from '@heroicons/react/24/outline';
+import { useState } from 'react';
+import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import Sidebar from './Sidebar';
-import TopBar from './TopBar';
-import DetailPanel from './DetailPanel';
+import { DetailsPanel } from '../chat/DetailsPanel';
 
 interface MainLayoutProps {
-  children: ReactNode;
-  showDetailsPanel?: boolean;
-  detailsData?: {
-    name?: string;
-    email?: string;
-    phone?: string;
-    status?: string;
-    lastContact?: string;
+  children: React.ReactNode;
+  showDetails?: boolean;
+  detailsProps?: {
+    lead?: any;
+    aluno?: any;
+    historicoInteracoes: any[];
+    onAcaoRapida: (acao: string) => void;
   };
 }
 
-export default function MainLayout({ 
-  children, 
-  showDetailsPanel = true,
-  detailsData 
-}: MainLayoutProps) {
+export function MainLayout({ children, showDetails = false, detailsProps }: MainLayoutProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [isDetailsPanelOpen, setIsDetailsPanelOpen] = useState(true);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(showDetails);
 
   return (
-    <div className="flex h-screen bg-neutral-light">
-      {/* Mobile Sidebar Backdrop */}
-      {isSidebarOpen && (
-        <div 
-          className="fixed inset-0 bg-gray-600 bg-opacity-75 lg:hidden" 
-          onClick={() => setIsSidebarOpen(false)}
-        />
-      )}
+    <div className="h-screen flex overflow-hidden bg-gray-100">
+      {/* Sidebar Mobile Overlay */}
+      <div
+        className={`fixed inset-0 bg-gray-600 bg-opacity-75 transition-opacity lg:hidden ${
+          isSidebarOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
+        }`}
+        onClick={() => setIsSidebarOpen(false)}
+      />
 
       {/* Sidebar */}
-      <div className={`
-        fixed inset-y-0 left-0 z-40 w-64 transform transition-transform duration-300 ease-in-out lg:static lg:transform-none
-        ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-      `}>
+      <div
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-white transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${
+          isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+      >
         <Sidebar />
       </div>
 
-      {/* Main Content Area */}
-      <div className="flex flex-1 flex-col lg:flex-row overflow-hidden">
-        {/* Central Panel */}
-        <div className="flex flex-col flex-1 min-w-0">
-          {/* TopBar */}
-          <div className="bg-neutral-lightest border-b border-primary-light">
-            <div className="flex h-16 items-center justify-between px-4">
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Top Bar */}
+        <div className="flex-shrink-0 h-16 bg-white border-b flex items-center justify-between px-4">
+          <div className="flex items-center">
+            <button
+              type="button"
+              className="lg:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100"
+              onClick={() => setIsSidebarOpen(true)}
+            >
+              <Bars3Icon className="h-6 w-6" />
+            </button>
+            <h1 className="ml-2 text-xl font-semibold text-gray-900">Edunexia</h1>
+          </div>
+          <div className="flex items-center">
+            {showDetails && (
               <button
                 type="button"
-                className="lg:hidden text-neutral-dark hover:text-gray-900"
-                onClick={() => setIsSidebarOpen(true)}
+                className="lg:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100"
+                onClick={() => setIsDetailsOpen(!isDetailsOpen)}
               >
-                <Bars3Icon className="h-6 w-6" />
+                {isDetailsOpen ? (
+                  <XMarkIcon className="h-6 w-6" />
+                ) : (
+                  <Bars3Icon className="h-6 w-6" />
+                )}
               </button>
-              <TopBar />
-            </div>
+            )}
           </div>
-
-          {/* Main Content */}
-          <main className="flex-1 overflow-y-auto bg-neutral-lightest">
-            <div className="container mx-auto px-4 py-8">
-              {children}
-            </div>
-          </main>
         </div>
 
-        {/* Details Panel */}
-        {showDetailsPanel && (
-          <div className={`
-            fixed inset-y-0 right-0 z-30 w-80 transform transition-transform duration-300 ease-in-out 
-            xl:static xl:transform-none
-            ${isDetailsPanelOpen ? 'translate-x-0' : 'translate-x-full'}
-          `}>
-            <DetailPanel 
-              onClose={() => setIsDetailsPanelOpen(false)}
-              data={detailsData}
-            />
+        {/* Main Content Area */}
+        <div className="flex-1 flex overflow-hidden">
+          {/* Primary Content */}
+          <div className="flex-1 overflow-y-auto">
+            {children}
           </div>
-        )}
+
+          {/* Details Panel */}
+          {showDetails && detailsProps && (
+            <div
+              className={`fixed inset-y-0 right-0 z-50 w-80 bg-white transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${
+                isDetailsOpen ? 'translate-x-0' : 'translate-x-full'
+              }`}
+            >
+              <DetailsPanel {...detailsProps} />
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
