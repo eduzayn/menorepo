@@ -1,3 +1,4 @@
+/// <reference types="vitest" />
 /// <reference types="vite/client" />
 /// <reference types="node" />
 
@@ -16,7 +17,7 @@ export default defineConfig({
       formats: ['es']
     },
     rollupOptions: {
-      external: ['react', 'react-dom', 'react-router-dom', '@edunexia/auth', '@edunexia/ui-components', '@edunexia/database-schema', '@supabase/supabase-js'],
+      external: ['react', 'react-dom', 'react-router-dom', '@edunexia/auth', '@edunexia/ui-components', '@edunexia/database-schema'],
       output: {
         globals: {
           react: 'React',
