@@ -6,7 +6,7 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "yarn workspace @edunexia/comunicacao dev",
+    "dev": "yarn workspace @edunexia/modulo-matriculas dev",
     "build": "yarn workspaces foreach -pi run build",
     "lint": "yarn workspaces foreach -pi run lint",
     "clean": "yarn workspaces foreach -pi run clean"
@@ -20,5 +20,6 @@
     "eslint": "^8.55.0",
     "tailwind-merge": "^2.2.1",
     "typescript": "^5.2.2"
-  }
+  },
+  "packageManager": "yarn@4.7.0"
 }
