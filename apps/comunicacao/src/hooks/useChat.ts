@@ -12,6 +12,7 @@ interface UseChatResult {
   mensagens: Mensagem[];
   loading: boolean;
   error?: Error;
+  usuarioDigitando?: string;
   enviarMensagem: (conteudo: string, tipo: ComunicacaoTipoMensagem) => Promise<void>;
   marcarComoLida: (mensagemId: string) => Promise<void>;
   indicarDigitando: (digitando: boolean) => Promise<void>;
@@ -23,6 +24,7 @@ export function useChat({ conversaId }: UseChatOptions): UseChatResult {
   const [mensagens, setMensagens] = useState<Mensagem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error>();
+  const [usuarioDigitando, setUsuarioDigitando] = useState<string>();
 
   // Carregar conversa e mensagens
   useEffect(() => {
@@ -62,8 +64,10 @@ export function useChat({ conversaId }: UseChatOptions): UseChatResult {
     carregarDados();
 
     // Inscrever para atualizações em tempo real
-    const mensagensSubscription = supabase
-      .channel(`conversa:${conversaId}`)
+    const channel = supabase.channel(`conversa:${conversaId}`);
+
+    // Inscrever para mensagens
+    channel
       .on('postgres_changes', {
         event: '*',
         schema: 'public',
@@ -76,8 +80,17 @@ export function useChat({ conversaId }: UseChatOptions): UseChatResult {
       })
       .subscribe();
 
+    // Inscrever para status de digitação
+    channel
+      .on('broadcast', { event: 'typing' }, ({ payload }) => {
+        if (payload.usuario_id !== user.id) {
+          setUsuarioDigitando(payload.digitando ? payload.usuario_nome : undefined);
+        }
+      })
+      .subscribe();
+
     return () => {
-      mensagensSubscription.unsubscribe();
+      channel.unsubscribe();
     };
   }, [conversaId, user]);
 
@@ -125,11 +138,17 @@ export function useChat({ conversaId }: UseChatOptions): UseChatResult {
     if (!conversaId || !user) return;
 
     try {
-      await supabase.rpc('atualizar_status_digitando', {
-        p_conversa_id: conversaId,
-        p_usuario_id: user.id,
-        p_digitando: digitando
-      });
+      await supabase
+        .channel(`conversa:${conversaId}`)
+        .send({
+          type: 'broadcast',
+          event: 'typing',
+          payload: {
+            usuario_id: user.id,
+            usuario_nome: user.user_metadata?.nome || user.email,
+            digitando
+          }
+        });
     } catch (err) {
       setError(err instanceof Error ? err : new Error('Erro ao atualizar status de digitação'));
       throw err;
@@ -141,6 +160,7 @@ export function useChat({ conversaId }: UseChatOptions): UseChatResult {
     mensagens,
     loading,
     error,
+    usuarioDigitando,
     enviarMensagem,
     marcarComoLida,
     indicarDigitando
