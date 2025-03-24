@@ -1,95 +1,143 @@
-# Configuração do Banco de Dados
+# Configuração do Banco de Dados - Edunéxia
 
-## Pré-requisitos
+Este documento descreve o processo de configuração do banco de dados para a plataforma Edunéxia, incluindo a estrutura de tabelas, políticas de segurança e instruções de instalação.
 
-1. Ter o Supabase CLI instalado:
-```bash
-scoop bucket add supabase https://github.com/supabase/scoop-bucket.git
-scoop install supabase
-```
+## 🗄️ Estrutura do Banco de Dados
 
-2. Ter acesso ao projeto Supabase:
-   - URL: https://npiyusbnaaibibcucspv.supabase.co
-   - Senha do banco: Zayn@2025
+O banco de dados é gerenciado pelo Supabase e inclui as seguintes tabelas:
 
-## Configuração do Ambiente
+### Tabelas Principais
+
+1. `institutions`
+   - Armazena informações das instituições de ensino
+   - Campos: id, name, domain, logo_url, settings, created_at, updated_at
+
+2. `profiles`
+   - Perfis de usuário vinculados às contas de autenticação
+   - Campos: id, email, full_name, avatar_url, role, institution_id, created_at, updated_at
+
+3. `user_sessions`
+   - Gerencia sessões ativas dos usuários
+   - Campos: id, user_id, provider, ip_address, user_agent, created_at, expires_at
+
+4. `password_resets`
+   - Controla solicitações de redefinição de senha
+   - Campos: id, user_id, token, created_at, expires_at, used
+
+5. `email_verifications`
+   - Gerencia verificações de email
+   - Campos: id, user_id, token, created_at, expires_at, verified_at
+
+### Tipos Enumerados
+
+1. `user_role`
+   - super_admin
+   - admin_instituicao
+   - consultor_comercial
+   - tutor
+   - aluno
+
+2. `auth_provider`
+   - email
+   - google
+   - facebook
+   - microsoft
+   - apple
+
+## 🔒 Políticas de Segurança (RLS)
+
+Todas as tabelas têm Row Level Security (RLS) habilitada com as seguintes políticas:
+
+### Institutions
+- SELECT: Visível para usuários autenticados
+- INSERT/UPDATE: Apenas super_admin
+
+### Profiles
+- SELECT/UPDATE: Usuários podem ver/editar apenas seu próprio perfil
+
+### User Sessions
+- SELECT/DELETE: Usuários podem ver/deletar apenas suas próprias sessões
+
+### Password Resets & Email Verifications
+- SELECT: Usuários podem ver apenas seus próprios registros
+
+## 🔄 Triggers e Funções
+
+- `handle_new_user()`: Cria automaticamente um perfil quando um novo usuário é registrado
+- Trigger `on_auth_user_created`: Executa após INSERT em auth.users
+
+## 📑 Índices
+
+- `idx_profiles_institution_id`
+- `idx_user_sessions_user_id`
+- `idx_password_resets_user_id`
+- `idx_email_verifications_user_id`
+
+## 🚀 Instalação e Configuração
+
+### Pré-requisitos
+
+1. Supabase CLI instalado
+2. Projeto Supabase criado
+3. Variáveis de ambiente configuradas
+
+### Passos para Configuração
 
 1. Clone o repositório:
-```bash
-git clone https://github.com/eduzayn/menorepo.git
-cd menorepo
-```
+   ```bash
+   git clone https://github.com/eduzayn/menorepo.git
+   cd menorepo
+   ```
 
 2. Configure as variáveis de ambiente:
-```bash
-# Windows (PowerShell)
-$env:SUPABASE_DB_PASSWORD="Zayn@2025"
+   ```bash
+   $env:SUPABASE_DB_PASSWORD="sua_senha"
+   ```
 
-# Linux/MacOS
-export SUPABASE_DB_PASSWORD="Zayn@2025"
-```
+3. Vincule ao projeto Supabase:
+   ```bash
+   supabase link --project-ref seu-project-ref
+   ```
 
-3. Vincule o projeto local ao Supabase:
-```bash
-supabase link --project-ref npiyusbnaaibibcucspv
-```
+4. Aplique as migrações:
+   ```bash
+   supabase db push
+   ```
 
-## Aplicando Migrações
+### Usando o Pacote Database Schema
 
-Para aplicar as migrações do banco de dados:
+1. Instale o pacote nos módulos que precisam dele:
+   ```json
+   {
+     "dependencies": {
+       "@edunexia/database-schema": "workspace:*"
+     }
+   }
+   ```
 
-```bash
-supabase db push
-```
+2. Importe os tipos e enums:
+   ```typescript
+   import { UserRole, AuthProvider, Profile } from '@edunexia/database-schema';
+   ```
 
-Se você receber um erro de autenticação, certifique-se de que:
-1. A variável de ambiente `SUPABASE_DB_PASSWORD` está configurada corretamente
-2. Você está usando a senha correta do banco de dados
-3. Você tem permissões de acesso ao projeto no Supabase
+## 🔍 Monitoramento e Manutenção
 
-## Solução de Problemas
+- Use o Supabase Dashboard para monitorar:
+  - Uso do banco de dados
+  - Performance das queries
+  - Logs de autenticação
+  - Políticas de segurança
 
-### Erro de Autenticação
-Se você receber um erro de autenticação, tente:
+## 🤝 Contribuindo
 
-1. Verificar se a senha está correta:
-```bash
-echo $SUPABASE_DB_PASSWORD  # Linux/MacOS
-echo $env:SUPABASE_DB_PASSWORD  # Windows
-```
+1. Crie uma nova branch para sua feature
+2. Adicione migrações em `supabase/migrations`
+3. Atualize os tipos em `packages/database-schema`
+4. Teste localmente com `supabase db push`
+5. Abra um Pull Request
 
-2. Reconfigurar a variável de ambiente:
-```bash
-# Windows (PowerShell)
-$env:SUPABASE_DB_PASSWORD="Zayn@2025"
+## 📚 Recursos Adicionais
 
-# Linux/MacOS
-export SUPABASE_DB_PASSWORD="Zayn@2025"
-```
-
-3. Tentar novamente com a senha explícita:
-```bash
-$env:SUPABASE_DB_PASSWORD="Zayn@2025"; supabase db push
-```
-
-### Erro de Conexão
-Se você receber um erro de conexão:
-
-1. Verifique se você está conectado à internet
-2. Verifique se o projeto Supabase está online
-3. Tente usar o comando com a flag de debug:
-```bash
-supabase db push --debug
-```
-
-## Estrutura do Banco de Dados
-
-O banco de dados está configurado com as seguintes tabelas:
-
-1. `profiles` - Perfis de usuários
-2. `institutions` - Instituições parceiras
-3. `user_sessions` - Sessões de usuários
-4. `password_resets` - Reset de senhas
-5. `email_verifications` - Verificação de email
-
-Para mais detalhes sobre a estrutura do banco de dados, consulte o arquivo [database-structure.md](./database-structure.md). 
+- [Documentação do Supabase](https://supabase.com/docs)
+- [Guia de Row Level Security](https://supabase.com/docs/guides/auth/row-level-security)
+- [Referência de Políticas](https://supabase.com/docs/guides/auth/row-level-security/policies) 

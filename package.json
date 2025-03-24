@@ -1,23 +1,16 @@
 {
-  "name": "edunexia-monorepo",
+  "name": "@edunexia/monorepo",
   "private": true,
   "workspaces": [
     "apps/*",
     "packages/*"
   ],
   "scripts": {
-    "build": "yarn workspaces run build",
-    "dev": "yarn workspaces run dev",
-    "lint": "yarn workspaces run lint",
-    "test": "yarn workspaces run test"
+    "dev": "yarn workspace @edunexia/comunicacao dev",
+    "build": "yarn workspace @edunexia/comunicacao build",
+    "lint": "yarn workspace @edunexia/comunicacao lint"
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^6.0.0",
-    "@typescript-eslint/parser": "^6.0.0",
-    "eslint": "^8.0.0",
-    "eslint-config-prettier": "^9.0.0",
-    "eslint-plugin-react": "^7.0.0",
-    "prettier": "^3.0.0",
-    "typescript": "^5.0.0"
+    "typescript": "^5.2.2"
   }
 }

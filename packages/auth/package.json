@@ -1,0 +1,13 @@
+{
+  "name": "@edunexia/auth",
+  "version": "0.0.1",
+  "private": true,
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.7"
+  },
+  "devDependencies": {
+    "typescript": "^5.2.2"
+  }
+} 

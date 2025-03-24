@@ -1,27 +1,28 @@
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import MainLayout from './components/layout/MainLayout';
+
+// Pages
+import ConversasPage from './pages/ConversasPage';
+import LeadsPage from './pages/LeadsPage';
+import CampanhasPage from './pages/CampanhasPage';
+import RespostasRapidasPage from './pages/RespostasRapidasPage';
+import ConfiguracoesPage from './pages/ConfiguracoesPage';
+
 function App() {
   return (
-    <div className="min-h-screen bg-gray-100">
-      <header className="bg-white shadow">
-        <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-          <h1 className="text-3xl font-bold text-gray-900">
-            Módulo de Comunicação
-          </h1>
-        </div>
-      </header>
-      <main>
-        <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-          {/* Conteúdo principal será adicionado aqui */}
-          <div className="px-4 py-6 sm:px-0">
-            <div className="border-4 border-dashed border-gray-200 rounded-lg h-96 flex items-center justify-center">
-              <p className="text-gray-500 text-xl">
-                Conteúdo em desenvolvimento
-              </p>
-            </div>
-          </div>
-        </div>
-      </main>
-    </div>
-  )
+    <Router>
+      <MainLayout>
+        <Routes>
+          <Route path="/" element={<Navigate to="/conversas" replace />} />
+          <Route path="/conversas" element={<ConversasPage />} />
+          <Route path="/leads" element={<LeadsPage />} />
+          <Route path="/campanhas" element={<CampanhasPage />} />
+          <Route path="/respostas-rapidas" element={<RespostasRapidasPage />} />
+          <Route path="/configuracoes" element={<ConfiguracoesPage />} />
+        </Routes>
+      </MainLayout>
+    </Router>
+  );
 }
 
-export default App 
+export default App; 
