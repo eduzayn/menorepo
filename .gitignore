@@ -50,4 +50,9 @@ next-env.d.ts
 
 # Build outputs
 apps/*/dist
-packages/*/dist 
+packages/*/dist
+
+# Environment variables
+.env
+.env.local
+.env.*.local 
