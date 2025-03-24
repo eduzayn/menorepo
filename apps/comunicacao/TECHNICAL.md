@@ -218,5 +218,4 @@ Cada rota conterá um painel com:
 
 ---
 
-Este módulo será um dos pilares da experiência do aluno e da força de vendas da instituição. Com ele, garantimos uma comunicação centralizada, inteligente e automatizada entre todos os envolvidos no ecossistema EAD da Edunéxia.
-
+Este módulo será um dos pilares da experiência do aluno e da força de vendas da instituição. Com ele, garantimos uma comunicação centralizada, inteligente e automatizada entre todos os envolvidos no ecossistema EAD da Edunéxia. 

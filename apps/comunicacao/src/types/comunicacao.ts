@@ -11,6 +11,7 @@ export interface Participante {
   id: string;
   nome: string;
   email: string;
+  tipo: 'USUARIO' | 'LEAD' | 'ALUNO';
   avatar_url?: string;
   online: boolean;
   ultimo_acesso?: string;
@@ -22,11 +23,13 @@ export interface Conversa {
   titulo: string;
   status: ComunicacaoStatus;
   canal: ComunicacaoCanal;
+  participante_id: string;
+  participante_tipo: 'LEAD' | 'ALUNO';
+  digitando?: string;
   participantes: Participante[];
   ultima_mensagem?: string;
   ultima_mensagem_at?: string;
   nao_lidas: number;
-  digitando?: string;
   criado_at: string;
   atualizado_at: string;
   usuario_id: string;
@@ -115,4 +118,44 @@ export interface InsertGrupoParticipante extends Omit<GrupoParticipante, 'id' | 
 export interface UpdateGrupoParticipante extends Partial<InsertGrupoParticipante> {}
 
 export interface InsertNotificacaoConfig extends Omit<NotificacaoConfig, 'id' | 'criado_at' | 'atualizado_at'> {}
-export interface UpdateNotificacaoConfig extends Partial<InsertNotificacaoConfig> {} 
+export interface UpdateNotificacaoConfig extends Partial<InsertNotificacaoConfig> {}
+
+export interface Lead {
+  id: string;
+  nome: string;
+  email: string;
+  telefone: string;
+  status: 'NOVO' | 'QUALIFICADO' | 'CONTATO' | 'NEGOCIACAO' | 'FECHADO';
+  ultima_interacao: string;
+  engajamento: number;
+  canal_origem: string;
+  observacoes?: string;
+  criado_at: string;
+  atualizado_at: string;
+}
+
+export interface Aluno {
+  id: string;
+  nome: string;
+  email: string;
+  telefone: string;
+  matricula: string;
+  curso: string;
+  status: 'ATIVO' | 'INATIVO' | 'TRANCADO';
+  ultima_interacao: string;
+  engajamento: number;
+  observacoes?: string;
+  criado_at: string;
+  atualizado_at: string;
+}
+
+export interface Interacao {
+  id: string;
+  tipo: 'MENSAGEM' | 'CHAMADA' | 'EMAIL' | 'VISITA' | 'MATRICULA';
+  data: string;
+  descricao: string;
+  participante_id: string;
+  participante_tipo: 'LEAD' | 'ALUNO';
+  usuario_id: string;
+  criado_at: string;
+} 
