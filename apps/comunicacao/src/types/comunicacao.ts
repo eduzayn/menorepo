@@ -1,10 +1,12 @@
-import type { Database } from '@edunexia/database-schema';
-
+// Tipos base
 export type ComunicacaoStatus = 'ATIVO' | 'ARQUIVADO' | 'FINALIZADO';
-export type ComunicacaoCanal = 'CHAT' | 'EMAIL' | 'SMS' | 'WHATSAPP';
+export type ComunicacaoCanal = 'CHAT' | 'EMAIL' | 'SMS' | 'WHATSAPP' | 'PUSH';
 export type ComunicacaoTipoMensagem = 'TEXTO' | 'IMAGEM' | 'ARQUIVO' | 'VIDEO' | 'AUDIO' | 'LOCALIZACAO';
 export type ComunicacaoTipoCampanha = 'marketing' | 'notificacao' | 'lembrete' | 'pesquisa';
+export type GrupoRole = 'admin' | 'moderador' | 'membro';
+export type TipoNotificacao = 'mensagem' | 'campanha' | 'sistema' | 'lembrete';
 
+// Interfaces base
 export interface Participante {
   id: string;
   nome: string;
@@ -14,6 +16,7 @@ export interface Participante {
   ultimo_acesso?: string;
 }
 
+// Interfaces de comunicação
 export interface Conversa {
   id: string;
   titulo: string;
@@ -34,7 +37,7 @@ export interface Mensagem {
   conversa_id: string;
   remetente_id: string;
   conteudo: string;
-  tipo: 'TEXTO' | 'IMAGEM' | 'ARQUIVO' | 'VIDEO' | 'AUDIO' | 'LOCALIZACAO';
+  tipo: ComunicacaoTipoMensagem;
   metadata?: Record<string, any>;
   lida: boolean;
   criado_at: string;
@@ -73,14 +76,43 @@ export interface RespostaRapida {
   atualizado_at: string;
 }
 
-export type InsertConversa = Database['public']['Tables']['conversas']['Insert'];
-export type InsertMensagem = Database['public']['Tables']['mensagens']['Insert'];
-export type InsertCampanha = Database['public']['Tables']['campanhas']['Insert'];
-export type InsertCampanhaDestinatario = Database['public']['Tables']['campanha_destinatarios']['Insert'];
-export type InsertRespostaRapida = Database['public']['Tables']['respostas_rapidas']['Insert'];
+// Interfaces de grupos e notificações
+export interface Grupo {
+  id: string;
+  nome: string;
+  descricao?: string;
+  criado_por: string;
+  criado_at: string;
+  atualizado_at: string;
+}
 
-export type UpdateConversa = Database['public']['Tables']['conversas']['Update'];
-export type UpdateMensagem = Database['public']['Tables']['mensagens']['Update'];
-export type UpdateCampanha = Database['public']['Tables']['campanhas']['Update'];
-export type UpdateCampanhaDestinatario = Database['public']['Tables']['campanha_destinatarios']['Update'];
-export type UpdateRespostaRapida = Database['public']['Tables']['respostas_rapidas']['Update']; 
+export interface GrupoParticipante {
+  id: string;
+  grupo_id: string;
+  usuario_id: string;
+  role: GrupoRole;
+  criado_at: string;
+}
+
+export interface NotificacaoConfig {
+  id: string;
+  usuario_id: string;
+  tipo_notificacao: TipoNotificacao;
+  canal: ComunicacaoCanal;
+  ativo: boolean;
+  horario_inicio?: string;
+  horario_fim?: string;
+  dias_semana?: number[];
+  criado_at: string;
+  atualizado_at: string;
+}
+
+// Tipos para inserção e atualização
+export interface InsertGrupo extends Omit<Grupo, 'id' | 'criado_at' | 'atualizado_at'> {}
+export interface UpdateGrupo extends Partial<InsertGrupo> {}
+
+export interface InsertGrupoParticipante extends Omit<GrupoParticipante, 'id' | 'criado_at'> {}
+export interface UpdateGrupoParticipante extends Partial<InsertGrupoParticipante> {}
+
+export interface InsertNotificacaoConfig extends Omit<NotificacaoConfig, 'id' | 'criado_at' | 'atualizado_at'> {}
+export interface UpdateNotificacaoConfig extends Partial<InsertNotificacaoConfig> {} 

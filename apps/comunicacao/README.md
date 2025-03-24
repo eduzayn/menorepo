@@ -1,56 +1,108 @@
-# Módulo de Comunicação - Edunexia
+# Edunexia - Módulo de Comunicação
 
-Este é o módulo de comunicação do sistema Edunexia, responsável por gerenciar a comunicação entre alunos, professores e administradores.
+Este é o módulo de comunicação do sistema Edunexia, responsável por gerenciar conversas, grupos, notificações e outras funcionalidades relacionadas à comunicação.
+
+## Funcionalidades
+
+- Autenticação de usuários
+- Gerenciamento de grupos
+- Configuração de notificações
+- Conversas em tempo real
+- Respostas rápidas
+- Campanhas de comunicação
+- Gestão de leads
 
 ## Tecnologias Utilizadas
 
 - React
 - TypeScript
-- Vite
+- Ant Design
 - Tailwind CSS
+- Supabase
+- React Router
+- Jest
+- Testing Library
 
-## Configuração do Ambiente de Desenvolvimento
+## Pré-requisitos
 
-1. Instale as dependências:
+- Node.js 16.x ou superior
+- npm ou yarn
+- Conta no Supabase
+
+## Configuração
+
+1. Clone o repositório
+2. Instale as dependências:
+   ```bash
+   npm install
+   # ou
+   yarn install
+   ```
+3. Copie o arquivo `.env.example` para `.env` e configure as variáveis de ambiente:
+   ```bash
+   cp .env.example .env
+   ```
+4. Configure as variáveis de ambiente no arquivo `.env`:
+   ```
+   REACT_APP_SUPABASE_URL=your_supabase_url
+   REACT_APP_SUPABASE_ANON_KEY=your_supabase_anon_key
+   ```
+
+## Desenvolvimento
+
+Para iniciar o servidor de desenvolvimento:
+
 ```bash
-npm install
+npm start
+# ou
+yarn start
 ```
 
-2. Inicie o servidor de desenvolvimento:
+## Testes
+
+Para executar os testes:
+
 ```bash
-npm run dev
+npm test
+# ou
+yarn test
 ```
 
-3. Acesse o aplicativo em `http://localhost:5173`
+## Build
 
-## Scripts Disponíveis
+Para criar uma build de produção:
 
-- `npm run dev`: Inicia o servidor de desenvolvimento
-- `npm run build`: Compila o projeto para produção
-- `npm run lint`: Executa a verificação de linting
-- `npm run preview`: Visualiza a versão de produção localmente
+```bash
+npm run build
+# ou
+yarn build
+```
 
 ## Estrutura do Projeto
 
 ```
 src/
-  ├── components/     # Componentes React reutilizáveis
+  ├── components/     # Componentes reutilizáveis
+  ├── hooks/         # Hooks personalizados
   ├── pages/         # Páginas da aplicação
-  ├── services/      # Serviços e integrações
-  ├── styles/        # Estilos e configurações do Tailwind
-  ├── types/         # Definições de tipos TypeScript
+  ├── services/      # Serviços e APIs
+  ├── types/         # Definições de tipos
   ├── utils/         # Funções utilitárias
-  ├── App.tsx        # Componente principal
-  └── main.tsx       # Ponto de entrada da aplicação
+  ├── routes.tsx     # Configuração de rotas
+  └── index.tsx      # Ponto de entrada
 ```
 
 ## Contribuição
 
-1. Faça o fork do projeto
-2. Crie uma branch para sua feature (`git checkout -b feature/nova-feature`)
-3. Faça commit das suas alterações (`git commit -m 'Adiciona nova feature'`)
-4. Faça push para a branch (`git push origin feature/nova-feature`)
+1. Faça um fork do projeto
+2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
+3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
+4. Push para a branch (`git push origin feature/AmazingFeature`)
 5. Abra um Pull Request
+
+## Licença
+
+Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
 
 # README TÉCNICO - Módulo de Comunicação da Plataforma Edunéxia
 

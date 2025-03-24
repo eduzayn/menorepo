@@ -1,4 +1,5 @@
 import { UserRole, AuthProvider } from './enums';
+import type { Database } from './generated-types';
 
 export interface Profile {
     id: string;
@@ -108,6 +109,35 @@ export interface RespostaRapida {
     criado_at: string;
     atualizado_at: string;
 }
+
+// Tipos base
+export type Tables<T extends keyof Database['public']['Tables']> = Database['public']['Tables'][T]['Row'];
+export type Enums<T extends keyof Database['public']['Enums']> = Database['public']['Enums'][T];
+
+// Tipos de autenticação e perfil
+export type DbUser = Tables<'users'>;
+export type DbProfile = Tables<'profiles'>;
+export type DbInstitution = Tables<'institutions'>;
+
+// Tipos de comunicação
+export type DbConversa = Tables<'conversas'>;
+export type DbMensagem = Tables<'mensagens'>;
+export type DbCampanha = Tables<'campanhas'>;
+export type DbCampanhaDestinatario = Tables<'campanha_destinatarios'>;
+export type DbRespostaRapida = Tables<'respostas_rapidas'>;
+
+// Tipos de grupos e notificações
+export type DbGrupo = Tables<'grupos'>;
+export type DbGrupoParticipante = Tables<'grupo_participantes'>;
+export type DbNotificacaoConfig = Tables<'notificacoes_config'>;
+
+// Enums
+export type ComunicacaoStatus = Enums<'comunicacao_status'>;
+export type ComunicacaoCanal = Enums<'comunicacao_canal'>;
+export type ComunicacaoTipoMensagem = Enums<'comunicacao_tipo_mensagem'>;
+export type ComunicacaoTipoCampanha = Enums<'comunicacao_tipo_campanha'>;
+export type GrupoRole = Enums<'grupo_role'>;
+export type TipoNotificacao = Enums<'tipo_notificacao'>;
 
 export interface Database {
     public: {

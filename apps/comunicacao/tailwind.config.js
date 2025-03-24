@@ -1,29 +1,24 @@
 /** @type {import('tailwindcss').Config} */
-export default {
+module.exports = {
   content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
+    "./src/**/*.{js,jsx,ts,tsx}",
   ],
   theme: {
     extend: {
       colors: {
         primary: {
-          light: '#E6F0FF', // azul claro
-          DEFAULT: '#3B82F6', // azul principal
-          dark: '#1E40AF', // azul escuro
-        },
-        accent: {
-          mint: '#86EFAC', // verde menta
-          lavender: '#E9D5FF', // lilás claro
+          light: '#E6F4FF',
+          DEFAULT: '#1890FF',
+          dark: '#0960D0',
         },
         neutral: {
-          lightest: '#FFFFFF',
-          light: '#F8FAFC',
-          DEFAULT: '#F1F5F9',
-          dark: '#64748B',
-        }
-      }
-    }
+          lightest: '#F5F5F5',
+          light: '#E8E8E8',
+          DEFAULT: '#8C8C8C',
+          dark: '#262626',
+        },
+      },
+    },
   },
   plugins: [],
 } 

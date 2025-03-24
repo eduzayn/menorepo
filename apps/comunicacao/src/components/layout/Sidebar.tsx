@@ -1,11 +1,15 @@
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   ChatBubbleLeftIcon,
   UserGroupIcon,
   MegaphoneIcon,
   DocumentTextIcon,
-  Cog6ToothIcon
+  Cog6ToothIcon,
+  UsersIcon,
+  BellIcon,
+  ArrowLeftOnRectangleIcon,
 } from '@heroicons/react/24/outline';
+import { useAuth } from '../../hooks/useAuth';
 
 interface NavItem {
   name: string;
@@ -15,14 +19,27 @@ interface NavItem {
 
 const navigation: NavItem[] = [
   { name: 'Conversas', path: '/conversas', icon: ChatBubbleLeftIcon },
+  { name: 'Grupos', path: '/grupos', icon: UsersIcon },
   { name: 'Leads', path: '/leads', icon: UserGroupIcon },
   { name: 'Campanhas', path: '/campanhas', icon: MegaphoneIcon },
   { name: 'Respostas Rápidas', path: '/respostas-rapidas', icon: DocumentTextIcon },
+  { name: 'Notificações', path: '/notificacoes', icon: BellIcon },
   { name: 'Configurações', path: '/configuracoes', icon: Cog6ToothIcon },
 ];
 
 export default function Sidebar() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, signOut } = useAuth();
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      navigate('/login');
+    } catch (error) {
+      console.error('Erro ao fazer logout:', error);
+    }
+  };
 
   return (
     <div className="flex flex-col h-full bg-neutral-lightest">
@@ -76,14 +93,22 @@ export default function Sidebar() {
         <div className="flex-shrink-0">
           <img
             className="h-8 w-8 rounded-full"
-            src="https://ui-avatars.com/api/?name=User"
-            alt="User"
+            src={user?.user_metadata?.avatar_url || `https://ui-avatars.com/api/?name=${user?.email}`}
+            alt={user?.email}
           />
         </div>
-        <div className="ml-3">
-          <p className="text-sm font-medium text-gray-900">Usuário</p>
-          <p className="text-xs text-neutral-dark">Online</p>
+        <div className="ml-3 flex-1">
+          <p className="text-sm font-medium text-gray-900">{user?.email}</p>
+          <p className="text-xs text-neutral-dark">
+            {user?.user_metadata?.role || 'Usuário'}
+          </p>
         </div>
+        <button
+          onClick={handleSignOut}
+          className="ml-2 p-1 rounded-full hover:bg-neutral-lightest transition-colors"
+        >
+          <ArrowLeftOnRectangleIcon className="h-5 w-5 text-neutral-dark" />
+        </button>
       </div>
     </div>
   );
