@@ -7,10 +7,18 @@
   ],
   "scripts": {
     "dev": "yarn workspace @edunexia/comunicacao dev",
-    "build": "yarn workspace @edunexia/comunicacao build",
-    "lint": "yarn workspace @edunexia/comunicacao lint"
+    "build": "yarn workspaces foreach -pi run build",
+    "lint": "yarn workspaces foreach -pi run lint",
+    "clean": "yarn workspaces foreach -pi run clean"
   },
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^6.14.0",
+    "@typescript-eslint/parser": "^6.14.0",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.0",
+    "date-fns": "^3.3.1",
+    "eslint": "^8.55.0",
+    "tailwind-merge": "^2.2.1",
     "typescript": "^5.2.2"
   }
 }

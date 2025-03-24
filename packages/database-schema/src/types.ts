@@ -49,6 +49,66 @@ export interface EmailVerification {
     verified_at: string | null;
 }
 
+export interface Conversa {
+    id: string;
+    titulo: string;
+    status: 'ativo' | 'inativo' | 'pendente' | 'arquivado';
+    canal: 'whatsapp' | 'email' | 'chat' | 'sms';
+    remetente_id: string;
+    destinatario_id?: string;
+    lead_id?: string;
+    ultima_mensagem_at?: string;
+    criado_at: string;
+    atualizado_at: string;
+}
+
+export interface Mensagem {
+    id: string;
+    conversa_id: string;
+    remetente_id: string;
+    tipo: 'texto' | 'imagem' | 'arquivo' | 'video' | 'audio' | 'localizacao';
+    conteudo: string;
+    metadata?: Record<string, any>;
+    lida_at?: string;
+    criado_at: string;
+}
+
+export interface Campanha {
+    id: string;
+    nome: string;
+    descricao?: string;
+    tipo: 'marketing' | 'notificacao' | 'lembrete' | 'pesquisa';
+    conteudo: string;
+    metadata?: Record<string, any>;
+    status: string;
+    data_inicio?: string;
+    data_fim?: string;
+    criado_por: string;
+    criado_at: string;
+    atualizado_at: string;
+}
+
+export interface CampanhaDestinatario {
+    id: string;
+    campanha_id: string;
+    destinatario_id: string;
+    status: string;
+    enviado_at?: string;
+    lido_at?: string;
+    respondido_at?: string;
+    criado_at: string;
+}
+
+export interface RespostaRapida {
+    id: string;
+    titulo: string;
+    conteudo: string;
+    categoria?: string;
+    criado_por: string;
+    criado_at: string;
+    atualizado_at: string;
+}
+
 export interface Database {
     public: {
         Tables: {
@@ -76,6 +136,31 @@ export interface Database {
                 Row: EmailVerification;
                 Insert: Omit<EmailVerification, 'id' | 'created_at'>;
                 Update: Partial<Omit<EmailVerification, 'id' | 'created_at'>>;
+            };
+            conversas: {
+                Row: Conversa;
+                Insert: Omit<Conversa, 'id' | 'criado_at' | 'atualizado_at'>;
+                Update: Partial<Omit<Conversa, 'id' | 'criado_at' | 'atualizado_at'>>;
+            };
+            mensagens: {
+                Row: Mensagem;
+                Insert: Omit<Mensagem, 'id' | 'criado_at'>;
+                Update: Partial<Omit<Mensagem, 'id' | 'criado_at'>>;
+            };
+            campanhas: {
+                Row: Campanha;
+                Insert: Omit<Campanha, 'id' | 'criado_at' | 'atualizado_at'>;
+                Update: Partial<Omit<Campanha, 'id' | 'criado_at' | 'atualizado_at'>>;
+            };
+            campanha_destinatarios: {
+                Row: CampanhaDestinatario;
+                Insert: Omit<CampanhaDestinatario, 'id' | 'criado_at'>;
+                Update: Partial<Omit<CampanhaDestinatario, 'id' | 'criado_at'>>;
+            };
+            respostas_rapidas: {
+                Row: RespostaRapida;
+                Insert: Omit<RespostaRapida, 'id' | 'criado_at' | 'atualizado_at'>;
+                Update: Partial<Omit<RespostaRapida, 'id' | 'criado_at' | 'atualizado_at'>>;
             };
         };
         Views: {

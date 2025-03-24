@@ -23,7 +23,10 @@
     /* Path Aliases */
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["./src/*"],
+      "@edunexia/auth": ["../../packages/auth/src"],
+      "@edunexia/database-schema": ["../../packages/database-schema/src"],
+      "@edunexia/ui-components": ["../../packages/ui-components/src"]
     }
   },
   "include": ["src"],

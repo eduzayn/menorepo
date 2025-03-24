@@ -1,64 +1,24 @@
+import type { Database } from '@edunexia/database-schema';
+
 export type ComunicacaoStatus = 'ativo' | 'inativo' | 'pendente' | 'arquivado';
 export type ComunicacaoCanal = 'whatsapp' | 'email' | 'chat' | 'sms';
 export type ComunicacaoTipoMensagem = 'texto' | 'imagem' | 'arquivo' | 'video' | 'audio' | 'localizacao';
 export type ComunicacaoTipoCampanha = 'marketing' | 'notificacao' | 'lembrete' | 'pesquisa';
 
-export interface Conversa {
-  id: string;
-  titulo: string;
-  status: ComunicacaoStatus;
-  canal: ComunicacaoCanal;
-  remetente_id: string;
-  destinatario_id?: string;
-  lead_id?: string;
-  ultima_mensagem_at?: string;
-  criado_at: string;
-  atualizado_at: string;
-}
+export type Conversa = Database['public']['Tables']['conversas']['Row'];
+export type Mensagem = Database['public']['Tables']['mensagens']['Row'];
+export type Campanha = Database['public']['Tables']['campanhas']['Row'];
+export type CampanhaDestinatario = Database['public']['Tables']['campanha_destinatarios']['Row'];
+export type RespostaRapida = Database['public']['Tables']['respostas_rapidas']['Row'];
 
-export interface Mensagem {
-  id: string;
-  conversa_id: string;
-  remetente_id: string;
-  tipo: ComunicacaoTipoMensagem;
-  conteudo: string;
-  metadata?: Record<string, any>;
-  lida_at?: string;
-  criado_at: string;
-}
+export type InsertConversa = Database['public']['Tables']['conversas']['Insert'];
+export type InsertMensagem = Database['public']['Tables']['mensagens']['Insert'];
+export type InsertCampanha = Database['public']['Tables']['campanhas']['Insert'];
+export type InsertCampanhaDestinatario = Database['public']['Tables']['campanha_destinatarios']['Insert'];
+export type InsertRespostaRapida = Database['public']['Tables']['respostas_rapidas']['Insert'];
 
-export interface Campanha {
-  id: string;
-  nome: string;
-  descricao?: string;
-  tipo: ComunicacaoTipoCampanha;
-  conteudo: string;
-  metadata?: Record<string, any>;
-  status: string;
-  data_inicio?: string;
-  data_fim?: string;
-  criado_por: string;
-  criado_at: string;
-  atualizado_at: string;
-}
-
-export interface CampanhaDestinatario {
-  id: string;
-  campanha_id: string;
-  destinatario_id: string;
-  status: string;
-  enviado_at?: string;
-  lido_at?: string;
-  respondido_at?: string;
-  criado_at: string;
-}
-
-export interface RespostaRapida {
-  id: string;
-  titulo: string;
-  conteudo: string;
-  categoria?: string;
-  criado_por: string;
-  criado_at: string;
-  atualizado_at: string;
-} 
+export type UpdateConversa = Database['public']['Tables']['conversas']['Update'];
+export type UpdateMensagem = Database['public']['Tables']['mensagens']['Update'];
+export type UpdateCampanha = Database['public']['Tables']['campanhas']['Update'];
+export type UpdateCampanhaDestinatario = Database['public']['Tables']['campanha_destinatarios']['Update'];
+export type UpdateRespostaRapida = Database['public']['Tables']['respostas_rapidas']['Update']; 

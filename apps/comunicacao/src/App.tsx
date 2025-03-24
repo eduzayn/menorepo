@@ -1,28 +1,9 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import MainLayout from './components/layout/MainLayout';
+import { AppRoutes } from './routes';
 
-// Pages
-import ConversasPage from './pages/ConversasPage';
-import LeadsPage from './pages/LeadsPage';
-import CampanhasPage from './pages/CampanhasPage';
-import RespostasRapidasPage from './pages/RespostasRapidasPage';
-import ConfiguracoesPage from './pages/ConfiguracoesPage';
-
-function App() {
+export default function App() {
   return (
-    <Router>
-      <MainLayout>
-        <Routes>
-          <Route path="/" element={<Navigate to="/conversas" replace />} />
-          <Route path="/conversas" element={<ConversasPage />} />
-          <Route path="/leads" element={<LeadsPage />} />
-          <Route path="/campanhas" element={<CampanhasPage />} />
-          <Route path="/respostas-rapidas" element={<RespostasRapidasPage />} />
-          <Route path="/configuracoes" element={<ConfiguracoesPage />} />
-        </Routes>
-      </MainLayout>
-    </Router>
+    <div className="min-h-screen bg-gray-50">
+      <AppRoutes />
+    </div>
   );
-}
-
-export default App; 
+} 
