@@ -1,52 +1,32 @@
-import { useState, useEffect } from 'react'
+import { useParams, useNavigate } from 'react-router-dom'
 import { Button } from '@edunexia/ui-components'
-import { Matricula, MatriculaDetailsProps } from '../types/matricula'
+import { useState, useEffect } from 'react'
+import { Matricula } from '../types/matricula'
 import { matriculaService } from '../services/matriculaService'
 
-export function MatriculaDetails({ matriculaId, onClose }: MatriculaDetailsProps) {
+export function MatriculaDetails() {
+  const { id } = useParams()
+  const navigate = useNavigate()
   const [matricula, setMatricula] = useState<Matricula | null>(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    // TODO: Implementar integração com Supabase
-    const fetchMatriculaDetails = async () => {
+    const fetchMatricula = async () => {
       try {
-        // Simulação de dados
-        const mockData: Matricula = {
-          id: matriculaId,
-          nome: 'João Silva',
-          cpf: '123.456.789-00',
-          dataNascimento: '1990-01-01',
-          email: 'joao.silva@email.com',
-          telefone: '(11) 99999-9999',
-          endereco: 'Rua das Flores, 123 - São Paulo, SP',
-          curso: 'Informática',
-          periodo: 'Manhã',
-          status: 'ativa',
-          dataMatricula: '2024-03-20',
-          observacoes: 'Aluno com necessidades especiais'
-        }
-        setMatricula(mockData)
-      } catch (error) {
-        console.error('Erro ao buscar detalhes da matrícula:', error)
+        if (!id) return
+        const data = await matriculaService.buscarMatricula(id)
+        setMatricula(data)
+      } catch (err) {
+        setError('Erro ao carregar os detalhes da matrícula')
+        console.error('Erro:', err)
       } finally {
         setLoading(false)
       }
     }
 
-    fetchMatriculaDetails()
-  }, [matriculaId])
-
-  const handleCancelarMatricula = async () => {
-    if (!matricula) return
-
-    try {
-      await matriculaService.cancelarMatricula(matricula.id)
-      setMatricula({ ...matricula, status: 'cancelada' })
-    } catch (err) {
-      console.error('Erro ao cancelar matrícula:', err)
-    }
-  }
+    fetchMatricula()
+  }, [id])
 
   if (loading) {
     return (
@@ -56,10 +36,21 @@ export function MatriculaDetails({ matriculaId, onClose }: MatriculaDetailsProps
     )
   }
 
+  if (error) {
+    return (
+      <div className="bg-red-50 text-red-700 p-4 rounded-md">
+        {error}
+      </div>
+    )
+  }
+
   if (!matricula) {
     return (
-      <div className="text-center py-4">
-        <p className="text-gray-500">Matrícula não encontrada</p>
+      <div className="text-center py-8">
+        <p className="text-gray-600">Matrícula não encontrada</p>
+        <Button onClick={() => navigate('/matriculas')} variant="secondary" className="mt-4">
+          Voltar para lista
+        </Button>
       </div>
     )
   }
@@ -68,102 +59,50 @@ export function MatriculaDetails({ matriculaId, onClose }: MatriculaDetailsProps
     <div className="bg-white shadow rounded-lg p-6">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold text-gray-900">Detalhes da Matrícula</h2>
-        <Button variant="secondary" onClick={onClose}>
-          Fechar
+        <Button onClick={() => navigate('/matriculas')} variant="secondary">
+          Voltar
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="space-y-4">
         <div>
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Informações Pessoais</h3>
-          <dl className="space-y-4">
-            <div>
-              <dt className="text-sm font-medium text-gray-500">Nome</dt>
-              <dd className="mt-1 text-sm text-gray-900">{matricula.nome}</dd>
-            </div>
-            <div>
-              <dt className="text-sm font-medium text-gray-500">CPF</dt>
-              <dd className="mt-1 text-sm text-gray-900">{matricula.cpf}</dd>
-            </div>
-            <div>
-              <dt className="text-sm font-medium text-gray-500">Data de Nascimento</dt>
-              <dd className="mt-1 text-sm text-gray-900">
-                {new Date(matricula.dataNascimento).toLocaleDateString('pt-BR')}
-              </dd>
-            </div>
-          </dl>
+          <h3 className="text-lg font-medium text-gray-900">Aluno</h3>
+          <p className="text-gray-600">{matricula.nomeAluno}</p>
         </div>
-
         <div>
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Contato</h3>
-          <dl className="space-y-4">
-            <div>
-              <dt className="text-sm font-medium text-gray-500">E-mail</dt>
-              <dd className="mt-1 text-sm text-gray-900">{matricula.email}</dd>
-            </div>
-            <div>
-              <dt className="text-sm font-medium text-gray-500">Telefone</dt>
-              <dd className="mt-1 text-sm text-gray-900">{matricula.telefone}</dd>
-            </div>
-            <div>
-              <dt className="text-sm font-medium text-gray-500">Endereço</dt>
-              <dd className="mt-1 text-sm text-gray-900">{matricula.endereco}</dd>
-            </div>
-          </dl>
+          <h3 className="text-lg font-medium text-gray-900">Curso</h3>
+          <p className="text-gray-600">{matricula.nomeCurso}</p>
         </div>
-
         <div>
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Informações da Matrícula</h3>
-          <dl className="space-y-4">
-            <div>
-              <dt className="text-sm font-medium text-gray-500">Curso</dt>
-              <dd className="mt-1 text-sm text-gray-900">{matricula.curso}</dd>
-            </div>
-            <div>
-              <dt className="text-sm font-medium text-gray-500">Período</dt>
-              <dd className="mt-1 text-sm text-gray-900">{matricula.periodo}</dd>
-            </div>
-            <div>
-              <dt className="text-sm font-medium text-gray-500">Status</dt>
-              <dd className="mt-1">
-                <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                  matricula.status === 'ativa' ? 'bg-green-100 text-green-800' :
-                  matricula.status === 'cancelada' ? 'bg-red-100 text-red-800' :
-                  'bg-blue-100 text-blue-800'
-                }`}>
-                  {matricula.status}
-                </span>
-              </dd>
-            </div>
-            <div>
-              <dt className="text-sm font-medium text-gray-500">Data de Matrícula</dt>
-              <dd className="mt-1 text-sm text-gray-900">
-                {new Date(matricula.dataMatricula).toLocaleDateString('pt-BR')}
-              </dd>
-            </div>
-          </dl>
+          <h3 className="text-lg font-medium text-gray-900">Data da Matrícula</h3>
+          <p className="text-gray-600">
+            {new Date(matricula.dataMatricula).toLocaleDateString()}
+          </p>
         </div>
-
-        {matricula.observacoes && (
-          <div>
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Observações</h3>
-            <p className="text-sm text-gray-900">{matricula.observacoes}</p>
-          </div>
-        )}
+        <div>
+          <h3 className="text-lg font-medium text-gray-900">Status</h3>
+          <p className="text-gray-600">{matricula.status}</p>
+        </div>
       </div>
 
-      <div className="mt-6 flex justify-end space-x-3">
-        <Button variant="secondary">
-          Editar
-        </Button>
-        <Button 
-          variant="outline"
-          onClick={handleCancelarMatricula}
-          disabled={matricula.status === 'cancelada'}
-        >
-          Cancelar Matrícula
-        </Button>
-      </div>
+      {matricula.status === 'ativa' && (
+        <div className="mt-8">
+          <Button
+            onClick={async () => {
+              try {
+                await matriculaService.cancelarMatricula(matricula.id)
+                navigate('/matriculas')
+              } catch (err) {
+                setError('Erro ao cancelar matrícula')
+                console.error('Erro:', err)
+              }
+            }}
+            variant="danger"
+          >
+            Cancelar Matrícula
+          </Button>
+        </div>
+      )}
     </div>
   )
 } 

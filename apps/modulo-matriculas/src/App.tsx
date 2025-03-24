@@ -1,14 +1,11 @@
-import { Routes, Route } from 'react-router-dom'
-import Layout from './components/Layout'
+import { RouterProvider } from 'react-router-dom'
+import { AuthProvider } from '@edunexia/auth'
+import { router } from './routes'
 
-function App() {
+export default function App() {
   return (
-    <Routes>
-      <Route path="/" element={<Layout />}>
-        {/* Rotas serão adicionadas aqui */}
-      </Route>
-    </Routes>
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
   )
-}
-
-export default App 
+} 
