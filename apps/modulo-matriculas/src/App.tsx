@@ -2,10 +2,12 @@ import { RouterProvider } from 'react-router-dom'
 import { AuthProvider } from '@edunexia/auth'
 import { router } from './routes'
 
-export default function App() {
+function App() {
   return (
     <AuthProvider>
       <RouterProvider router={router} />
     </AuthProvider>
   )
-} 
+}
+
+export default App 

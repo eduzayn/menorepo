@@ -1,4 +1,5 @@
-import { ButtonHTMLAttributes, forwardRef } from 'react';
+import type { ButtonHTMLAttributes, Ref } from 'react';
+import { forwardRef } from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../utils';
 
@@ -7,11 +8,11 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        primary: 'bg-blue-600 text-white hover:bg-blue-700 focus-visible:ring-blue-500',
+        primary: 'bg-primary-600 text-white hover:bg-primary-700 focus-visible:ring-primary-500',
         secondary: 'bg-gray-100 text-gray-900 hover:bg-gray-200 focus-visible:ring-gray-500',
         outline: 'border border-gray-200 bg-white hover:bg-gray-100 hover:text-gray-900 focus-visible:ring-gray-500',
         ghost: 'hover:bg-gray-100 hover:text-gray-900 focus-visible:ring-gray-500',
-        link: 'underline-offset-4 hover:underline text-blue-600',
+        link: 'underline-offset-4 hover:underline text-primary-600',
       },
       size: {
         default: 'h-10 py-2 px-4',
@@ -29,10 +30,14 @@ const buttonVariants = cva(
 
 export interface ButtonProps
   extends ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {}
+    VariantProps<typeof buttonVariants> {
+  className?: string;
+  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'link';
+  size?: 'default' | 'sm' | 'lg' | 'icon';
+}
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, ...props }, ref) => {
+  ({ className, variant, size, ...props }: ButtonProps, ref: Ref<HTMLButtonElement>) => {
     return (
       <button
         className={cn(buttonVariants({ variant, size, className }))}

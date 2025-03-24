@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, FormEvent, ChangeEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button, TextField } from '@edunexia/ui-components'
 import { useAuth } from '@edunexia/auth'
@@ -11,7 +11,7 @@ export function Login() {
   const navigate = useNavigate()
   const { signIn } = useAuth()
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setError(null)
     setLoading(true)
@@ -37,34 +37,26 @@ export function Login() {
           </div>
         )}
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-              Email
-            </label>
-            <TextField
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="mt-1"
-              placeholder="seu@email.com"
-            />
-          </div>
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-              Senha
-            </label>
-            <TextField
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="mt-1"
-              placeholder="••••••••"
-            />
-          </div>
+          <TextField
+            id="email"
+            type="email"
+            label="Email"
+            value={email}
+            onChange={(e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+            required
+            placeholder="seu@email.com"
+            error={error ? 'Email ou senha inválidos' : undefined}
+          />
+          <TextField
+            id="password"
+            type="password"
+            label="Senha"
+            value={password}
+            onChange={(e: ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
+            required
+            placeholder="••••••••"
+            error={error ? 'Email ou senha inválidos' : undefined}
+          />
           <Button
             type="submit"
             variant="primary"

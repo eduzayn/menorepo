@@ -224,7 +224,15 @@ __metadata:
   resolution: "@edunexia/auth@workspace:packages/auth"
   dependencies:
     "@supabase/supabase-js": "npm:^2.39.7"
+    "@types/node": "npm:^20.11.16"
+    "@types/react": "npm:^19.0.12"
+    "@types/react-dom": "npm:^19.0.4"
+    react: "npm:^18.2.0"
+    react-dom: "npm:^18.2.0"
     typescript: "npm:^5.2.2"
+  peerDependencies:
+    react: ^18.2.0
+    react-dom: ^18.2.0
   languageName: unknown
   linkType: soft
 
@@ -281,7 +289,7 @@ __metadata:
     "@edunexia/database-schema": "workspace:*"
     "@edunexia/ui-components": "workspace:*"
     "@supabase/supabase-js": "npm:^2.39.3"
-    "@types/node": "npm:^20.11.16"
+    "@types/node": "npm:^22.13.13"
     "@types/react": "npm:^19.0.12"
     "@types/react-dom": "npm:^19.0.4"
     "@typescript-eslint/eslint-plugin": "npm:^7.0.2"
@@ -310,6 +318,9 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@edunexia/monorepo@workspace:."
   dependencies:
+    "@types/node": "npm:^22.13.13"
+    "@types/react": "npm:^19.0.12"
+    "@types/react-dom": "npm:^19.0.4"
     "@typescript-eslint/eslint-plugin": "npm:^6.14.0"
     "@typescript-eslint/parser": "npm:^6.14.0"
     class-variance-authority: "npm:^0.7.0"
@@ -327,15 +338,21 @@ __metadata:
   dependencies:
     "@headlessui/react": "npm:^1.7.18"
     "@heroicons/react": "npm:^2.1.1"
-    "@types/react": "npm:^18.2.0"
-    "@types/react-dom": "npm:^18.2.0"
-    class-variance-authority: "npm:^0.7.0"
+    "@types/node": "npm:^22.13.13"
+    "@types/react": "npm:^19.0.12"
+    "@types/react-dom": "npm:^19.0.4"
+    "@vitejs/plugin-react": "npm:^4.2.1"
+    class-variance-authority: "npm:^0.7.1"
     clsx: "npm:^2.1.0"
     react: "npm:^18.2.0"
     react-dom: "npm:^18.2.0"
     tailwind-merge: "npm:^2.2.1"
     tailwindcss: "npm:^3.4.1"
     typescript: "npm:^5.2.2"
+    vite: "npm:^6.2.3"
+  peerDependencies:
+    react: ^18.2.0
+    react-dom: ^18.2.0
   languageName: unknown
   linkType: soft
 
@@ -1198,7 +1215,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*":
+"@types/node@npm:*, @types/node@npm:^22.13.13":
   version: 22.13.13
   resolution: "@types/node@npm:22.13.13"
   dependencies:
@@ -2082,7 +2099,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"class-variance-authority@npm:^0.7.0":
+"class-variance-authority@npm:^0.7.0, class-variance-authority@npm:^0.7.1":
   version: 0.7.1
   resolution: "class-variance-authority@npm:0.7.1"
   dependencies:

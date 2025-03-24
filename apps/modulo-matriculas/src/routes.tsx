@@ -5,11 +5,40 @@ import { MatriculasList } from './components/MatriculasList'
 import { MatriculaForm } from './components/MatriculaForm'
 import { MatriculaDetails } from './components/MatriculaDetails'
 import { PrivateRoute } from './components/PrivateRoute'
+import { CursosList } from './components/cursos/CursosList'
+import { CursoForm } from './components/cursos/CursoForm'
+import { CursoDetails } from './components/cursos/CursoDetails'
 
 export const router = createBrowserRouter([
   {
     path: '/login',
     element: <Login />,
+  },
+  {
+    path: '/cursos',
+    element: (
+      <PrivateRoute requiredRoles={['admin', 'secretaria']}>
+        <Layout />
+      </PrivateRoute>
+    ),
+    children: [
+      {
+        index: true,
+        element: <CursosList />,
+      },
+      {
+        path: 'novo',
+        element: <CursoForm />,
+      },
+      {
+        path: ':id',
+        element: <CursoDetails />,
+      },
+      {
+        path: ':id/editar',
+        element: <CursoForm />,
+      },
+    ],
   },
   {
     path: '/matriculas',
