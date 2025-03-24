@@ -1,0 +1,1 @@
+// Este arquivo exportará todas as páginas do módulo de comunicação 

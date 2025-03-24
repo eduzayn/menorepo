@@ -1,0 +1,1 @@
+// Definições de tipos específicas do módulo de comunicação 

@@ -1,3 +1,57 @@
+# Módulo de Comunicação - Edunexia
+
+Este é o módulo de comunicação do sistema Edunexia, responsável por gerenciar a comunicação entre alunos, professores e administradores.
+
+## Tecnologias Utilizadas
+
+- React
+- TypeScript
+- Vite
+- Tailwind CSS
+
+## Configuração do Ambiente de Desenvolvimento
+
+1. Instale as dependências:
+```bash
+npm install
+```
+
+2. Inicie o servidor de desenvolvimento:
+```bash
+npm run dev
+```
+
+3. Acesse o aplicativo em `http://localhost:5173`
+
+## Scripts Disponíveis
+
+- `npm run dev`: Inicia o servidor de desenvolvimento
+- `npm run build`: Compila o projeto para produção
+- `npm run lint`: Executa a verificação de linting
+- `npm run preview`: Visualiza a versão de produção localmente
+
+## Estrutura do Projeto
+
+```
+src/
+  ├── components/     # Componentes React reutilizáveis
+  ├── pages/         # Páginas da aplicação
+  ├── services/      # Serviços e integrações
+  ├── styles/        # Estilos e configurações do Tailwind
+  ├── types/         # Definições de tipos TypeScript
+  ├── utils/         # Funções utilitárias
+  ├── App.tsx        # Componente principal
+  └── main.tsx       # Ponto de entrada da aplicação
+```
+
+## Contribuição
+
+1. Faça o fork do projeto
+2. Crie uma branch para sua feature (`git checkout -b feature/nova-feature`)
+3. Faça commit das suas alterações (`git commit -m 'Adiciona nova feature'`)
+4. Faça push para a branch (`git push origin feature/nova-feature`)
+5. Abra um Pull Request
+
 # README TÉCNICO - Módulo de Comunicação da Plataforma Edunéxia
 
 ## 📌 Visão Geral

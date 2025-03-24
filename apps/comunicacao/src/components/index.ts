@@ -1,0 +1,1 @@
+// Este arquivo exportará todos os componentes do módulo de comunicação 

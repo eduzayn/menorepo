@@ -1,0 +1,1 @@
+// Este arquivo exportará todos os serviços do módulo de comunicação 
