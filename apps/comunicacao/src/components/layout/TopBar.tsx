@@ -1,107 +1,71 @@
-import { Fragment } from 'react';
-import { Menu, Transition } from '@headlessui/react';
-import {
+import { 
+  MagnifyingGlassIcon,
   BellIcon,
-  ChevronDownIcon,
+  ChevronDownIcon
 } from '@heroicons/react/24/outline';
+import { useLocation } from 'react-router-dom';
 
-function classNames(...classes: string[]) {
-  return classes.filter(Boolean).join(' ');
-}
+const pageTitle: { [key: string]: string } = {
+  '/conversas': 'Conversas',
+  '/leads': 'Leads',
+  '/campanhas': 'Campanhas',
+  '/respostas-rapidas': 'Respostas Rápidas',
+  '/configuracoes': 'Configurações'
+};
 
 export default function TopBar() {
+  const location = useLocation();
+  const currentTitle = pageTitle[location.pathname] || 'Dashboard';
+
   return (
-    <div className="flex-shrink-0 h-16 bg-white border-b border-gray-200">
-      <div className="flex items-center justify-between px-4 h-full">
+    <div className="flex-1 flex items-center justify-between px-4">
+      {/* Left: Page Title */}
+      <div>
+        <h1 className="text-xl font-semibold text-gray-900">{currentTitle}</h1>
+      </div>
+
+      {/* Right: Actions */}
+      <div className="flex items-center space-x-4">
         {/* Search */}
-        <div className="flex-1 flex">
-          <div className="w-full flex md:ml-0">
-            <div className="relative w-full text-gray-400 focus-within:text-gray-600">
-              <input
-                type="text"
-                placeholder="Buscar..."
-                className="block w-full h-full pl-8 pr-3 py-2 border-transparent text-gray-900 placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-0 focus:border-transparent sm:text-sm"
-              />
+        <div className="hidden md:flex items-center">
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <MagnifyingGlassIcon className="h-5 w-5 text-neutral-dark" aria-hidden="true" />
             </div>
+            <input
+              type="text"
+              placeholder="Buscar..."
+              className="block w-full pl-10 pr-3 py-2 border border-primary-light rounded-md leading-5 bg-neutral-lightest placeholder-neutral-dark focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary sm:text-sm"
+            />
           </div>
         </div>
 
-        {/* Actions */}
-        <div className="ml-4 flex items-center md:ml-6">
-          {/* Notifications */}
+        {/* Notifications */}
+        <button
+          type="button"
+          className="relative p-2 text-neutral-dark hover:text-primary rounded-full hover:bg-neutral-light focus:outline-none focus:ring-2 focus:ring-primary"
+        >
+          <span className="sr-only">Ver notificações</span>
+          <BellIcon className="h-6 w-6" aria-hidden="true" />
+          <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-accent-mint ring-2 ring-white" />
+        </button>
+
+        {/* Profile Dropdown */}
+        <div className="relative">
           <button
             type="button"
-            className="p-1 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            className="flex items-center space-x-3 focus:outline-none"
           >
-            <span className="sr-only">Ver notificações</span>
-            <BellIcon className="h-6 w-6" aria-hidden="true" />
-          </button>
-
-          {/* Profile dropdown */}
-          <Menu as="div" className="ml-3 relative">
-            <div>
-              <Menu.Button className="max-w-xs bg-white flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                <span className="sr-only">Abrir menu do usuário</span>
-                <img
-                  className="h-8 w-8 rounded-full"
-                  src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                  alt=""
-                />
-                <ChevronDownIcon className="ml-2 h-4 w-4 text-gray-400" aria-hidden="true" />
-              </Menu.Button>
+            <img
+              className="h-8 w-8 rounded-full"
+              src="https://ui-avatars.com/api/?name=User"
+              alt=""
+            />
+            <div className="hidden md:flex items-center">
+              <span className="text-sm font-medium text-gray-900">Usuário</span>
+              <ChevronDownIcon className="ml-2 h-5 w-5 text-neutral-dark" aria-hidden="true" />
             </div>
-            <Transition
-              as={Fragment}
-              enter="transition ease-out duration-100"
-              enterFrom="transform opacity-0 scale-95"
-              enterTo="transform opacity-100 scale-100"
-              leave="transition ease-in duration-75"
-              leaveFrom="transform opacity-100 scale-100"
-              leaveTo="transform opacity-0 scale-95"
-            >
-              <Menu.Items className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
-                <Menu.Item>
-                  {({ active }) => (
-                    <a
-                      href="#"
-                      className={classNames(
-                        active ? 'bg-gray-100' : '',
-                        'block px-4 py-2 text-sm text-gray-700'
-                      )}
-                    >
-                      Seu Perfil
-                    </a>
-                  )}
-                </Menu.Item>
-                <Menu.Item>
-                  {({ active }) => (
-                    <a
-                      href="#"
-                      className={classNames(
-                        active ? 'bg-gray-100' : '',
-                        'block px-4 py-2 text-sm text-gray-700'
-                      )}
-                    >
-                      Configurações
-                    </a>
-                  )}
-                </Menu.Item>
-                <Menu.Item>
-                  {({ active }) => (
-                    <a
-                      href="#"
-                      className={classNames(
-                        active ? 'bg-gray-100' : '',
-                        'block px-4 py-2 text-sm text-gray-700'
-                      )}
-                    >
-                      Sair
-                    </a>
-                  )}
-                </Menu.Item>
-              </Menu.Items>
-            </Transition>
-          </Menu>
+          </button>
         </div>
       </div>
     </div>

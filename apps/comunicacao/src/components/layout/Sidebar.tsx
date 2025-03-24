@@ -25,51 +25,64 @@ export default function Sidebar() {
   const location = useLocation();
 
   return (
-    <div className="hidden lg:flex lg:flex-shrink-0">
-      <div className="flex flex-col w-64">
-        {/* Sidebar Header */}
-        <div className="flex items-center h-16 flex-shrink-0 px-4 bg-white border-b border-gray-200">
-          <img
-            className="h-8 w-auto"
-            src="/logo.svg"
-            alt="Edunexia"
-          />
-        </div>
+    <div className="flex flex-col h-full bg-neutral-lightest">
+      {/* Sidebar Header */}
+      <div className="flex items-center h-16 flex-shrink-0 px-4 border-b border-primary-light">
+        <img
+          className="h-8 w-auto"
+          src="/logo.svg"
+          alt="Edunexia"
+        />
+      </div>
 
-        {/* Sidebar Content */}
-        <div className="flex flex-col flex-1 bg-white border-r border-gray-200">
-          <nav className="flex-1 px-2 py-4 space-y-1">
-            {navigation.map((item) => {
-              const isActive = location.pathname.startsWith(item.path);
-              const Icon = item.icon;
+      {/* Sidebar Content */}
+      <div className="flex-1 flex flex-col overflow-y-auto">
+        <nav className="flex-1 px-2 py-4 space-y-1">
+          {navigation.map((item) => {
+            const isActive = location.pathname.startsWith(item.path);
+            const Icon = item.icon;
 
-              return (
-                <Link
-                  key={item.name}
-                  to={item.path}
+            return (
+              <Link
+                key={item.name}
+                to={item.path}
+                className={`
+                  group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors
+                  ${isActive
+                    ? 'bg-primary-light text-primary-dark'
+                    : 'text-neutral-dark hover:bg-neutral-light hover:text-primary'
+                  }
+                `}
+              >
+                <Icon
                   className={`
-                    group flex items-center px-2 py-2 text-sm font-medium rounded-md
+                    mr-3 h-5 w-5 transition-colors
                     ${isActive
-                      ? 'bg-gray-100 text-gray-900'
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                      ? 'text-primary'
+                      : 'text-neutral-dark group-hover:text-primary'
                     }
                   `}
-                >
-                  <Icon
-                    className={`
-                      mr-3 h-6 w-6
-                      ${isActive
-                        ? 'text-gray-500'
-                        : 'text-gray-400 group-hover:text-gray-500'
-                      }
-                    `}
-                    aria-hidden="true"
-                  />
-                  {item.name}
-                </Link>
-              );
-            })}
-          </nav>
+                  aria-hidden="true"
+                />
+                {item.name}
+              </Link>
+            );
+          })}
+        </nav>
+      </div>
+
+      {/* User Profile Section */}
+      <div className="flex items-center px-4 py-3 border-t border-primary-light bg-neutral-light">
+        <div className="flex-shrink-0">
+          <img
+            className="h-8 w-8 rounded-full"
+            src="https://ui-avatars.com/api/?name=User"
+            alt="User"
+          />
+        </div>
+        <div className="ml-3">
+          <p className="text-sm font-medium text-gray-900">Usuário</p>
+          <p className="text-xs text-neutral-dark">Online</p>
         </div>
       </div>
     </div>
