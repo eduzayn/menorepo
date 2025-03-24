@@ -134,7 +134,3 @@ Este modelo permitirá que instituições realizem a contratação sem depender 
 ---
 
 Com essa estrutura, a Edunéxia evolui para um ecossistema educacional escalável, modular e tecnicamente moderno, pronto para atender instituições de EAD de diferentes portes e necessidades, com possibilidade de contratação automatizada por meio do site.
-
-
-
-
