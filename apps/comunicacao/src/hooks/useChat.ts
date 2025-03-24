@@ -1,135 +1,114 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../services/supabase';
-import type { Conversa, Mensagem, ComunicacaoTipoMensagem } from '../types/comunicacao';
+import type { Mensagem, ComunicacaoTipoMensagem } from '../types/comunicacao';
 
 interface UseChatOptions {
   conversaId?: string;
 }
 
 interface UseChatResult {
-  conversa?: Conversa;
   mensagens: Mensagem[];
   loading: boolean;
   error?: Error;
-  usuarioDigitando?: string;
-  enviarMensagem: (conteudo: string, tipo: ComunicacaoTipoMensagem) => Promise<void>;
-  marcarComoLida: (mensagemId: string) => Promise<void>;
-  indicarDigitando: (digitando: boolean) => Promise<void>;
+  enviarMensagem: (texto: string) => void;
+  marcarComoLida: () => void;
+  indicarDigitando: (digitando: boolean) => void;
+  digitando: boolean;
 }
 
-export function useChat({ conversaId }: UseChatOptions): UseChatResult {
+export function useChat({ conversaId }: UseChatOptions = {}): UseChatResult {
   const { user } = useAuth();
-  const [conversa, setConversa] = useState<Conversa>();
   const [mensagens, setMensagens] = useState<Mensagem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error>();
-  const [usuarioDigitando, setUsuarioDigitando] = useState<string>();
+  const [digitando, setDigitando] = useState(false);
 
-  // Carregar conversa e mensagens
+  // Carregar mensagens
   useEffect(() => {
     if (!conversaId || !user) return;
 
-    const carregarDados = async () => {
+    const carregarMensagens = async () => {
       try {
         setLoading(true);
-        
-        // Carregar conversa
-        const { data: conversaData, error: conversaError } = await supabase
-          .from('conversas')
-          .select('*')
-          .eq('id', conversaId)
-          .single();
+        setError(undefined);
 
-        if (conversaError) throw conversaError;
-        setConversa(conversaData);
-
-        // Carregar mensagens
-        const { data: mensagensData, error: mensagensError } = await supabase
+        const { data, error } = await supabase
           .from('mensagens')
           .select('*')
           .eq('conversa_id', conversaId)
           .order('criado_at', { ascending: true });
 
-        if (mensagensError) throw mensagensError;
-        setMensagens(mensagensData);
-
+        if (error) throw error;
+        setMensagens(data || []);
       } catch (err) {
-        setError(err instanceof Error ? err : new Error('Erro ao carregar dados'));
+        setError(err instanceof Error ? err : new Error('Erro ao carregar mensagens'));
       } finally {
         setLoading(false);
       }
     };
 
-    carregarDados();
+    carregarMensagens();
 
     // Inscrever para atualizações em tempo real
-    const channel = supabase.channel(`conversa:${conversaId}`);
-
-    // Inscrever para mensagens
-    channel
-      .on('postgres_changes', {
-        event: '*',
-        schema: 'public',
-        table: 'mensagens',
-        filter: `conversa_id=eq.${conversaId}`
-      }, (payload) => {
-        if (payload.eventType === 'INSERT') {
-          setMensagens(prev => [...prev, payload.new as Mensagem]);
+    const subscription = supabase
+      .channel(`conversa:${conversaId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'mensagens',
+          filter: `conversa_id=eq.${conversaId}`
+        },
+        (payload) => {
+          setMensagens((prev) => [...prev, payload.new as Mensagem]);
         }
-      })
-      .subscribe();
-
-    // Inscrever para status de digitação
-    channel
-      .on('broadcast', { event: 'typing' }, ({ payload }) => {
-        if (payload.usuario_id !== user.id) {
-          setUsuarioDigitando(payload.digitando ? payload.usuario_nome : undefined);
-        }
-      })
+      )
       .subscribe();
 
     return () => {
-      channel.unsubscribe();
+      subscription.unsubscribe();
     };
   }, [conversaId, user]);
 
   // Enviar mensagem
-  const enviarMensagem = async (conteudo: string, tipo: ComunicacaoTipoMensagem) => {
+  const enviarMensagem = async (texto: string) => {
     if (!conversaId || !user) return;
 
     try {
-      const { error: insertError } = await supabase
-        .from('mensagens')
-        .insert({
-          conversa_id: conversaId,
-          remetente_id: user.id,
-          conteudo,
-          tipo,
-          lida: false
-        });
+      const mensagem: Omit<Mensagem, 'id' | 'criado_at' | 'atualizado_at'> = {
+        conversa_id: conversaId,
+        remetente_id: user.id,
+        conteudo: texto,
+        tipo: 'TEXTO',
+        lida: false
+      };
 
-      if (insertError) throw insertError;
+      const { error } = await supabase
+        .from('mensagens')
+        .insert([mensagem]);
+
+      if (error) throw error;
     } catch (err) {
       setError(err instanceof Error ? err : new Error('Erro ao enviar mensagem'));
-      throw err;
     }
   };
 
-  // Marcar mensagem como lida
-  const marcarComoLida = async (mensagemId: string) => {
-    if (!user) return;
+  // Marcar mensagens como lidas
+  const marcarComoLida = async () => {
+    if (!conversaId || !user) return;
 
     try {
-      const { error: updateError } = await supabase
+      const { error } = await supabase
         .from('mensagens')
         .update({ lida: true })
-        .eq('id', mensagemId);
+        .eq('conversa_id', conversaId)
+        .neq('remetente_id', user.id);
 
-      if (updateError) throw updateError;
+      if (error) throw error;
     } catch (err) {
-      setError(err instanceof Error ? err : new Error('Erro ao marcar mensagem como lida'));
-      throw err;
+      setError(err instanceof Error ? err : new Error('Erro ao marcar mensagens como lidas'));
     }
   };
 
@@ -138,31 +117,26 @@ export function useChat({ conversaId }: UseChatOptions): UseChatResult {
     if (!conversaId || !user) return;
 
     try {
-      await supabase
-        .channel(`conversa:${conversaId}`)
-        .send({
-          type: 'broadcast',
-          event: 'typing',
-          payload: {
-            usuario_id: user.id,
-            usuario_nome: user.user_metadata?.nome || user.email,
-            digitando
-          }
-        });
+      setDigitando(digitando);
+
+      const { error } = await supabase
+        .from('conversas')
+        .update({ digitando: digitando ? user.id : null })
+        .eq('id', conversaId);
+
+      if (error) throw error;
     } catch (err) {
-      setError(err instanceof Error ? err : new Error('Erro ao atualizar status de digitação'));
-      throw err;
+      setError(err instanceof Error ? err : new Error('Erro ao indicar status de digitação'));
     }
   };
 
   return {
-    conversa,
     mensagens,
     loading,
     error,
-    usuarioDigitando,
     enviarMensagem,
     marcarComoLida,
-    indicarDigitando
+    indicarDigitando,
+    digitando
   };
 } 
