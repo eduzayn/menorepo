@@ -1,20 +1,32 @@
 import type { Database } from '@edunexia/database-schema';
 
-export type ComunicacaoStatus = 'ativo' | 'inativo' | 'pendente' | 'arquivado';
-export type ComunicacaoCanal = 'whatsapp' | 'email' | 'chat' | 'sms';
-export type ComunicacaoTipoMensagem = 'texto' | 'imagem' | 'arquivo' | 'video' | 'audio' | 'localizacao';
+export type ComunicacaoStatus = 'ATIVO' | 'ARQUIVADO' | 'FINALIZADO';
+export type ComunicacaoCanal = 'CHAT' | 'EMAIL' | 'SMS' | 'WHATSAPP';
+export type ComunicacaoTipoMensagem = 'TEXTO' | 'IMAGEM' | 'ARQUIVO' | 'VIDEO' | 'AUDIO' | 'LOCALIZACAO';
 export type ComunicacaoTipoCampanha = 'marketing' | 'notificacao' | 'lembrete' | 'pesquisa';
+
+export interface Participante {
+  id: string;
+  nome: string;
+  email: string;
+  avatar_url?: string;
+  online: boolean;
+  ultimo_acesso?: string;
+}
 
 export interface Conversa {
   id: string;
   titulo: string;
   status: ComunicacaoStatus;
   canal: ComunicacaoCanal;
-  participantes: string[];
-  criado_at: string;
-  atualizado_at: string;
+  participantes: Participante[];
+  ultima_mensagem?: string;
   ultima_mensagem_at?: string;
   nao_lidas: number;
+  digitando?: string;
+  criado_at: string;
+  atualizado_at: string;
+  usuario_id: string;
 }
 
 export interface Mensagem {
@@ -22,7 +34,8 @@ export interface Mensagem {
   conversa_id: string;
   remetente_id: string;
   conteudo: string;
-  tipo: ComunicacaoTipoMensagem;
+  tipo: 'TEXTO' | 'IMAGEM' | 'ARQUIVO' | 'VIDEO' | 'AUDIO' | 'LOCALIZACAO';
+  metadata?: Record<string, any>;
   lida: boolean;
   criado_at: string;
   atualizado_at: string;
