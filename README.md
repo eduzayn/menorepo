@@ -67,13 +67,11 @@ Será desenvolvido um **site de vendas independente (site-vendas)**, totalmente 
 
 Este modelo permitirá que instituições realizem a contratação sem depender de equipe de vendas, facilitando a escalabilidade do negócio.
 
-## Módulos Já Prontos
+## Módulos a Serem Desenvolvidos
 - **material-didatico**: Criação de cursos, organização de conteúdos e e-books inteligentes.
 - **matriculas**: Cadastro de cursos, planos e fluxo de inscrição.
 - **portal-do-aluno**: Acesso ao ambiente acadêmico, documentos e certificados.
 - **comunicacao**: Envio de mensagens, notificações, e integração com WhatsApp e chat com IA.
-
-## Módulos em Desenvolvimento
 - **financeiro-empresarial**: Controle de contas, emissão de boletos e fluxo de caixa.
 - **portal-parceiro**: Visão administrativa e de desempenho para parceiros comerciais.
 - **portal-polo**: Gestão pedagógica e operacional dos polos educacionais.
@@ -81,9 +79,9 @@ Este modelo permitirá que instituições realizem a contratação sem depender 
 - **contabilidade**: Relatórios fiscais, balanços e integração com contadores externos.
 - **site-vendas**: Site de apresentação e comercialização self-service da plataforma.
 
-## Estratégia de Integração
+## Estratégia de Desenvolvimento
 1. Criação da estrutura base do monorepo com Yarn Workspaces.
-2. Importação de cada módulo como um workspace dentro de `apps/`.
+2. Desenvolvimento de cada módulo como um workspace dentro de `apps/`.
 3. Criação de bibliotecas reutilizáveis dentro de `packages/` (ex: autenticação, design system, API).
 4. Configuração de SSO (Single Sign-On) e compartilhamento de sessões.
 5. Padronização de ferramentas de desenvolvimento: ESLint, Prettier, Husky, Vite, etc.
