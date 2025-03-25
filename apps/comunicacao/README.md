@@ -18,7 +18,7 @@ Este é o módulo de comunicação do sistema Edunexia, responsável por gerenci
 - TypeScript
 - Ant Design
 - Tailwind CSS
-- Supabase
+- @supabase/supabase-js (Backend e Autenticação)
 - React Router
 - Jest
 - Testing Library

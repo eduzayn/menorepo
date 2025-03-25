@@ -13,7 +13,7 @@
 
 ## ⚙️ Tecnologias Utilizadas
 - **React + TypeScript** (Frontend)
-- **Supabase** (Banco de dados e autenticação)
+- **@supabase/supabase-js** (Backend, banco de dados e autenticação)
 - **TailwindCSS** (Estilização)
 - **Vite** (Dev server e build)
 - **Yarn Workspaces** (Monorepo e pacotes compartilhados)
@@ -113,8 +113,7 @@ apps/matriculas/
 ### 🔗 Pacotes Compartilhados
 - `packages/auth`: autenticação centralizada (SSO)
 - `packages/ui-components`: design system global reutilizável
-- `packages/api-client`: cliente HTTP centralizado com Supabase
-- `packages/utils`: funções auxiliares reutilizáveis
+- `packages/database-schema`: tipos e schemas do banco de dados
 
 ## 🔐 Perfis e Permissões
 | Perfil de Usuário        | Acesso ao Módulo de Matrículas                     |
