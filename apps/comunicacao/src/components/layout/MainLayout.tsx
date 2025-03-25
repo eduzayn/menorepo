@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import Sidebar from './Sidebar';
+import TopBar from './TopBar';
 import DetailPanel from './DetailPanel';
 import { useComunicacao } from '@/contexts/ComunicacaoContext';
 import type { Conversa } from '@/lib/config';
@@ -44,8 +45,8 @@ export function MainLayout({ children, showDetails = false, detailsProps }: Main
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Top Bar */}
-        <div className="flex-shrink-0 h-16 bg-white border-b flex items-center justify-between px-4">
-          <div className="flex items-center">
+        <div className="flex-shrink-0 h-auto bg-white border-b">
+          <div className="flex items-center h-16 px-4">
             <button
               type="button"
               className="lg:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100"
@@ -53,22 +54,7 @@ export function MainLayout({ children, showDetails = false, detailsProps }: Main
             >
               <Bars3Icon className="h-6 w-6" />
             </button>
-            <h1 className="ml-2 text-xl font-semibold text-gray-900">Edunexia</h1>
-          </div>
-          <div className="flex items-center">
-            {shouldShowDetails && (
-              <button
-                type="button"
-                className="lg:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100"
-                onClick={() => setIsDetailsOpen(!isDetailsOpen)}
-              >
-                {isDetailsOpen ? (
-                  <XMarkIcon className="h-6 w-6" />
-                ) : (
-                  <Bars3Icon className="h-6 w-6" />
-                )}
-              </button>
-            )}
+            <TopBar />
           </div>
         </div>
 
@@ -76,7 +62,9 @@ export function MainLayout({ children, showDetails = false, detailsProps }: Main
         <div className="flex-1 flex overflow-hidden">
           {/* Primary Content */}
           <div className="flex-1 overflow-y-auto">
-            {children}
+            <div className="container mx-auto px-4 py-6">
+              {children}
+            </div>
           </div>
 
           {/* Details Panel */}

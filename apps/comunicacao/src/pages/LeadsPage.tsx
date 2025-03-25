@@ -1,32 +1,76 @@
 import { useState } from 'react';
-import { Tab } from '@headlessui/react';
-import {
-  TableCellsIcon,
-  ViewColumnsIcon,
-} from '@heroicons/react/24/outline';
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
+import { TableCellsIcon, ViewColumnsIcon, PlusIcon } from '@heroicons/react/24/outline';
+import { KanbanColumn } from '@/components/crm/KanbanColumn';
+import type { Lead } from '@/types/comunicacao';
+import { classNames } from '@/lib/utils';
+import { useLeads } from '@/hooks/useLeads';
 
-function classNames(...classes: string[]) {
-  return classes.filter(Boolean).join(' ');
-}
+const statusMap = {
+  'NOVO': 'Novos Leads',
+  'QUALIFICADO': 'Qualificados',
+  'CONTATO': 'Em Contato',
+  'NEGOCIACAO': 'Em Negociação',
+  'FECHADO': 'Fechados'
+} as const;
 
 export default function LeadsPage() {
-  const [viewType, setViewType] = useState('list');
+  const [viewType, setViewType] = useState<'list' | 'kanban'>('kanban');
+  const { data: leads = [], isLoading, error, updateLeadStatus } = useLeads();
+
+  const leadsByStatus = leads.reduce((acc, lead) => {
+    if (!acc[lead.status]) {
+      acc[lead.status] = [];
+    }
+    acc[lead.status].push(lead);
+    return acc;
+  }, {} as Record<Lead['status'], Lead[]>);
+
+  const handleLeadDrop = async (leadId: string, newStatus: Lead['status']) => {
+    try {
+      await updateLeadStatus(leadId, newStatus);
+    } catch (error) {
+      console.error('Erro ao atualizar status do lead:', error);
+    }
+  };
+
+  const handleLeadChat = (lead: Lead) => {
+    // Implementar navegação para a conversa
+    console.log('Iniciar chat com:', lead);
+  };
+
+  if (isLoading) {
+    return (
+      <div className="h-full flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="h-full flex items-center justify-center text-red-500">
+        Erro ao carregar leads. Por favor, tente novamente.
+      </div>
+    );
+  }
 
   return (
-    <div className="h-full">
+    <div className="h-full flex flex-col">
       {/* Header */}
       <div className="pb-5 border-b border-gray-200 sm:flex sm:items-center sm:justify-between">
         <h2 className="text-lg font-medium text-gray-900">Leads</h2>
-        <div className="mt-3 sm:mt-0 sm:ml-4">
+        <div className="mt-3 sm:mt-0 sm:ml-4 flex items-center space-x-3">
           <div className="flex rounded-md shadow-sm">
             <button
               type="button"
               onClick={() => setViewType('list')}
               className={classNames(
                 viewType === 'list'
-                  ? 'bg-indigo-600 text-white'
-                  : 'bg-white text-gray-700 hover:bg-gray-50',
-                'px-4 py-2 text-sm font-medium rounded-l-md border border-gray-300 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500'
+                  ? 'bg-primary text-white'
+                  : 'bg-white text-gray-700 hover:bg-neutral-50',
+                'px-4 py-2 text-sm font-medium rounded-l-md border border-neutral-300 focus:z-10 focus:outline-none focus:ring-1 focus:ring-primary'
               )}
             >
               <TableCellsIcon className="h-5 w-5" />
@@ -36,14 +80,22 @@ export default function LeadsPage() {
               onClick={() => setViewType('kanban')}
               className={classNames(
                 viewType === 'kanban'
-                  ? 'bg-indigo-600 text-white'
-                  : 'bg-white text-gray-700 hover:bg-gray-50',
-                '-ml-px px-4 py-2 text-sm font-medium rounded-r-md border border-gray-300 focus:z-10 focus:outline-none focus:ring-1 focus:ring-indigo-500'
+                  ? 'bg-primary text-white'
+                  : 'bg-white text-gray-700 hover:bg-neutral-50',
+                '-ml-px px-4 py-2 text-sm font-medium rounded-r-md border border-neutral-300 focus:z-10 focus:outline-none focus:ring-1 focus:ring-primary'
               )}
             >
               <ViewColumnsIcon className="h-5 w-5" />
             </button>
           </div>
+
+          <button
+            type="button"
+            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+          >
+            <PlusIcon className="h-5 w-5 mr-2" />
+            Novo Lead
+          </button>
         </div>
       </div>
 
@@ -75,14 +127,33 @@ export default function LeadsPage() {
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                      {/* Lista de leads será adicionada aqui */}
-                      <tr>
-                        <td className="px-6 py-4" colSpan={5}>
-                          <div className="text-center text-sm text-gray-500">
-                            Nenhum lead encontrado.
-                          </div>
-                        </td>
-                      </tr>
+                      {leads.map((lead) => (
+                        <tr key={lead.id}>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="text-sm font-medium text-gray-900">{lead.nome}</div>
+                            <div className="text-sm text-gray-500">{lead.canal_origem}</div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {lead.email}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {lead.telefone}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                              {statusMap[lead.status]}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <button
+                              onClick={() => handleLeadChat(lead)}
+                              className="text-primary hover:text-primary-dark"
+                            >
+                              Conversar
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
                     </tbody>
                   </table>
                 </div>
@@ -90,24 +161,20 @@ export default function LeadsPage() {
             </div>
           </div>
         ) : (
-          <div className="flex space-x-4 overflow-x-auto pb-4">
-            {/* Colunas do Kanban */}
-            {['Captado', 'Qualificado', 'Contato', 'Negociação', 'Fechado'].map((status) => (
-              <div key={status} className="flex-shrink-0 w-80">
-                <div className="bg-gray-100 rounded-lg p-4">
-                  <h3 className="text-sm font-medium text-gray-900">{status}</h3>
-                  <div className="mt-4 space-y-4">
-                    {/* Cards de leads serão adicionados aqui */}
-                    <div className="bg-white p-4 rounded-lg shadow">
-                      <p className="text-sm text-gray-500">
-                        Nenhum lead neste status.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+          <DndProvider backend={HTML5Backend}>
+            <div className="flex space-x-4 overflow-x-auto pb-4">
+              {(Object.keys(statusMap) as Lead['status'][]).map((status) => (
+                <KanbanColumn
+                  key={status}
+                  title={statusMap[status]}
+                  status={status}
+                  leads={leadsByStatus[status] || []}
+                  onLeadDrop={handleLeadDrop}
+                  onLeadChat={handleLeadChat}
+                />
+              ))}
+            </div>
+          </DndProvider>
         )}
       </div>
     </div>
