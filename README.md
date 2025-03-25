@@ -29,8 +29,7 @@ edunexia-monorepo/
 ├── packages/
 │   ├── ui-components/       # Design System compartilhado
 │   ├── auth/                # Autenticação unificada (SSO)
-│   ├── api-client/          # Cliente HTTP centralizado para Supabase
-│   └── utils/               # Funções e helpers reutilizáveis
+│   └── database-schema/     # Tipos e schemas do banco de dados
 ├── .gitignore
 ├── package.json             # Define os workspaces do Yarn
 ├── tsconfig.json            # Configuração TypeScript compartilhada
@@ -111,15 +110,16 @@ Como o projeto será iniciado do zero, todos os módulos abaixo estão em planej
 ```
 
 ## Considerações Técnicas
-- Gerenciamento de pacotes via `Yarn Workspaces`.
-- Integração contínua com CI/CD baseada em ramificações por módulo.
-- Autenticação JWT com SSO centralizado (em `packages/auth`).
-- Compartilhamento de componentes em `ui-components` e chamadas em `api-client`.
-- Uso de TypeScript em todos os módulos e bibliotecas.
-- Integração com gateway de pagamento no módulo `site-vendas`.
-- Geração automática de credenciais e e-mails transacionais.
-- Backend unificado no Supabase para todos os módulos.
-- Deploy do frontend via Vercel com integrações automáticas.
+- Gerenciamento de pacotes via `Yarn Workspaces`
+- Integração contínua com CI/CD baseada em ramificações por módulo
+- Autenticação JWT com SSO centralizado (em `packages/auth`)
+- Compartilhamento de componentes em `ui-components`
+- Uso de TypeScript em todos os módulos e bibliotecas
+- Integração com gateway de pagamento no módulo `site-vendas`
+- Geração automática de credenciais e e-mails transacionais
+- Backend unificado no Supabase para todos os módulos usando `@supabase/supabase-js`
+- Deploy do frontend via Vercel com integrações automáticas
+- Tipos e schemas centralizados em `database-schema`
 
 ## Próximos Passos
 - Criar a estrutura base do monorepo no GitHub.
