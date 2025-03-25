@@ -1,9 +1,9 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import { fileURLToPath } from 'url';
+import path from 'path';
 import { dirname, resolve } from 'path';
 
-const __filename = fileURLToPath(import.meta.url);
+const __filename = path.fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 // https://vitejs.dev/config/
@@ -11,7 +11,9 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      '@': resolve(__dirname, './src'),
+      '@': path.resolve(__dirname, './src'),
+      '@repo/auth': path.resolve(__dirname, '../../packages/auth/src'),
+      '@repo/ui-components': path.resolve(__dirname, '../../packages/ui-components/src'),
       '@components': resolve(__dirname, './src/components'),
       '@contexts': resolve(__dirname, './src/contexts'),
       '@hooks': resolve(__dirname, './src/hooks'),
@@ -20,9 +22,7 @@ export default defineConfig({
       '@styles': resolve(__dirname, './src/styles'),
       '@types': resolve(__dirname, './src/types'),
       '@utils': resolve(__dirname, './src/utils'),
-      '@edunexia/auth': resolve(__dirname, '../../packages/auth/src'),
       '@edunexia/database-schema': resolve(__dirname, '../../packages/database-schema/src'),
-      '@edunexia/ui-components': resolve(__dirname, '../../packages/ui-components/src'),
     },
   },
   server: {

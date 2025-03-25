@@ -2,7 +2,7 @@ import React from 'react';
 import { useGrupos } from '../../hooks';
 import { Button, Card, List, Typography, Space, Modal, Form, Input, message } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined, UserOutlined } from '@ant-design/icons';
-import type { Grupo } from '../../types/comunicacao';
+import type { Grupo, InsertGrupo, UpdateGrupo } from '../../types/comunicacao';
 
 const { Title, Text } = Typography;
 const { TextArea } = Input;
@@ -13,7 +13,7 @@ export const GrupoList: React.FC = () => {
   const [modalVisible, setModalVisible] = React.useState(false);
   const [editingGrupo, setEditingGrupo] = React.useState<Grupo | null>(null);
 
-  const handleCreate = async (values: any) => {
+  const handleCreate = async (values: InsertGrupo) => {
     try {
       await criarGrupo.mutateAsync(values);
       message.success('Grupo criado com sucesso!');
@@ -24,7 +24,7 @@ export const GrupoList: React.FC = () => {
     }
   };
 
-  const handleUpdate = async (values: any) => {
+  const handleUpdate = async (values: UpdateGrupo) => {
     if (!editingGrupo) return;
     try {
       await atualizarGrupo.mutateAsync({ id: editingGrupo.id, grupo: values });
@@ -57,6 +57,8 @@ export const GrupoList: React.FC = () => {
     setModalVisible(true);
   };
 
+  const gruposData = grupos.data || [];
+
   return (
     <div>
       <Space direction="vertical" style={{ width: '100%' }}>
@@ -73,9 +75,9 @@ export const GrupoList: React.FC = () => {
 
         <List
           grid={{ gutter: 16, xs: 1, sm: 2, md: 3, lg: 3, xl: 4, xxl: 4 }}
-          dataSource={grupos.data}
+          dataSource={gruposData}
           loading={grupos.isLoading}
-          renderItem={(grupo) => (
+          renderItem={(grupo: Grupo) => (
             <List.Item>
               <Card
                 title={grupo.nome}
@@ -100,7 +102,7 @@ export const GrupoList: React.FC = () => {
                   <Space>
                     <UserOutlined />
                     <Text type="secondary">
-                      {grupo.participantes?.length || 0} participantes
+                      {(grupo as any).participantes?.length || 0} participantes
                     </Text>
                   </Space>
                 </div>

@@ -1,5 +1,4 @@
-import { createClient } from '@supabase/supabase-js';
-import type { Database } from '@edunexia/database-schema';
+import { supabase } from './supabase';
 import type {
   Conversa,
   Mensagem,
@@ -17,11 +16,7 @@ import type {
   UpdateCampanhaDestinatario,
   UpdateRespostaRapida,
 } from '../types/comunicacao';
-
-const supabase = createClient<Database>(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY
-);
+import type { Database } from '../types/database';
 
 // Conversas
 export const getConversas = async () => {
@@ -31,7 +26,7 @@ export const getConversas = async () => {
     .order('ultima_mensagem_at', { ascending: false });
 
   if (error) throw error;
-  return data;
+  return data as Conversa[];
 };
 
 export const getConversa = async (id: string) => {
@@ -42,7 +37,7 @@ export const getConversa = async (id: string) => {
     .single();
 
   if (error) throw error;
-  return data;
+  return data as Conversa;
 };
 
 export const criarConversa = async (conversa: InsertConversa) => {
@@ -53,7 +48,7 @@ export const criarConversa = async (conversa: InsertConversa) => {
     .single();
 
   if (error) throw error;
-  return data;
+  return data as Conversa;
 };
 
 // Mensagens
@@ -65,7 +60,7 @@ export const getMensagens = async (conversaId: string) => {
     .order('criado_at', { ascending: true });
 
   if (error) throw error;
-  return data;
+  return data as Mensagem[];
 };
 
 export const enviarMensagem = async (mensagem: InsertMensagem) => {
@@ -76,7 +71,7 @@ export const enviarMensagem = async (mensagem: InsertMensagem) => {
     .single();
 
   if (error) throw error;
-  return data;
+  return data as Mensagem;
 };
 
 // Campanhas
@@ -87,7 +82,7 @@ export const getCampanhas = async () => {
     .order('criado_at', { ascending: false });
 
   if (error) throw error;
-  return data;
+  return data as Campanha[];
 };
 
 export const getCampanha = async (id: string) => {
@@ -98,7 +93,7 @@ export const getCampanha = async (id: string) => {
     .single();
 
   if (error) throw error;
-  return data;
+  return data as Campanha;
 };
 
 export const criarCampanha = async (campanha: InsertCampanha) => {
@@ -109,7 +104,7 @@ export const criarCampanha = async (campanha: InsertCampanha) => {
     .single();
 
   if (error) throw error;
-  return data;
+  return data as Campanha;
 };
 
 // Respostas Rápidas
@@ -120,7 +115,7 @@ export const getRespostasRapidas = async () => {
     .order('criado_at', { ascending: false });
 
   if (error) throw error;
-  return data;
+  return data as RespostaRapida[];
 };
 
 export const criarRespostaRapida = async (resposta: InsertRespostaRapida) => {
@@ -131,7 +126,7 @@ export const criarRespostaRapida = async (resposta: InsertRespostaRapida) => {
     .single();
 
   if (error) throw error;
-  return data;
+  return data as RespostaRapida;
 };
 
 // Storage

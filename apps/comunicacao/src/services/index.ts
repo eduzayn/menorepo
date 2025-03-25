@@ -1,4 +1,7 @@
 // Este arquivo exportará todos os serviços do módulo de comunicação 
+export * from './comunicacao';
+export { gruposService } from './grupos';
+export { notificacoesService } from './notificacoes';
 export * from './supabase';
 export {
   getConversas,
@@ -17,16 +20,6 @@ export {
   subscribeToConversa,
   atualizarStatusDigitando
 } from './chat';
-export {
-  getGrupos,
-  getGrupo,
-  criarGrupo,
-  atualizarGrupo,
-  excluirGrupo,
-  adicionarParticipante,
-  removerParticipante,
-  atualizarRoleParticipante
-} from './grupos';
 export {
   getNotificacoes,
   getNotificacao,

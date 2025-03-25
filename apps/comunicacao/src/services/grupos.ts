@@ -7,6 +7,7 @@ import type {
   InsertGrupoParticipante,
   UpdateGrupoParticipante,
 } from '../types/comunicacao';
+import type { Database } from '../types/database';
 
 export const gruposService = {
   // Operações de Grupos
@@ -135,6 +136,6 @@ export const gruposService = {
       .single();
 
     if (error) return null;
-    return data?.role;
+    return data?.role as Database['public']['Enums']['grupo_role'] | null;
   }
 }; 

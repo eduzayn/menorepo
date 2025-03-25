@@ -6,6 +6,7 @@ import type {
   TipoNotificacao,
   ComunicacaoCanal
 } from '../types/comunicacao';
+import type { Database } from '../types/database';
 
 export const notificacoesService = {
   // Operações de Configuração
@@ -66,8 +67,8 @@ export const notificacoesService = {
   // Operações por Tipo e Canal
   obterConfiguracaoPorTipoECanal: async (
     usuarioId: string,
-    tipo: TipoNotificacao,
-    canal: ComunicacaoCanal
+    tipo: Database['public']['Enums']['tipo_notificacao'],
+    canal: Database['public']['Enums']['comunicacao_canal']
   ) => {
     const { data, error } = await supabase
       .from('notificacoes_config')
@@ -116,8 +117,8 @@ export const notificacoesService = {
   // Verificação completa de permissão
   verificarPermissaoNotificacao: async (
     usuarioId: string,
-    tipo: TipoNotificacao,
-    canal: ComunicacaoCanal
+    tipo: Database['public']['Enums']['tipo_notificacao'],
+    canal: Database['public']['Enums']['comunicacao_canal']
   ): Promise<boolean> => {
     const config = await notificacoesService.obterConfiguracaoPorTipoECanal(
       usuarioId,

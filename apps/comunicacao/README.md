@@ -1,132 +1,97 @@
-# Edunexia - Módulo de Comunicação
+# Módulo de Comunicação
 
-Este é o módulo de comunicação do sistema Edunexia, responsável por gerenciar conversas, grupos, notificações e outras funcionalidades relacionadas à comunicação.
+Este é o módulo de comunicação integrado, que permite gerenciar conversas, mensagens e interações com usuários através de diferentes canais.
 
 ## Funcionalidades
 
-- Autenticação de usuários
-- Gerenciamento de grupos
-- Configuração de notificações
-- Conversas em tempo real
-- Respostas rápidas
-- Campanhas de comunicação
-- Gerenciamento de leads
-
-## Tecnologias Utilizadas
-
-- React
-- TypeScript
-- Ant Design
-- Tailwind CSS
-- @supabase/supabase-js (Backend e Autenticação)
-- React Router
-- Jest
-- Testing Library
+- Lista de conversas com busca e filtros
+- Chat em tempo real com suporte a diferentes tipos de mensagens
+- Respostas rápidas pré-definidas
+- Suporte a múltiplos canais (chat, email, SMS, WhatsApp)
+- Notificações e indicadores de status
+- Integração com Supabase para persistência e tempo real
 
 ## Pré-requisitos
 
-- Node.js 18 ou superior
-- npm ou yarn
+- Node.js 18+
+- pnpm 8+
 - Conta no Supabase
 
-## Configuração
+## Instalação
 
 1. Clone o repositório
 2. Instale as dependências:
    ```bash
-   npm install
-   # ou
-   yarn install
+   pnpm install
    ```
-3. Copie o arquivo `.env.example` para `.env` e configure as variáveis de ambiente:
+3. Copie o arquivo `.env.example` para `.env` e configure as variáveis:
    ```bash
    cp .env.example .env
    ```
-4. Configure as credenciais do Supabase no arquivo `.env`
+4. Configure as variáveis do Supabase no arquivo `.env`:
+   ```
+   VITE_SUPABASE_URL=sua_url_do_supabase
+   VITE_SUPABASE_ANON_KEY=sua_chave_anonima_do_supabase
+   ```
 
 ## Desenvolvimento
 
 Para iniciar o servidor de desenvolvimento:
 
 ```bash
-npm start
-# ou
-yarn start
+pnpm dev
 ```
 
-O aplicativo estará disponível em `http://localhost:3000`.
+## Build
+
+Para gerar o build de produção:
+
+```bash
+pnpm build
+```
 
 ## Testes
 
 Para executar os testes:
 
 ```bash
-# Executar todos os testes
-npm test
-# ou
-yarn test
-
-# Executar testes em modo watch
-npm run test:watch
-# ou
-yarn test:watch
-
-# Executar testes com cobertura
-npm run test:coverage
-# ou
-yarn test:coverage
-```
-
-## Build
-
-Para criar uma build de produção:
-
-```bash
-npm run build
-# ou
-yarn build
-```
-
-Para criar uma build de staging:
-
-```bash
-npm run build:staging
-# ou
-yarn build:staging
-```
-
-Para analisar o tamanho do bundle:
-
-```bash
-npm run build:analyze
-# ou
-yarn build:analyze
+pnpm test
 ```
 
 ## Estrutura do Projeto
 
 ```
 src/
-├── components/     # Componentes reutilizáveis
-├── hooks/         # Custom hooks
-├── pages/         # Páginas da aplicação
-├── services/      # Serviços e APIs
-├── types/         # Definições de tipos TypeScript
-├── utils/         # Funções utilitárias
-└── App.tsx        # Componente principal
+  ├── components/     # Componentes React
+  ├── contexts/      # Contextos React
+  ├── hooks/         # Hooks personalizados
+  ├── lib/           # Configurações e utilitários
+  ├── pages/         # Páginas da aplicação
+  ├── services/      # Serviços e integrações
+  ├── types/         # Tipos TypeScript
+  └── utils/         # Funções utilitárias
 ```
 
-## Contribuindo
+## Tecnologias Utilizadas
 
-1. Faça um fork do projeto
-2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
-3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
-4. Push para a branch (`git push origin feature/AmazingFeature`)
+- React
+- TypeScript
+- Tailwind CSS
+- Supabase
+- Vite
+- Vitest
+
+## Contribuição
+
+1. Faça o fork do projeto
+2. Crie uma branch para sua feature (`git checkout -b feature/nova-feature`)
+3. Faça commit das suas alterações (`git commit -m 'feat: adiciona nova feature'`)
+4. Faça push para a branch (`git push origin feature/nova-feature`)
 5. Abra um Pull Request
 
 ## Licença
 
-Este projeto está licenciado sob a licença MIT - veja o arquivo [LICENSE](LICENSE) para detalhes.
+Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
 
 ## Documentação Técnica
 
