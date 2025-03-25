@@ -1,6 +1,11 @@
 import { Link, useLocation } from 'react-router-dom';
 import { ChevronRightIcon, HomeIcon } from '@heroicons/react/24/outline';
 
+interface BreadcrumbItem {
+  path: string;
+  label: string;
+}
+
 const routeMap: { [key: string]: { label: string; parent?: string } } = {
   '': { label: 'Home' },
   'conversas': { label: 'Conversas', parent: '' },
@@ -16,11 +21,13 @@ export function Breadcrumbs() {
   const location = useLocation();
   const pathSegments = location.pathname.split('/').filter(Boolean);
   
-  const breadcrumbs = pathSegments.map((segment, index) => {
-    const path = `/${pathSegments.slice(0, index + 1).join('/')}`;
-    const route = routeMap[segment];
-    return route ? { path, label: route.label } : null;
-  }).filter(Boolean);
+  const breadcrumbs: BreadcrumbItem[] = pathSegments
+    .map((segment, index) => {
+      const path = `/${pathSegments.slice(0, index + 1).join('/')}`;
+      const route = routeMap[segment];
+      return route ? { path, label: route.label } : null;
+    })
+    .filter((item): item is BreadcrumbItem => item !== null);
 
   if (breadcrumbs.length === 0) {
     return null;
