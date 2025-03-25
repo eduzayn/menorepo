@@ -58,7 +58,7 @@ export function AlunoSelect({ value, onChange, onAlunoChange }: AlunoSelectProps
               <CommandItem
                 key={aluno.id}
                 value={aluno.id}
-                onSelect={(currentValue) => {
+                onSelect={(currentValue: string) => {
                   onChange(currentValue === value ? "" : currentValue)
                   onAlunoChange?.(aluno)
                   setOpen(false)
