@@ -57,6 +57,7 @@ CREATE TABLE IF NOT EXISTS public.conversas (
     ultima_mensagem_at TIMESTAMPTZ,
     criado_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     atualizado_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    grupo_id uuid REFERENCES public.profiles(id),
     CONSTRAINT fk_remetente FOREIGN KEY (remetente_id) REFERENCES auth.users(id),
     CONSTRAINT fk_destinatario FOREIGN KEY (destinatario_id) REFERENCES auth.users(id),
     CONSTRAINT fk_lead FOREIGN KEY (lead_id) REFERENCES public.leads(id)
@@ -71,6 +72,7 @@ CREATE TABLE IF NOT EXISTS public.mensagens (
     metadata JSONB,
     lida_at TIMESTAMPTZ,
     criado_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     CONSTRAINT fk_conversa FOREIGN KEY (conversa_id) REFERENCES public.conversas(id),
     CONSTRAINT fk_remetente FOREIGN KEY (remetente_id) REFERENCES auth.users(id)
 );
@@ -116,12 +118,21 @@ CREATE TABLE IF NOT EXISTS public.respostas_rapidas (
     CONSTRAINT fk_criado_por FOREIGN KEY (criado_por) REFERENCES auth.users(id)
 );
 
+CREATE TABLE IF NOT EXISTS public.participantes (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    conversa_id UUID NOT NULL REFERENCES public.conversas(id) ON DELETE CASCADE,
+    usuario_id UUID NOT NULL REFERENCES auth.users(id),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE(conversa_id, usuario_id)
+);
+
 -- RLS Policies
 ALTER TABLE public.conversas ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.mensagens ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.campanhas ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.campanha_destinatarios ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.respostas_rapidas ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.participantes ENABLE ROW LEVEL SECURITY;
 
 -- Policies for conversas
 DO $$
@@ -172,9 +183,9 @@ BEGIN
             ON public.mensagens FOR SELECT
             USING (
                 EXISTS (
-                    SELECT 1 FROM public.conversas
-                    WHERE conversas.id = mensagens.conversa_id
-                    AND (conversas.remetente_id = auth.uid() OR conversas.destinatario_id = auth.uid())
+                    SELECT 1 FROM public.participantes
+                    WHERE participantes.conversa_id = mensagens.conversa_id
+                    AND participantes.usuario_id = auth.uid()
                 )
             );
     END IF;
@@ -188,9 +199,9 @@ BEGIN
             ON public.mensagens FOR INSERT
             WITH CHECK (
                 EXISTS (
-                    SELECT 1 FROM public.conversas
-                    WHERE conversas.id = mensagens.conversa_id
-                    AND (conversas.remetente_id = auth.uid() OR conversas.destinatario_id = auth.uid())
+                    SELECT 1 FROM public.participantes
+                    WHERE participantes.conversa_id = mensagens.conversa_id
+                    AND participantes.usuario_id = auth.uid()
                 )
             );
     END IF;
@@ -284,12 +295,33 @@ BEGIN
     END IF;
 END$$;
 
+-- Policies for participantes
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_policies 
+        WHERE tablename = 'participantes' 
+        AND policyname = 'Usuários podem ver participantes'
+    ) THEN
+        CREATE POLICY "Usuários podem ver participantes"
+            ON public.participantes FOR SELECT
+            USING (
+                EXISTS (
+                    SELECT 1 FROM public.participantes p2
+                    WHERE p2.conversa_id = participantes.conversa_id
+                    AND p2.usuario_id = auth.uid()
+                )
+            );
+    END IF;
+END$$;
+
 -- Functions
 CREATE OR REPLACE FUNCTION public.atualizar_ultima_mensagem()
 RETURNS TRIGGER AS $$
 BEGIN
     UPDATE public.conversas
-    SET ultima_mensagem_at = NEW.criado_at
+    SET ultima_mensagem_at = NEW.criado_at,
+        updated_at = NEW.criado_at
     WHERE id = NEW.conversa_id;
     RETURN NEW;
 END;
@@ -341,4 +373,11 @@ BEGIN
                 (storage.foldername(name))[1] = auth.uid()::text
             );
     END IF;
-END$$; 
+END$$;
+
+-- Indices
+CREATE INDEX IF NOT EXISTS idx_mensagens_conversa ON public.mensagens(conversa_id);
+CREATE INDEX IF NOT EXISTS idx_mensagens_usuario ON public.mensagens(remetente_id);
+CREATE INDEX IF NOT EXISTS idx_participantes_conversa ON public.participantes(conversa_id);
+CREATE INDEX IF NOT EXISTS idx_participantes_usuario ON public.participantes(usuario_id);
+CREATE INDEX IF NOT EXISTS idx_conversas_grupo ON public.conversas(grupo_id); 
