@@ -1,19 +1,19 @@
 import { useState } from 'react'
 import { Check, ChevronsUpDown } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { Button } from "@repo/ui-components/components/ui/button"
+import { Button } from "@repo/ui-components/components/Button"
 import {
   Command,
   CommandEmpty,
   CommandGroup,
   CommandInput,
   CommandItem,
-} from "@/components/ui/command"
+} from "@repo/ui-components/components/Command"
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@repo/ui-components/components/ui/popover"
+} from "@repo/ui-components/components/Popover"
 import { useQuery } from '@tanstack/react-query'
 import { alunoService } from '@/services/alunoService'
 import type { Aluno } from '@/types/matricula'
