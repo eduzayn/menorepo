@@ -7,6 +7,9 @@ export interface Curso {
   modalidade: 'presencial' | 'ead' | 'hibrido'
   coordenador_id: string
   institution_id: string
+  status: 'ativo' | 'inativo'
   created_at: string
   updated_at: string
-} 
+}
+
+export type CursoFormData = Omit<Curso, 'id' | 'created_at' | 'updated_at'> 

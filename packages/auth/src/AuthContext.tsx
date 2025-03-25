@@ -14,20 +14,19 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 interface AuthProviderProps {
   children: ReactNode
+  supabaseUrl: string
+  supabaseAnonKey: string
 }
 
-export function AuthProvider({ children }: AuthProviderProps) {
+export function AuthProvider({ children, supabaseUrl, supabaseAnonKey }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  const supabase = createSupabaseClient(
-    import.meta.env.VITE_SUPABASE_URL,
-    import.meta.env.VITE_SUPABASE_ANON_KEY
-  )
+  const supabase = createSupabaseClient(supabaseUrl, supabaseAnonKey)
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session) {
         setUser(session.user)
       } else {
