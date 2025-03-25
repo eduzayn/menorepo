@@ -4,7 +4,10 @@ import { router } from './routes'
 
 function App() {
   return (
-    <AuthProvider>
+    <AuthProvider
+      supabaseUrl={import.meta.env.VITE_SUPABASE_URL}
+      supabaseAnonKey={import.meta.env.VITE_SUPABASE_ANON_KEY}
+    >
       <RouterProvider router={router} />
     </AuthProvider>
   )

@@ -67,7 +67,7 @@ export function CursoDetails() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <h2 className="text-sm font-medium text-gray-500">Descrição</h2>
-            <p className="mt-1 text-sm text-gray-900">{curso.descricao}</p>
+            <p className="mt-1 text-sm text-gray-900">{curso.descricao || '-'}</p>
           </div>
 
           <div>
@@ -101,14 +101,14 @@ export function CursoDetails() {
           <div>
             <h2 className="text-sm font-medium text-gray-500">Data de Criação</h2>
             <p className="mt-1 text-sm text-gray-900">
-              {new Date(curso.created_at).toLocaleDateString()}
+              {curso.created_at ? new Date(curso.created_at).toLocaleDateString() : '-'}
             </p>
           </div>
 
           <div>
             <h2 className="text-sm font-medium text-gray-500">Última Atualização</h2>
             <p className="mt-1 text-sm text-gray-900">
-              {new Date(curso.updated_at).toLocaleDateString()}
+              {curso.updated_at ? new Date(curso.updated_at).toLocaleDateString() : '-'}
             </p>
           </div>
         </div>

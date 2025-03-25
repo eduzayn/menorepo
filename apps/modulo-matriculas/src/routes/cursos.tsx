@@ -8,7 +8,7 @@ export const cursosRoutes: RouteObject[] = [
   {
     path: '/cursos',
     element: (
-      <PrivateRoute roles={['admin', 'coordenador']}>
+      <PrivateRoute requiredRoles={['admin', 'coordenador']}>
         <CursosList />
       </PrivateRoute>
     )
@@ -16,7 +16,7 @@ export const cursosRoutes: RouteObject[] = [
   {
     path: '/cursos/novo',
     element: (
-      <PrivateRoute roles={['admin']}>
+      <PrivateRoute requiredRoles={['admin']}>
         <CursoForm />
       </PrivateRoute>
     )
@@ -24,7 +24,7 @@ export const cursosRoutes: RouteObject[] = [
   {
     path: '/cursos/:id',
     element: (
-      <PrivateRoute roles={['admin', 'coordenador']}>
+      <PrivateRoute requiredRoles={['admin', 'coordenador']}>
         <CursoDetails />
       </PrivateRoute>
     )
@@ -32,7 +32,7 @@ export const cursosRoutes: RouteObject[] = [
   {
     path: '/cursos/:id/edit',
     element: (
-      <PrivateRoute roles={['admin']}>
+      <PrivateRoute requiredRoles={['admin']}>
         <CursoForm />
       </PrivateRoute>
     )

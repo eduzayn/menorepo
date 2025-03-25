@@ -1,10 +1,12 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Button } from '@edunexia/ui-components'
-import { Matricula } from '../types/matricula'
+import { MatriculaDetalhada } from '../types/matricula'
 import { matriculaService } from '../services/matriculaService'
 
 export function MatriculasList() {
-  const [matriculas, setMatriculas] = useState<Matricula[]>([])
+  const navigate = useNavigate()
+  const [matriculas, setMatriculas] = useState<MatriculaDetalhada[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -14,8 +16,8 @@ export function MatriculasList() {
         const data = await matriculaService.listarMatriculas()
         setMatriculas(data)
       } catch (err) {
-        setError('Erro ao carregar matrículas. Por favor, tente novamente.')
-        console.error('Erro ao buscar matrículas:', err)
+        setError('Erro ao carregar as matrículas')
+        console.error('Erro:', err)
       } finally {
         setLoading(false)
       }
@@ -23,17 +25,6 @@ export function MatriculasList() {
 
     fetchMatriculas()
   }, [])
-
-  const handleCancelarMatricula = async (id: string) => {
-    try {
-      await matriculaService.cancelarMatricula(id)
-      setMatriculas(matriculas.map(m => 
-        m.id === id ? { ...m, status: 'cancelada' } : m
-      ))
-    } catch (err) {
-      console.error('Erro ao cancelar matrícula:', err)
-    }
-  }
 
   if (loading) {
     return (
@@ -45,77 +36,58 @@ export function MatriculasList() {
 
   if (error) {
     return (
-      <div className="text-center py-4">
-        <p className="text-red-600">{error}</p>
+      <div className="bg-red-50 text-red-700 p-4 rounded-md">
+        {error}
       </div>
     )
   }
 
   return (
-    <div className="overflow-x-auto">
-      <table className="min-w-full divide-y divide-gray-200">
-        <thead className="bg-gray-50">
-          <tr>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Nome
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Curso
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Período
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Status
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Data de Matrícula
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Ações
-            </th>
-          </tr>
-        </thead>
-        <tbody className="bg-white divide-y divide-gray-200">
-          {matriculas.map((matricula) => (
-            <tr key={matricula.id}>
-              <td className="px-6 py-4 whitespace-nowrap">
-                <div className="text-sm font-medium text-gray-900">{matricula.nome}</div>
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap">
-                <div className="text-sm text-gray-900">{matricula.curso}</div>
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap">
-                <div className="text-sm text-gray-900">{matricula.periodo}</div>
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap">
-                <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                  matricula.status === 'ativa' ? 'bg-green-100 text-green-800' :
-                  matricula.status === 'cancelada' ? 'bg-red-100 text-red-800' :
-                  'bg-blue-100 text-blue-800'
-                }`}>
-                  {matricula.status}
-                </span>
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {new Date(matricula.dataMatricula).toLocaleDateString('pt-BR')}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                <Button variant="secondary" className="mr-2">
-                  Editar
-                </Button>
-                <Button 
-                  variant="outline"
-                  onClick={() => handleCancelarMatricula(matricula.id)}
-                  disabled={matricula.status === 'cancelada'}
-                >
-                  Cancelar
-                </Button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div className="bg-white shadow rounded-lg">
+      <div className="p-6 border-b border-gray-200">
+        <div className="flex justify-between items-center">
+          <h2 className="text-2xl font-bold text-gray-900">Matrículas</h2>
+          <Button onClick={() => navigate('/matriculas/nova')} variant="primary">
+            Nova Matrícula
+          </Button>
+        </div>
+      </div>
+
+      <ul className="divide-y divide-gray-200">
+        {matriculas.map((matricula) => (
+          <li
+            key={matricula.id}
+            className="hover:bg-gray-50 cursor-pointer"
+            onClick={() => navigate(`/matriculas/${matricula.id}`)}
+          >
+            <div className="px-6 py-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-sm font-medium text-gray-900">{matricula.nomeAluno}</div>
+                  <div className="text-sm text-gray-500">ID: {matricula.id}</div>
+                </div>
+                <div>
+                  <div className="text-sm text-gray-900">{matricula.nomeCurso}</div>
+                  <div className="text-sm text-gray-500">
+                    {new Date(matricula.dataMatricula).toLocaleDateString('pt-BR')}
+                  </div>
+                </div>
+                <div>
+                  <span className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${
+                    matricula.status === 'ativa'
+                      ? 'bg-green-100 text-green-800'
+                      : matricula.status === 'pendente'
+                      ? 'bg-yellow-100 text-yellow-800'
+                      : 'bg-red-100 text-red-800'
+                  }`}>
+                    {matricula.status}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </li>
+        ))}
+      </ul>
     </div>
   )
 } 

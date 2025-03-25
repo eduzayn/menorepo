@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { cursoService } from '../../services/cursoService'
-import { Curso } from '@edunexia/database-schema'
+import { CursoFormData } from '@edunexia/database-schema'
 import { Button, Input, Textarea, Select } from '@edunexia/ui-components'
 
 export function CursoForm() {
@@ -9,13 +9,15 @@ export function CursoForm() {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [curso, setCurso] = useState<Partial<Curso>>({
+  const [curso, setCurso] = useState<CursoFormData>({
     nome: '',
     descricao: '',
     modalidade: 'presencial',
     carga_horaria: 0,
     duracao_meses: 0,
-    status: 'ativo'
+    status: 'ativo',
+    coordenador_id: '',
+    institution_id: ''
   })
 
   useEffect(() => {
@@ -124,7 +126,7 @@ export function CursoForm() {
             required
           >
             <option value="presencial">Presencial</option>
-            <option value="online">Online</option>
+            <option value="ead">EAD</option>
             <option value="hibrido">Híbrido</option>
           </Select>
         </div>

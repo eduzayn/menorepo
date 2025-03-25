@@ -1,5 +1,5 @@
 import { createBrowserRouter } from 'react-router-dom'
-import Layout from './components/Layout'
+import { Layout } from './components/Layout'
 import { MatriculasList } from './components/MatriculasList'
 import { MatriculaForm } from './components/MatriculaForm'
 import { MatriculaDetails } from './components/MatriculaDetails'
@@ -19,7 +19,7 @@ export const router = createBrowserRouter([
       },
       {
         path: ':id',
-        element: <MatriculaDetails matriculaId=":id" onClose={() => window.history.back()} />
+        element: <MatriculaDetails />
       }
     ]
   }

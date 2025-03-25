@@ -1,8 +1,8 @@
-import { Contrato } from '@edunexia/database-schema'
+import { DbContrato } from '@edunexia/database-schema'
 import { supabase } from '../lib/supabase'
 
 export const contratoService = {
-  async listarContratos(matriculaId: string): Promise<Contrato[]> {
+  async listarContratos(matriculaId: string): Promise<DbContrato[]> {
     const { data, error } = await supabase
       .from('contratos')
       .select('*')
@@ -13,7 +13,7 @@ export const contratoService = {
     return data
   },
 
-  async buscarContrato(id: string): Promise<Contrato | null> {
+  async buscarContrato(id: string): Promise<DbContrato | null> {
     const { data, error } = await supabase
       .from('contratos')
       .select('*')
@@ -24,7 +24,7 @@ export const contratoService = {
     return data
   },
 
-  async criarContrato(contrato: Omit<Contrato, 'id' | 'created_at' | 'updated_at'>): Promise<Contrato> {
+  async criarContrato(contrato: Omit<DbContrato, 'id' | 'created_at' | 'updated_at'>): Promise<DbContrato> {
     const { data, error } = await supabase
       .from('contratos')
       .insert([contrato])
@@ -35,7 +35,7 @@ export const contratoService = {
     return data
   },
 
-  async atualizarContrato(id: string, contrato: Partial<Contrato>): Promise<Contrato> {
+  async atualizarContrato(id: string, contrato: Partial<DbContrato>): Promise<DbContrato> {
     const { data, error } = await supabase
       .from('contratos')
       .update(contrato)
@@ -47,7 +47,7 @@ export const contratoService = {
     return data
   },
 
-  async assinarContrato(id: string): Promise<Contrato> {
+  async assinarContrato(id: string): Promise<DbContrato> {
     const { data, error } = await supabase
       .from('contratos')
       .update({

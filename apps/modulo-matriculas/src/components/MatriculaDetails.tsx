@@ -1,13 +1,13 @@
 import { useParams, useNavigate } from 'react-router-dom'
 import { Button } from '@edunexia/ui-components'
 import { useState, useEffect } from 'react'
-import { Matricula } from '../types/matricula'
+import { MatriculaDetalhada } from '../types/matricula'
 import { matriculaService } from '../services/matriculaService'
 
 export function MatriculaDetails() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const [matricula, setMatricula] = useState<Matricula | null>(null)
+  const [matricula, setMatricula] = useState<MatriculaDetalhada | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -78,10 +78,6 @@ export function MatriculaDetails() {
           <p className="text-gray-600">
             {new Date(matricula.dataMatricula).toLocaleDateString()}
           </p>
-        </div>
-        <div>
-          <h3 className="text-lg font-medium text-gray-900">Status</h3>
-          <p className="text-gray-600">{matricula.status}</p>
         </div>
       </div>
 

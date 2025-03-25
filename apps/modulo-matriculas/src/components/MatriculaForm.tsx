@@ -1,34 +1,32 @@
 import { useState } from 'react'
-import { Button } from '@edunexia/ui-components'
+import { useNavigate } from 'react-router-dom'
+import { Button, Input, Select } from '@edunexia/ui-components'
 import { MatriculaFormData } from '../types/matricula'
 import { matriculaService } from '../services/matriculaService'
 
 export function MatriculaForm() {
-  const [formData, setFormData] = useState<MatriculaFormData>({
-    nome: '',
-    cpf: '',
-    dataNascimento: '',
-    email: '',
-    telefone: '',
-    endereco: '',
-    curso: '',
-    periodo: ''
-  })
+  const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [formData, setFormData] = useState<MatriculaFormData>({
+    aluno_id: '',
+    curso_id: '',
+    plano_id: '',
+    data_inicio: '',
+    data_conclusao_prevista: '',
+    status: 'pendente',
+    observacoes: null
+  })
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setLoading(true)
-    setError(null)
-
     try {
+      setLoading(true)
       await matriculaService.criarMatricula(formData)
-      // TODO: Implementar feedback de sucesso e redirecionamento
-      console.log('Matrícula criada com sucesso!')
+      navigate('/matriculas')
     } catch (err) {
-      setError('Erro ao criar matrícula. Por favor, tente novamente.')
-      console.error('Erro ao criar matrícula:', err)
+      setError('Erro ao criar matrícula')
+      console.error('Erro:', err)
     } finally {
       setLoading(false)
     }
@@ -42,150 +40,138 @@ export function MatriculaForm() {
     }))
   }
 
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500"></div>
+      </div>
+    )
+  }
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 max-w-2xl mx-auto p-6">
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-bold text-gray-900">Nova Matrícula</h1>
+        <Button variant="outline" onClick={() => navigate('/matriculas')}>
+          Cancelar
+        </Button>
+      </div>
+
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative" role="alert">
-          <span className="block sm:inline">{error}</span>
+        <div className="bg-red-50 text-red-700 p-4 rounded-md">
+          {error}
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <form onSubmit={handleSubmit} className="space-y-6">
         <div>
-          <label htmlFor="nome" className="block text-sm font-medium text-gray-700">
-            Nome Completo
+          <label htmlFor="aluno_id" className="block text-sm font-medium text-gray-700">
+            ID do Aluno
           </label>
-          <input
+          <Input
             type="text"
-            id="nome"
-            name="nome"
-            value={formData.nome}
+            name="aluno_id"
+            id="aluno_id"
+            value={formData.aluno_id}
             onChange={handleChange}
             required
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
           />
         </div>
 
         <div>
-          <label htmlFor="cpf" className="block text-sm font-medium text-gray-700">
-            CPF
+          <label htmlFor="curso_id" className="block text-sm font-medium text-gray-700">
+            ID do Curso
           </label>
-          <input
+          <Input
             type="text"
-            id="cpf"
-            name="cpf"
-            value={formData.cpf}
+            name="curso_id"
+            id="curso_id"
+            value={formData.curso_id}
             onChange={handleChange}
             required
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
           />
         </div>
 
         <div>
-          <label htmlFor="dataNascimento" className="block text-sm font-medium text-gray-700">
-            Data de Nascimento
+          <label htmlFor="plano_id" className="block text-sm font-medium text-gray-700">
+            ID do Plano
           </label>
-          <input
+          <Input
+            type="text"
+            name="plano_id"
+            id="plano_id"
+            value={formData.plano_id}
+            onChange={handleChange}
+            required
+          />
+        </div>
+
+        <div>
+          <label htmlFor="data_inicio" className="block text-sm font-medium text-gray-700">
+            Data de Início
+          </label>
+          <Input
             type="date"
-            id="dataNascimento"
-            name="dataNascimento"
-            value={formData.dataNascimento}
+            name="data_inicio"
+            id="data_inicio"
+            value={formData.data_inicio}
             onChange={handleChange}
             required
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
           />
         </div>
 
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-            E-mail
+          <label htmlFor="data_conclusao_prevista" className="block text-sm font-medium text-gray-700">
+            Data de Conclusão Prevista
           </label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            value={formData.email}
+          <Input
+            type="date"
+            name="data_conclusao_prevista"
+            id="data_conclusao_prevista"
+            value={formData.data_conclusao_prevista}
             onChange={handleChange}
             required
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
           />
         </div>
 
         <div>
-          <label htmlFor="telefone" className="block text-sm font-medium text-gray-700">
-            Telefone
+          <label htmlFor="status" className="block text-sm font-medium text-gray-700">
+            Status
           </label>
-          <input
-            type="tel"
-            id="telefone"
-            name="telefone"
-            value={formData.telefone}
+          <Select
+            name="status"
+            id="status"
+            value={formData.status}
             onChange={handleChange}
             required
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-          />
+          >
+            <option value="pendente">Pendente</option>
+            <option value="ativa">Ativa</option>
+            <option value="cancelada">Cancelada</option>
+            <option value="trancada">Trancada</option>
+            <option value="concluida">Concluída</option>
+          </Select>
         </div>
 
         <div>
-          <label htmlFor="endereco" className="block text-sm font-medium text-gray-700">
-            Endereço
+          <label htmlFor="observacoes" className="block text-sm font-medium text-gray-700">
+            Observações
           </label>
-          <input
+          <Input
             type="text"
-            id="endereco"
-            name="endereco"
-            value={formData.endereco}
+            name="observacoes"
+            id="observacoes"
+            value={formData.observacoes || ''}
             onChange={handleChange}
-            required
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
           />
         </div>
 
-        <div>
-          <label htmlFor="curso" className="block text-sm font-medium text-gray-700">
-            Curso
-          </label>
-          <select
-            id="curso"
-            name="curso"
-            value={formData.curso}
-            onChange={handleChange}
-            required
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-          >
-            <option value="">Selecione um curso</option>
-            <option value="informatica">Informática</option>
-            <option value="administracao">Administração</option>
-            <option value="contabilidade">Contabilidade</option>
-            <option value="marketing">Marketing</option>
-          </select>
+        <div className="flex justify-end">
+          <Button type="submit" disabled={loading}>
+            {loading ? 'Salvando...' : 'Salvar'}
+          </Button>
         </div>
-
-        <div>
-          <label htmlFor="periodo" className="block text-sm font-medium text-gray-700">
-            Período
-          </label>
-          <select
-            id="periodo"
-            name="periodo"
-            value={formData.periodo}
-            onChange={handleChange}
-            required
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-          >
-            <option value="">Selecione um período</option>
-            <option value="manha">Manhã</option>
-            <option value="tarde">Tarde</option>
-            <option value="noite">Noite</option>
-          </select>
-        </div>
-      </div>
-
-      <div className="flex justify-end">
-        <Button type="submit" variant="primary" disabled={loading}>
-          {loading ? 'Processando...' : 'Realizar Matrícula'}
-        </Button>
-      </div>
-    </form>
+      </form>
+    </div>
   )
 } 

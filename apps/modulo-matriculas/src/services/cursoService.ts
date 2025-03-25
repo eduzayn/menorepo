@@ -1,4 +1,4 @@
-import { Curso } from '@edunexia/database-schema'
+import { Curso, CursoFormData } from '@edunexia/database-schema'
 import { supabase } from '../lib/supabase'
 
 export const cursoService = {
@@ -13,7 +13,10 @@ export const cursoService = {
       throw error
     }
 
-    return data
+    return data.map(curso => ({
+      ...curso,
+      status: curso.status || 'inativo'
+    }))
   },
 
   async buscarCurso(id: string): Promise<Curso> {
@@ -28,10 +31,13 @@ export const cursoService = {
       throw error
     }
 
-    return data
+    return {
+      ...data,
+      status: data.status || 'inativo'
+    }
   },
 
-  async criarCurso(curso: Partial<Curso>): Promise<Curso> {
+  async criarCurso(curso: CursoFormData): Promise<Curso> {
     const { data, error } = await supabase
       .from('cursos')
       .insert([curso])
@@ -43,10 +49,13 @@ export const cursoService = {
       throw error
     }
 
-    return data
+    return {
+      ...data,
+      status: data.status || 'inativo'
+    }
   },
 
-  async atualizarCurso(id: string, curso: Partial<Curso>): Promise<Curso> {
+  async atualizarCurso(id: string, curso: Partial<CursoFormData>): Promise<Curso> {
     const { data, error } = await supabase
       .from('cursos')
       .update(curso)
@@ -59,7 +68,10 @@ export const cursoService = {
       throw error
     }
 
-    return data
+    return {
+      ...data,
+      status: data.status || 'inativo'
+    }
   },
 
   async excluirCurso(id: string): Promise<void> {

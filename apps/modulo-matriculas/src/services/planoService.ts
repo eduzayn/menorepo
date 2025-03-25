@@ -1,8 +1,8 @@
-import { PlanoPagamento } from '@edunexia/database-schema'
+import { DbPlanoPagamento } from '@edunexia/database-schema'
 import { supabase } from '../lib/supabase'
 
 export const planoService = {
-  async listarPlanos(cursoId?: string): Promise<PlanoPagamento[]> {
+  async listarPlanos(cursoId?: string): Promise<DbPlanoPagamento[]> {
     let query = supabase
       .from('planos_pagamento')
       .select('*')
@@ -18,7 +18,7 @@ export const planoService = {
     return data
   },
 
-  async buscarPlano(id: string): Promise<PlanoPagamento | null> {
+  async buscarPlano(id: string): Promise<DbPlanoPagamento | null> {
     const { data, error } = await supabase
       .from('planos_pagamento')
       .select('*')
@@ -29,7 +29,7 @@ export const planoService = {
     return data
   },
 
-  async criarPlano(plano: Omit<PlanoPagamento, 'id' | 'created_at' | 'updated_at'>): Promise<PlanoPagamento> {
+  async criarPlano(plano: Omit<DbPlanoPagamento, 'id' | 'created_at' | 'updated_at'>): Promise<DbPlanoPagamento> {
     const { data, error } = await supabase
       .from('planos_pagamento')
       .insert([plano])
@@ -40,7 +40,7 @@ export const planoService = {
     return data
   },
 
-  async atualizarPlano(id: string, plano: Partial<PlanoPagamento>): Promise<PlanoPagamento> {
+  async atualizarPlano(id: string, plano: Partial<DbPlanoPagamento>): Promise<DbPlanoPagamento> {
     const { data, error } = await supabase
       .from('planos_pagamento')
       .update(plano)

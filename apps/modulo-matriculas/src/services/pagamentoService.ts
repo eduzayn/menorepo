@@ -1,8 +1,8 @@
-import { Pagamento, PaymentStatus } from '@edunexia/database-schema'
+import { DbPagamento, PaymentStatus } from '@edunexia/database-schema'
 import { supabase } from '../lib/supabase'
 
 export const pagamentoService = {
-  async listarPagamentos(matriculaId: string): Promise<Pagamento[]> {
+  async listarPagamentos(matriculaId: string): Promise<DbPagamento[]> {
     const { data, error } = await supabase
       .from('pagamentos')
       .select('*')
@@ -13,7 +13,7 @@ export const pagamentoService = {
     return data
   },
 
-  async buscarPagamento(id: string): Promise<Pagamento | null> {
+  async buscarPagamento(id: string): Promise<DbPagamento | null> {
     const { data, error } = await supabase
       .from('pagamentos')
       .select('*')
@@ -24,7 +24,7 @@ export const pagamentoService = {
     return data
   },
 
-  async criarPagamento(pagamento: Omit<Pagamento, 'id' | 'created_at' | 'updated_at'>): Promise<Pagamento> {
+  async criarPagamento(pagamento: Omit<DbPagamento, 'id' | 'created_at' | 'updated_at'>): Promise<DbPagamento> {
     const { data, error } = await supabase
       .from('pagamentos')
       .insert([pagamento])
@@ -41,7 +41,7 @@ export const pagamentoService = {
     numeroParcelas: number,
     diaVencimento: number,
     dataInicio: Date
-  ): Promise<Pagamento[]> {
+  ): Promise<DbPagamento[]> {
     const pagamentos = Array.from({ length: numeroParcelas }, (_, i) => {
       const dataVencimento = new Date(dataInicio)
       dataVencimento.setMonth(dataVencimento.getMonth() + i)
@@ -68,7 +68,7 @@ export const pagamentoService = {
     id: string,
     formaPagamento: string,
     comprovante?: File
-  ): Promise<Pagamento> {
+  ): Promise<DbPagamento> {
     let comprovanteUrl: string | undefined
 
     if (comprovante) {
@@ -102,7 +102,7 @@ export const pagamentoService = {
     return data
   },
 
-  async estornarPagamento(id: string): Promise<Pagamento> {
+  async estornarPagamento(id: string): Promise<DbPagamento> {
     const { data, error } = await supabase
       .from('pagamentos')
       .update({

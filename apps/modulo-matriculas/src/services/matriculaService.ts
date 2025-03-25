@@ -1,23 +1,22 @@
-import { Matricula, MatriculaStatus } from '@edunexia/database-schema'
+import { DbMatricula, MatriculaStatus } from '@edunexia/database-schema'
 import { supabase } from '../lib/supabase'
+import { MatriculaDetalhada, Matricula } from '../types/matricula'
 
 export const matriculaService = {
   async listarMatriculas(filters?: {
     alunoId?: string
     cursoId?: string
     status?: MatriculaStatus
-  }): Promise<Matricula[]> {
+  }): Promise<MatriculaDetalhada[]> {
     let query = supabase
       .from('matriculas')
       .select(`
         *,
-        cursos (
-          nome,
-          modalidade
+        alunos (
+          nome
         ),
-        planos_pagamento (
-          nome,
-          valor_total
+        cursos (
+          nome
         )
       `)
       .order('created_at', { ascending: false })
@@ -37,61 +36,47 @@ export const matriculaService = {
     const { data, error } = await query
 
     if (error) throw error
-    return data
+    if (!data) return []
+
+    return data.map(matricula => ({
+      ...matricula,
+      nomeAluno: matricula.alunos.nome,
+      nomeCurso: matricula.cursos.nome,
+      dataMatricula: matricula.created_at
+    }))
   },
 
-  async buscarMatricula(id: string): Promise<Matricula | null> {
+  async buscarMatricula(id: string): Promise<MatriculaDetalhada> {
     const { data, error } = await supabase
       .from('matriculas')
       .select(`
         *,
+        alunos (
+          nome
+        ),
         cursos (
-          nome,
-          modalidade,
-          carga_horaria,
-          duracao_meses
-        ),
-        planos_pagamento (
-          nome,
-          valor_total,
-          numero_parcelas,
-          valor_parcela,
-          dia_vencimento
-        ),
-        documentos (
-          id,
-          tipo,
-          nome,
-          url,
-          status
-        ),
-        contratos (
-          id,
-          numero_contrato,
-          data_assinatura,
-          url_documento,
-          status
-        ),
-        pagamentos (
-          id,
-          valor,
-          data_vencimento,
-          data_pagamento,
-          status,
-          forma_pagamento
+          nome
         )
       `)
       .eq('id', id)
       .single()
 
     if (error) throw error
-    return data
+
+    if (!data) throw new Error('Matrícula não encontrada')
+
+    return {
+      ...data,
+      nomeAluno: data.alunos.nome,
+      nomeCurso: data.cursos.nome,
+      dataMatricula: data.created_at
+    }
   },
 
   async criarMatricula(matricula: Omit<Matricula, 'id' | 'created_at' | 'updated_at'>): Promise<Matricula> {
     const { data, error } = await supabase
       .from('matriculas')
-      .insert([matricula])
+      .insert(matricula)
       .select()
       .single()
 
@@ -99,7 +84,7 @@ export const matriculaService = {
     return data
   },
 
-  async atualizarMatricula(id: string, matricula: Partial<Matricula>): Promise<Matricula> {
+  async atualizarMatricula(id: string, matricula: Partial<DbMatricula>): Promise<DbMatricula> {
     const { data, error } = await supabase
       .from('matriculas')
       .update(matricula)
@@ -111,18 +96,15 @@ export const matriculaService = {
     return data
   },
 
-  async cancelarMatricula(id: string, observacoes?: string): Promise<Matricula> {
-    const { data, error } = await supabase
+  async cancelarMatricula(id: string, observacoes?: string): Promise<void> {
+    const { error } = await supabase
       .from('matriculas')
       .update({
         status: 'cancelada',
         observacoes: observacoes ? `${observacoes}\nMatrícula cancelada em ${new Date().toISOString()}` : `Matrícula cancelada em ${new Date().toISOString()}`
       })
       .eq('id', id)
-      .select()
-      .single()
 
     if (error) throw error
-    return data
   }
 } 

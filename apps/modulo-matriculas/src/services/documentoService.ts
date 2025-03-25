@@ -1,8 +1,8 @@
-import { Documento } from '@edunexia/database-schema'
+import { DbDocumento } from '@edunexia/database-schema'
 import { supabase } from '../lib/supabase'
 
 export const documentoService = {
-  async listarDocumentos(matriculaId: string): Promise<Documento[]> {
+  async listarDocumentos(matriculaId: string): Promise<DbDocumento[]> {
     const { data, error } = await supabase
       .from('documentos')
       .select('*')
@@ -13,7 +13,7 @@ export const documentoService = {
     return data
   },
 
-  async buscarDocumento(id: string): Promise<Documento | null> {
+  async buscarDocumento(id: string): Promise<DbDocumento | null> {
     const { data, error } = await supabase
       .from('documentos')
       .select('*')
@@ -24,7 +24,7 @@ export const documentoService = {
     return data
   },
 
-  async criarDocumento(documento: Omit<Documento, 'id' | 'created_at' | 'updated_at'>): Promise<Documento> {
+  async criarDocumento(documento: Omit<DbDocumento, 'id' | 'created_at' | 'updated_at'>): Promise<DbDocumento> {
     const { data, error } = await supabase
       .from('documentos')
       .insert([documento])
@@ -35,7 +35,7 @@ export const documentoService = {
     return data
   },
 
-  async atualizarDocumento(id: string, documento: Partial<Documento>): Promise<Documento> {
+  async atualizarDocumento(id: string, documento: Partial<DbDocumento>): Promise<DbDocumento> {
     const { data, error } = await supabase
       .from('documentos')
       .update(documento)
