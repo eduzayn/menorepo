@@ -1,25 +1,29 @@
 import { useState } from 'react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import Sidebar from './Sidebar';
-import { DetailsPanel } from '../chat/DetailsPanel';
+import DetailPanel from './DetailPanel';
+import { useComunicacao } from '@/contexts/ComunicacaoContext';
+import type { Conversa } from '@/lib/config';
 
 interface MainLayoutProps {
   children: React.ReactNode;
   showDetails?: boolean;
   detailsProps?: {
-    lead?: any;
-    aluno?: any;
-    historicoInteracoes: any[];
-    onAcaoRapida: (acao: string) => void;
+    conversa?: Conversa;
+    onClose?: () => void;
   };
 }
 
 export function MainLayout({ children, showDetails = false, detailsProps }: MainLayoutProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isDetailsOpen, setIsDetailsOpen] = useState(showDetails);
+  const { conversaAtual } = useComunicacao();
+
+  // Determina se deve mostrar o painel de detalhes
+  const shouldShowDetails = showDetails || !!conversaAtual;
 
   return (
-    <div className="h-screen flex overflow-hidden bg-gray-100">
+    <div className="h-screen flex overflow-hidden bg-neutral-lightest">
       {/* Sidebar Mobile Overlay */}
       <div
         className={`fixed inset-0 bg-gray-600 bg-opacity-75 transition-opacity lg:hidden ${
@@ -52,7 +56,7 @@ export function MainLayout({ children, showDetails = false, detailsProps }: Main
             <h1 className="ml-2 text-xl font-semibold text-gray-900">Edunexia</h1>
           </div>
           <div className="flex items-center">
-            {showDetails && (
+            {shouldShowDetails && (
               <button
                 type="button"
                 className="lg:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100"
@@ -76,13 +80,21 @@ export function MainLayout({ children, showDetails = false, detailsProps }: Main
           </div>
 
           {/* Details Panel */}
-          {showDetails && detailsProps && (
+          {shouldShowDetails && (
             <div
               className={`fixed inset-y-0 right-0 z-50 w-80 bg-white transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${
                 isDetailsOpen ? 'translate-x-0' : 'translate-x-full'
               }`}
             >
-              <DetailsPanel {...detailsProps} />
+              <DetailPanel
+                onClose={detailsProps?.onClose}
+                data={conversaAtual ? {
+                  name: conversaAtual.titulo,
+                  email: conversaAtual.participante_id,
+                  status: conversaAtual.status,
+                  lastContact: conversaAtual.ultima_mensagem_at,
+                } : undefined}
+              />
             </div>
           )}
         </div>

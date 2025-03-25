@@ -1,1 +1,87 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Variáveis de cores do tema */
+:root {
+  --color-primary-lightest: #f0f9ff;
+  --color-primary-light: #e0f2fe;
+  --color-primary: #0ea5e9;
+  --color-primary-dark: #0369a1;
+  
+  --color-neutral-lightest: #f8fafc;
+  --color-neutral-light: #f1f5f9;
+  --color-neutral: #64748b;
+  --color-neutral-dark: #334155;
+  
+  --color-accent-mint: #86efac;
+  --color-accent-lavender: #e9d5ff;
+}
+
+/* Estilos base */
+@layer base {
+  body {
+    @apply bg-neutral-lightest text-neutral-dark antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-medium text-gray-900;
+  }
+}
+
+/* Componentes customizados */
+@layer components {
+  .btn {
+    @apply px-4 py-2 rounded-md font-medium transition-colors;
+  }
+
+  .btn-primary {
+    @apply bg-primary text-white hover:bg-primary-dark;
+  }
+
+  .btn-secondary {
+    @apply bg-neutral-light text-neutral-dark hover:bg-neutral;
+  }
+
+  .input {
+    @apply w-full px-3 py-2 border border-primary-light rounded-md 
+           focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary;
+  }
+
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .badge-success {
+    @apply bg-green-100 text-green-800;
+  }
+
+  .badge-warning {
+    @apply bg-yellow-100 text-yellow-800;
+  }
+
+  .badge-neutral {
+    @apply bg-gray-100 text-gray-800;
+  }
+}
+
+/* Animações */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideIn {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.animate-slide-in {
+  animation: slideIn 0.3s ease-in-out;
+}
+
 /* Estilos específicos do módulo de comunicação */ 
