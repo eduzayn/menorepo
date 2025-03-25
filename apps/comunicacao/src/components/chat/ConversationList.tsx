@@ -1,6 +1,6 @@
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { Card } from '@edunexia/ui-components';
+import { Card, Input } from '../ui';
 import type { Conversa } from '../../types/comunicacao';
 
 interface ConversationListProps {
@@ -11,35 +11,35 @@ interface ConversationListProps {
 
 export function ConversationList({ conversas, selectedId, onSelect }: ConversationListProps) {
   return (
-    <div className="h-full flex flex-col bg-neutral-lightest border-r border-primary-light">
+    <Card className="h-full flex flex-col">
       {/* Header */}
-      <div className="p-4 border-b border-primary-light">
-        <h2 className="text-lg font-medium text-gray-900">Conversas</h2>
+      <div className="p-4 border-b">
+        <h2 className="text-lg font-medium">Conversas</h2>
       </div>
 
       {/* Search */}
-      <div className="p-4 border-b border-primary-light">
-        <input
+      <div className="p-4 border-b">
+        <Input
           type="text"
           placeholder="Buscar conversa..."
-          className="w-full px-3 py-2 border border-primary-light rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+          className="w-full"
         />
       </div>
 
       {/* Conversations List */}
       <div className="flex-1 overflow-y-auto">
         {conversas.length === 0 ? (
-          <div className="p-4 text-center text-neutral-dark">
+          <div className="p-4 text-center text-muted-foreground">
             Nenhuma conversa encontrada
           </div>
         ) : (
-          <div className="divide-y divide-primary-light">
+          <div className="divide-y">
             {conversas.map((conversa) => (
               <button
                 key={conversa.id}
                 onClick={() => onSelect(conversa.id)}
-                className={`w-full p-4 text-left hover:bg-neutral-light transition-colors ${
-                  selectedId === conversa.id ? 'bg-primary-light' : ''
+                className={`w-full p-4 text-left hover:bg-accent transition-colors ${
+                  selectedId === conversa.id ? 'bg-accent/50' : ''
                 }`}
               >
                 <div className="flex items-center space-x-3">
@@ -55,21 +55,21 @@ export function ConversationList({ conversas, selectedId, onSelect }: Conversati
                   {/* Content */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
-                      <p className="text-sm font-medium text-gray-900 truncate">
+                      <p className="text-sm font-medium truncate">
                         {conversa.titulo}
                       </p>
-                      <p className="text-xs text-neutral-dark">
+                      <p className="text-xs text-muted-foreground">
                         {format(new Date(conversa.atualizado_at), 'HH:mm', {
                           locale: ptBR,
                         })}
                       </p>
                     </div>
                     <div className="flex items-center justify-between mt-1">
-                      <p className="text-sm text-neutral-dark truncate">
+                      <p className="text-sm text-muted-foreground truncate">
                         {conversa.ultima_mensagem_at ? 'Nova mensagem' : 'Nenhuma mensagem'}
                       </p>
                       {conversa.nao_lidas > 0 && (
-                        <span className="inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-primary rounded-full">
+                        <span className="inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-primary-foreground bg-primary rounded-full">
                           {conversa.nao_lidas}
                         </span>
                       )}
@@ -81,6 +81,6 @@ export function ConversationList({ conversas, selectedId, onSelect }: Conversati
           </div>
         )}
       </div>
-    </div>
+    </Card>
   );
 } 

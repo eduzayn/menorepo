@@ -36,7 +36,7 @@ export async function getMensagens(conversaId: string): Promise<Mensagem[]> {
 export async function enviarMensagem(
   conversaId: string,
   conteudo: string,
-  tipo: ComunicacaoTipoMensagem = 'texto'
+  tipo: ComunicacaoTipoMensagem = 'TEXTO'
 ): Promise<Mensagem> {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Usuário não autenticado');

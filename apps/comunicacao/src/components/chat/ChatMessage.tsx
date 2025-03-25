@@ -1,58 +1,51 @@
-import { Mensagem } from '../../types/comunicacao';
+import { Card } from '../ui';
+import type { Mensagem } from '../../types/comunicacao';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { Card } from '@edunexia/ui-components';
 
 interface ChatMessageProps {
   mensagem: Mensagem;
-  isOwn: boolean;
+  isOwn?: boolean;
 }
 
-export function ChatMessage({ mensagem, isOwn }: ChatMessageProps) {
+export function ChatMessage({ mensagem, isOwn = false }: ChatMessageProps) {
   const renderConteudo = () => {
     switch (mensagem.tipo) {
-      case 'imagem':
+      case 'IMAGEM':
         return (
           <img
             src={mensagem.conteudo}
             alt="Imagem"
-            className="max-w-sm rounded-lg"
-            loading="lazy"
+            className="max-w-xs rounded-lg"
           />
         );
-      case 'arquivo':
+      case 'ARQUIVO':
         return (
           <a
             href={mensagem.conteudo}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-blue-600 hover:underline"
+            className="text-blue-500 hover:underline"
           >
             Baixar arquivo
           </a>
         );
       default:
-        return <p className="whitespace-pre-wrap">{mensagem.conteudo}</p>;
+        return <p>{mensagem.conteudo}</p>;
     }
   };
 
   return (
-    <div
-      className={`flex ${
-        isOwn ? 'justify-end' : 'justify-start'
-      }`}
-    >
+    <div className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}>
       <Card
-        className={`max-w-[70%] ${
-          isOwn
-            ? 'bg-blue-600 text-white'
-            : 'bg-gray-100 text-gray-900'
+        className={`max-w-sm p-4 ${
+          isOwn ? 'bg-primary text-primary-foreground' : 'bg-muted'
         }`}
       >
-        <div className="text-sm">{renderConteudo()}</div>
+        {renderConteudo()}
         <div
           className={`text-xs mt-1 ${
-            isOwn ? 'text-blue-100' : 'text-gray-500'
+            isOwn ? 'text-primary-foreground' : 'text-muted-foreground'
           }`}
         >
           {format(new Date(mensagem.criado_at), "HH:mm", {

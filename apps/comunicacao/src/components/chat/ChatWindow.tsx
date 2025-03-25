@@ -1,70 +1,56 @@
 import { useState, useEffect, useRef } from 'react';
-import { Mensagem } from '../../types/comunicacao';
-import { getMensagens, enviarMensagem } from '../../services/comunicacao';
-import { ChatMessage } from './ChatMessage';
+import { Card } from '../ui';
+import { ChatHeader } from './ChatHeader';
 import { ChatInput } from './ChatInput';
-import { Card } from '@edunexia/ui-components';
+import { ChatMessage } from './ChatMessage';
+import type { Conversa, Mensagem, ComunicacaoTipoMensagem } from '../../types/comunicacao';
 
 interface ChatWindowProps {
-  conversaId: string;
+  conversa: Conversa;
+  mensagens: Mensagem[];
+  onEnviarMensagem: (texto: string) => Promise<void>;
+  onMarcarComoLida: () => Promise<void>;
+  onIndicarDigitando: (digitando: boolean) => Promise<void>;
 }
 
-export function ChatWindow({ conversaId }: ChatWindowProps) {
-  const [mensagens, setMensagens] = useState<Mensagem[]>([]);
-  const [loading, setLoading] = useState(true);
+export function ChatWindow({
+  conversa,
+  mensagens,
+  onEnviarMensagem,
+  onMarcarComoLida,
+  onIndicarDigitando
+}: ChatWindowProps) {
+  const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const scrollToBottom = () => {
+  useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  useEffect(() => {
-    loadMensagens();
-  }, [conversaId]);
-
-  useEffect(() => {
-    scrollToBottom();
   }, [mensagens]);
 
-  const loadMensagens = async () => {
+  useEffect(() => {
+    if (conversa.nao_lidas > 0) {
+      onMarcarComoLida();
+    }
+  }, [conversa.nao_lidas, onMarcarComoLida]);
+
+  const handleEnviarMensagem = async (conteudo: string, tipo: ComunicacaoTipoMensagem) => {
     try {
       setLoading(true);
-      const data = await getMensagens(conversaId);
-      setMensagens(data || []);
-    } catch (error) {
-      console.error('Erro ao carregar mensagens:', error);
+      await onEnviarMensagem(conteudo);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleEnviarMensagem = async (conteudo: string, tipo: 'texto' | 'imagem' | 'arquivo' = 'texto') => {
-    try {
-      const novaMensagem = await enviarMensagem(conversaId, conteudo, tipo);
-      if (novaMensagem) {
-        setMensagens(prev => [...prev, novaMensagem]);
-      }
-    } catch (error) {
-      console.error('Erro ao enviar mensagem:', error);
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-      </div>
-    );
-  }
-
   return (
     <Card className="flex flex-col h-full">
+      <ChatHeader conversa={conversa} />
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {mensagens.map((mensagem) => (
           <ChatMessage
             key={mensagem.id}
             mensagem={mensagem}
-            isOwn={mensagem.remetente_id === 'current-user-id'} // TODO: Substituir pelo ID real do usuário
+            isOwn={mensagem.remetente_id === conversa.usuario_id}
           />
         ))}
         <div ref={messagesEndRef} />

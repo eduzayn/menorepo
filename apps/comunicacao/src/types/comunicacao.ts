@@ -158,4 +158,19 @@ export interface Interacao {
   participante_tipo: 'LEAD' | 'ALUNO';
   usuario_id: string;
   criado_at: string;
-} 
+}
+
+export interface InsertConversa extends Omit<Conversa, 'id' | 'criado_at' | 'atualizado_at' | 'ultima_mensagem' | 'ultima_mensagem_at' | 'nao_lidas'> {}
+export interface UpdateConversa extends Partial<InsertConversa> {}
+
+export interface InsertMensagem extends Omit<Mensagem, 'id' | 'criado_at' | 'atualizado_at'> {}
+export interface UpdateMensagem extends Partial<InsertMensagem> {}
+
+export interface InsertCampanha extends Omit<Campanha, 'id' | 'criado_at' | 'atualizado_at'> {}
+export interface UpdateCampanha extends Partial<InsertCampanha> {}
+
+export interface InsertCampanhaDestinatario extends Omit<CampanhaDestinatario, 'id' | 'criado_at' | 'atualizado_at' | 'enviado_at' | 'lido_at'> {}
+export interface UpdateCampanhaDestinatario extends Partial<InsertCampanhaDestinatario> {}
+
+export interface InsertRespostaRapida extends Omit<RespostaRapida, 'id' | 'criado_at' | 'atualizado_at'> {}
+export interface UpdateRespostaRapida extends Partial<InsertRespostaRapida> {} 

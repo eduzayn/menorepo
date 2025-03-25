@@ -1,10 +1,10 @@
 import { useState, useRef } from 'react';
 import { PaperClipIcon, PhotoIcon } from '@heroicons/react/24/outline';
 import { uploadArquivo } from '../../services/comunicacao';
-import { Input, Button, IconButton } from '@edunexia/ui-components';
+import { Input, Button, IconButton } from '../ui';
 
 interface ChatInputProps {
-  onEnviar: (conteudo: string, tipo: 'texto' | 'imagem' | 'arquivo') => void;
+  onEnviar: (conteudo: string, tipo: 'TEXTO' | 'IMAGEM' | 'ARQUIVO') => void;
 }
 
 export function ChatInput({ onEnviar }: ChatInputProps) {
@@ -18,7 +18,7 @@ export function ChatInput({ onEnviar }: ChatInputProps) {
 
     try {
       setLoading(true);
-      await onEnviar(mensagem, 'texto');
+      await onEnviar(mensagem, 'TEXTO');
       setMensagem('');
     } finally {
       setLoading(false);
@@ -32,7 +32,7 @@ export function ChatInput({ onEnviar }: ChatInputProps) {
     try {
       setLoading(true);
       const url = await uploadArquivo(file, 'temp');
-      await onEnviar(url, file.type.startsWith('image/') ? 'imagem' : 'arquivo');
+      await onEnviar(url, file.type.startsWith('image/') ? 'IMAGEM' : 'ARQUIVO');
     } finally {
       setLoading(false);
     }
