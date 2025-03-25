@@ -1,5 +1,5 @@
-import { Curso, CursoFormData } from '@edunexia/database-schema'
-import { supabase } from '../lib/supabase'
+import { supabase } from '@/lib/supabase'
+import type { Curso, PlanoPagamento } from '@/types/matricula'
 
 export const cursoService = {
   async listarCursos(): Promise<Curso[]> {
@@ -8,15 +8,8 @@ export const cursoService = {
       .select('*')
       .order('nome')
 
-    if (error) {
-      console.error('Erro ao listar cursos:', error)
-      throw error
-    }
-
-    return data.map(curso => ({
-      ...curso,
-      status: curso.status || 'inativo'
-    }))
+    if (error) throw error
+    return data || []
   },
 
   async buscarCurso(id: string): Promise<Curso> {
@@ -26,36 +19,27 @@ export const cursoService = {
       .eq('id', id)
       .single()
 
-    if (error) {
-      console.error('Erro ao buscar curso:', error)
-      throw error
-    }
-
-    return {
-      ...data,
-      status: data.status || 'inativo'
-    }
+    if (error) throw error
+    if (!data) throw new Error('Curso não encontrado')
+    return data
   },
 
-  async criarCurso(curso: CursoFormData): Promise<Curso> {
+  async criarCurso(curso: Omit<Curso, 'id' | 'created_at' | 'updated_at'>): Promise<Curso> {
     const { data, error } = await supabase
       .from('cursos')
       .insert([curso])
       .select()
       .single()
 
-    if (error) {
-      console.error('Erro ao criar curso:', error)
-      throw error
-    }
-
-    return {
-      ...data,
-      status: data.status || 'inativo'
-    }
+    if (error) throw error
+    if (!data) throw new Error('Erro ao criar curso')
+    return data
   },
 
-  async atualizarCurso(id: string, curso: Partial<CursoFormData>): Promise<Curso> {
+  async atualizarCurso(
+    id: string, 
+    curso: Partial<Omit<Curso, 'id' | 'created_at' | 'updated_at'>>
+  ): Promise<Curso> {
     const { data, error } = await supabase
       .from('cursos')
       .update(curso)
@@ -63,15 +47,9 @@ export const cursoService = {
       .select()
       .single()
 
-    if (error) {
-      console.error('Erro ao atualizar curso:', error)
-      throw error
-    }
-
-    return {
-      ...data,
-      status: data.status || 'inativo'
-    }
+    if (error) throw error
+    if (!data) throw new Error('Erro ao atualizar curso')
+    return data
   },
 
   async excluirCurso(id: string): Promise<void> {
@@ -80,9 +58,29 @@ export const cursoService = {
       .delete()
       .eq('id', id)
 
-    if (error) {
-      console.error('Erro ao excluir curso:', error)
-      throw error
-    }
+    if (error) throw error
+  },
+
+  async buscarPlanosPagamento(cursoId: string): Promise<PlanoPagamento[]> {
+    const { data, error } = await supabase
+      .from('planos_pagamento')
+      .select('*')
+      .eq('curso_id', cursoId)
+      .order('valor_total')
+
+    if (error) throw error
+    return data || []
+  },
+
+  async buscarPlanoPagamento(id: string): Promise<PlanoPagamento> {
+    const { data, error } = await supabase
+      .from('planos_pagamento')
+      .select('*')
+      .eq('id', id)
+      .single()
+
+    if (error) throw error
+    if (!data) throw new Error('Plano de pagamento não encontrado')
+    return data
   }
 } 
