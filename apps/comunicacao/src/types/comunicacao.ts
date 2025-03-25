@@ -5,6 +5,7 @@ export type ComunicacaoTipoMensagem = 'TEXTO' | 'IMAGEM' | 'ARQUIVO' | 'VIDEO' |
 export type ComunicacaoTipoCampanha = 'marketing' | 'notificacao' | 'lembrete' | 'pesquisa';
 export type GrupoRole = 'admin' | 'moderador' | 'membro';
 export type TipoNotificacao = 'mensagem' | 'campanha' | 'sistema' | 'lembrete';
+export type LeadStatus = 'NOVO' | 'EM_CONTATO' | 'QUALIFICADO' | 'CONVERTIDO' | 'PERDIDO';
 
 // Interfaces base
 export interface Participante {
@@ -125,11 +126,13 @@ export interface Lead {
   nome: string;
   email: string;
   telefone: string;
-  status: 'NOVO' | 'QUALIFICADO' | 'CONTATO' | 'NEGOCIACAO' | 'FECHADO';
+  status: LeadStatus;
   ultima_interacao: string;
   engajamento: number;
   canal_origem: string;
   observacoes?: string;
+  online: boolean;
+  ultimo_acesso?: string;
   criado_at: string;
   atualizado_at: string;
 }
