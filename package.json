@@ -12,6 +12,7 @@
     "clean": "yarn workspaces foreach -pi run clean"
   },
   "devDependencies": {
+    "@rollup/rollup-win32-x64-msvc": "^4.37.0",
     "@types/node": "^22.13.13",
     "@types/react": "^19.0.12",
     "@types/react-dom": "^19.0.4",
@@ -23,6 +24,5 @@
     "eslint": "^8.55.0",
     "tailwind-merge": "^2.2.1",
     "typescript": "^5.2.2"
-  },
-  "packageManager": "yarn@4.7.0"
+  }
 }
