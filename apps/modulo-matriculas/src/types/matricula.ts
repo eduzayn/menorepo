@@ -54,13 +54,11 @@ export interface Matricula {
   updated_at: string
 }
 
-export interface MatriculaDetalhada extends Matricula {
+export interface MatriculaDetalhada extends DbMatricula {
   aluno: Aluno
   curso: Curso
   plano: PlanoPagamento
 }
-
-export type { DbMatricula as Matricula }
 
 export interface MatriculaFormData {
   aluno_id: string

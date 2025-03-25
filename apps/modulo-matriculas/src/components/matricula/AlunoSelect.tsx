@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Check, ChevronsUpDown } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import { Button } from "@repo/ui-components/components/ui/button"
 import {
   Command,
   CommandEmpty,
@@ -13,14 +13,15 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
+} from "@repo/ui-components/components/ui/popover"
 import { useQuery } from '@tanstack/react-query'
 import { alunoService } from '@/services/alunoService'
+import type { Aluno } from '@/types/matricula'
 
 interface AlunoSelectProps {
   value: string
   onChange: (value: string) => void
-  onAlunoChange?: (aluno: any) => void
+  onAlunoChange?: (aluno: Aluno | null) => void
 }
 
 export function AlunoSelect({ value, onChange, onAlunoChange }: AlunoSelectProps) {

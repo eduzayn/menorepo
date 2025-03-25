@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Check, ChevronsUpDown } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import { Button } from "@repo/ui-components/components/ui/button"
 import {
   Command,
   CommandEmpty,
@@ -13,15 +13,15 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
+} from "@repo/ui-components/components/ui/popover"
 import { useQuery } from '@tanstack/react-query'
 import { cursoService } from '@/services/cursoService'
-import type { PlanoPagamento } from '@/types/matricula'
+import type { Curso, PlanoPagamento } from '@/types/matricula'
 
 interface CursoSelectProps {
   value: string
   onChange: (value: string) => void
-  onCursoChange?: (curso: any) => void
+  onCursoChange?: (curso: Curso | null) => void
   onPlanoPagamentoChange?: (planos: PlanoPagamento[]) => void
 }
 
