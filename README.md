@@ -25,16 +25,40 @@ edunexia-monorepo/
 │   ├── portal-polo/
 │   ├── rh/
 │   ├── contabilidade/
-│   └── site-vendas/               # Novo módulo: Site de apresentação e vendas self-service e whitelabel
+│   ├── site-vendas/           # Site de apresentação e vendas self-service e whitelabel
+│   ├── core/                  # Módulo central com componentes, hooks e utilitários compartilhados
+│   ├── module-example/        # Módulo de exemplo funcional para referência de desenvolvedores
+│   └── module-template/       # Template para a criação de novos módulos
 ├── packages/
-│   ├── ui-components/       # Design System compartilhado
-│   ├── auth/                # Autenticação unificada (SSO)
-│   └── database-schema/     # Tipos e schemas do banco de dados
+│   ├── ui-components/         # Design System compartilhado
+│   ├── auth/                  # Autenticação unificada (SSO)
+│   ├── database-schema/       # Tipos e schemas do banco de dados
+│   └── api-client/            # Cliente de API unificado para comunicação com o backend
 ├── .gitignore
-├── package.json             # Define os workspaces do Yarn
-├── tsconfig.json            # Configuração TypeScript compartilhada
+├── package.json               # Define os workspaces do Yarn
+├── tsconfig.json              # Configuração TypeScript compartilhada
 └── README.md
 ```
+
+## Módulos Especiais e Infraestrutura
+
+### Module-Example e Module-Template
+Estes módulos servem como **referência e ponto de partida** para o desenvolvimento de novos módulos:
+
+- **module-example**: Um módulo funcional completo com todas as práticas recomendadas implementadas, servindo como exemplo prático para consulta durante o desenvolvimento. Contém implementações reais de hooks, contexts, componentes e serviços seguindo os padrões do projeto.
+
+- **module-template**: Um esqueleto inicial para a criação de novos módulos, contendo a estrutura de diretórios e arquivos básicos. Deve ser copiado ao iniciar um novo módulo para garantir que a estrutura padrão seja seguida.
+
+### Módulo Core
+O módulo **core** desempenha um papel fundamental na arquitetura da plataforma:
+
+- Centraliza componentes de layout, hooks e utilitários compartilhados entre todos os módulos
+- Fornece contextos globais para autenticação, navegação e notificações
+- Implementa abstrações para operações comuns como chamadas de API e gerenciamento de estado
+- Define padrões arquiteturais para garantir consistência em toda a plataforma
+- Unifica a experiência do usuário entre diferentes módulos
+
+Todos os módulos devem importar e utilizar o `core` para manter a consistência da experiência e evitar duplicação de código.
 
 ## Modelo de Comercialização da Plataforma
 A Edunéxia será oferecida como uma **plataforma modular** para instituições de Educação a Distância (EAD), especialmente **faculdades, centros universitários e universidades**. A proposta comercial é flexível e escalável:
@@ -76,6 +100,42 @@ Como o projeto será iniciado do zero, todos os módulos abaixo estão em planej
 - **rh**: Gerenciamento de colaboradores, produtividade e relatórios.
 - **contabilidade**: Relatórios fiscais, balanços e integração com contadores externos.
 - **site-vendas**: Site de apresentação e marketing self-service da plataforma.
+
+## Estrutura Padrão dos Módulos
+Todos os módulos devem seguir rigorosamente a seguinte estrutura padronizada:
+
+```
+apps/nome-do-modulo/
+├── src/
+│   ├── components/           # Componentes específicos do módulo
+│   │   └── index.ts         
+│   │
+│   ├── contexts/             # Contextos específicos (se necessário)
+│   │   └── index.ts
+│   │
+│   ├── hooks/                # Hooks específicos do módulo
+│   │   └── index.ts
+│   │
+│   ├── pages/                # Páginas do módulo
+│   │   └── index.ts
+│   │
+│   ├── services/             # Serviços específicos do módulo
+│   │   └── index.ts
+│   │
+│   ├── utils/                # Utilitários específicos do módulo
+│   │   └── index.ts
+│   │
+│   ├── types/                # Tipos e interfaces
+│   │   └── index.ts
+│   │
+│   ├── routes.tsx            # Definição de rotas do módulo
+│   └── index.tsx             # Ponto de entrada
+│
+├── package.json
+└── README.md                 # Documentação específica
+```
+
+O cumprimento desta estrutura garante consistência e facilita a navegação entre módulos para todos os desenvolvedores do projeto.
 
 ## Estratégia de Integração
 1. Criação da estrutura base do monorepo com Yarn Workspaces.
@@ -120,6 +180,7 @@ Como o projeto será iniciado do zero, todos os módulos abaixo estão em planej
 - Backend unificado no Supabase para todos os módulos usando `@supabase/supabase-js`
 - Deploy do frontend via Vercel com integrações automáticas
 - Tipos e schemas centralizados em `database-schema`
+- Cliente de API unificado em `api-client` para padronização de chamadas ao backend
 
 ## Próximos Passos
 - Criar a estrutura base do monorepo no GitHub.

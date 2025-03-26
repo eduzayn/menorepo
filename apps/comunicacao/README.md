@@ -14,21 +14,17 @@ Este é o módulo de comunicação integrado, que permite gerenciar conversas, m
 ## Pré-requisitos
 
 - Node.js 18+
-- pnpm 8+
+- Yarn (utilizado para gerenciamento de workspaces)
 - Conta no Supabase
 
 ## Instalação
 
-1. Clone o repositório
-2. Instale as dependências:
+1. Todas as dependências são gerenciadas através do Yarn Workspaces do monorepo
+2. Instale as dependências na raiz do projeto:
    ```bash
-   pnpm install
+   yarn install
    ```
-3. Copie o arquivo `.env.example` para `.env` e configure as variáveis:
-   ```bash
-   cp .env.example .env
-   ```
-4. Configure as variáveis do Supabase no arquivo `.env`:
+3. Configure as variáveis do Supabase no arquivo `.env`:
    ```
    VITE_SUPABASE_URL=sua_url_do_supabase
    VITE_SUPABASE_ANON_KEY=sua_chave_anonima_do_supabase
@@ -39,7 +35,7 @@ Este é o módulo de comunicação integrado, que permite gerenciar conversas, m
 Para iniciar o servidor de desenvolvimento:
 
 ```bash
-pnpm dev
+yarn workspace @edunexia/comunicacao dev
 ```
 
 ## Build
@@ -47,7 +43,7 @@ pnpm dev
 Para gerar o build de produção:
 
 ```bash
-pnpm build
+yarn workspace @edunexia/comunicacao build
 ```
 
 ## Testes
@@ -55,21 +51,35 @@ pnpm build
 Para executar os testes:
 
 ```bash
-pnpm test
+yarn workspace @edunexia/comunicacao test
 ```
 
 ## Estrutura do Projeto
 
 ```
-src/
-  ├── components/     # Componentes React
-  ├── contexts/      # Contextos React
-  ├── hooks/         # Hooks personalizados
-  ├── lib/           # Configurações e utilitários
-  ├── pages/         # Páginas da aplicação
-  ├── services/      # Serviços e integrações
-  ├── types/         # Tipos TypeScript
-  └── utils/         # Funções utilitárias
+apps/comunicacao/
+├── src/
+│   ├── components/    # Componentes React específicos do módulo
+│   ├── contexts/      # Contextos React para estado global
+│   ├── hooks/         # Hooks personalizados
+│   ├── lib/           # Configurações e utilitários
+│   ├── pages/         # Páginas da aplicação
+│   ├── services/      # Serviços e integrações com APIs
+│   ├── styles/        # Estilos específicos do módulo
+│   ├── types/         # Tipos TypeScript
+│   ├── utils/         # Funções utilitárias
+│   ├── App.tsx        # Componente principal do aplicativo
+│   ├── env.d.ts       # Definições de tipos para variáveis de ambiente
+│   ├── index.css      # Estilos globais
+│   ├── index.tsx      # Ponto de entrada do módulo
+│   ├── main.tsx       # Configuração principal do React
+│   ├── routes.tsx     # Definição de rotas do módulo
+│   ├── setupTests.ts  # Configuração para testes
+│   └── styles.css     # Estilos adicionais
+├── public/            # Arquivos estáticos
+├── index.html         # HTML principal
+├── package.json       # Dependências específicas do módulo
+└── README.md          # Esta documentação
 ```
 
 ## Tecnologias Utilizadas
@@ -80,19 +90,30 @@ src/
 - Supabase
 - Vite
 - Vitest
+- Integração com o core através de @edunexia/core
+- Componentes de UI do @edunexia/ui-components
+- Autenticação via @edunexia/auth
+
+## Integração com o Monorepo
+
+Este módulo faz parte do monorepo Edunéxia e segue a estrutura padronizada:
+
+- Utiliza componentes compartilhados do pacote ui-components
+- Integra-se com o módulo core para layouts e comportamentos comuns
+- Compartilha autenticação com outros módulos através do pacote auth
+- Utiliza o cliente API unificado através do api-client
 
 ## Contribuição
 
-1. Faça o fork do projeto
-2. Crie uma branch para sua feature (`git checkout -b feature/nova-feature`)
-3. Faça commit das suas alterações (`git commit -m 'feat: adiciona nova feature'`)
-4. Faça push para a branch (`git push origin feature/nova-feature`)
-5. Abra um Pull Request
+1. Siga o padrão de commit da Edunéxia: `tipo(módulo): descrição da alteração`
+2. Teste suas alterações localmente antes de enviar
+3. Garanta que não está duplicando componentes ou funcionalidades já existentes
+4. Utilize o core e os componentes compartilhados sempre que possível
 
 ## Licença
 
 Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
 
-## Documentação Técnica
+## Documentação Complementar
 
-Para informações técnicas detalhadas sobre a implementação, arquitetura e integrações, consulte o [README Técnico](TECHNICAL.md). 
+Para mais informações sobre a integração deste módulo com o restante da plataforma Edunéxia, consulte o [README Principal](../../README.md) do monorepo. 
