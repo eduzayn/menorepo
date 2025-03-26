@@ -2,6 +2,17 @@
 
 ## 📌 Visão Geral
 
+> **🎨 Design System:**
+> O Design System da Edunéxia é um conjunto de componentes React reutilizáveis, construídos com TypeScript e Tailwind CSS. Ele está localizado em `packages/ui-components` e é compartilhado entre todos os módulos da plataforma.
+> 
+> Consulte a [documentação detalhada do Design System](./design-system.md) para mais informações sobre:
+> - Estrutura de componentes
+> - Tecnologias utilizadas
+> - Como usar
+> - Boas práticas
+> - Contribuição
+> - Manutenção
+
 > **🎨 Paleta de Cores e Design:**
 > O módulo usará uma paleta de cores leve, moderna e amigável, com tons de azul claro, cinza suave e branco predominante, com detalhes em verde menta e lilás claro para feedbacks positivos e alertas sutis.
 > 
