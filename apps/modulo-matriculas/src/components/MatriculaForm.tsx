@@ -2,11 +2,11 @@
 
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Button } from '@repo/ui/components/ui/button'
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@repo/ui/components/ui/form'
-import { Input } from '@repo/ui/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@repo/ui/components/ui/select'
-import { Textarea } from '@repo/ui/components/ui/textarea'
+import { Button } from '@edunexia/ui-components/components/ui/button'
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@edunexia/ui-components/components/ui/form'
+import { Input } from '@edunexia/ui-components/components/ui/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@edunexia/ui-components/components/ui/select'
+import { Textarea } from '@edunexia/ui-components/components/ui/textarea'
 import { useCriarMatricula } from '../hooks/useMatriculas'
 import { matriculaSchema, type MatriculaInput } from '../schemas/matricula'
 

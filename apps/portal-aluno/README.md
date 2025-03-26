@@ -1,22 +1,22 @@
 # README TÉCNICO - Módulo Portal do Aluno da Plataforma Edunéxia
 
-## 📌 Visão Geral
+##  Visão Geral
 
-> *🔍 Objetivo:*
+> * Objetivo:*
 > O Módulo Portal do Aluno é o ambiente digital onde o aluno tem acesso a todas as informações e serviços da instituição. Ele é responsável pela visualização de conteúdos, progresso nos cursos, documentos, dados financeiros, certificados e comunicação com tutores.
 
-> *🛠️ Integração Total com o Ecossistema:*
+> * Integração Total com o Ecossistema:*
 > Integra-se aos módulos de Matrículas, Material Didático, Financeiro, Comunicação, Contratos e Inadimplência. Todas as informações do aluno fluem de forma automatizada, garantindo consistência.
 
-## ⚙️ Tecnologias Utilizadas
+##  Tecnologias Utilizadas
 - *React + TypeScript* (Frontend)
 - *Supabase* (Banco e Auth)
 - *TailwindCSS* (Design system)
 - *Yarn Workspaces* (Monorepo)
 
-## 🌟 Principais Funcionalidades
+##  Principais Funcionalidades
 
-### 👤 Perfil e Credenciais
+###  Perfil e Credenciais
 - Visualização dos dados pessoais e acadêmicos
 - Edição de informações permitidas (ex: foto, telefone)
 - Acesso à carteirinha digital
@@ -27,7 +27,7 @@
 - Status da matrícula e documentos
 - Avisos importantes e notificações
 
-### 📚 Área de Estudos (Integração com Módulo Material Didático)
+###  Área de Estudos (Integração com Módulo Material Didático)
 - Feedback automatizado por *IA* em todas as atividades realizadas pelo aluno
 - Acesso por disciplina e módulo
 - Vídeos-aula com acompanhamento de progresso
@@ -35,19 +35,19 @@
 - Entrega de atividades (upload ou preenchimento)
 - Simulados, fóruns e e-books
 
-### 📃 Documentos
+###  Documentos
 - Upload de documentos obrigatórios
 - Status de deferimento (pendente, aprovado, reprovado)
 - Correção automatizada por *IA* com base em regras pré-definidas (formato, validade, tipo)
 - Visualização de contratos assinados
 
-### 💳 Financeiro
+###  Financeiro
 - Visualização de parcelas e boletos
 - Emissão de 2ª via
 - Solicitação de negociação (gera aditivos)
 - Status financeiro e bloqueios
 
-### 🏆 Certificações
+###  Certificações
 - Solicitação de certificado (após cumprir critérios)
 - Validação dos seguintes requisitos:
   - Conclusão de todas as atividades
@@ -56,20 +56,20 @@
   - Documentação deferida
   - Tempo mínimo de curso atingido
 
-### 🚪 Controle de Acesso
+###  Controle de Acesso
 - Bloqueio automático após 10 dias de atraso no primeiro pagamento
 - Bloqueio após 30 dias de inadimplência
 - Cancelamento automático após 90 dias
 - Mensagens claras com orientação para regularização
 
-### 📢 Suporte e Comunicação
+###  Suporte e Comunicação
 - Chat com a *Professora Ana (IA)* para dúvidas sobre conteúdo e gerais
 - Contato com tutoria
 - Chat com IA
 - Notificações recebidas
 - Histórico de atendimento
 
-## 📅 Layout (Visual)
+##  Layout (Visual)
 ```text
 ┌────────────────────────────┐
 │        Menu Lateral        │
@@ -99,14 +99,14 @@
 └────────────────────────────┘
 ```
 
-## 🔗 Integrações
+##  Integrações
 - *Matrículas*: status de matrícula, documentos, acesso
 - *Financeiro*: cobranças, pagamentos, bloqueios
 - *Material Didático*: conteúdo e acompanhamento
 - *Comunicação*: atendimento automatizado, mensagens
 - *Contabilidade*: status financeiro
 
-## 📆 Rotas e Páginas
+##  Rotas e Páginas
 ```bash
 /dashboard                         # Visão inicial
 /perfil                            # Visualização e edição de perfil
@@ -126,10 +126,10 @@
 /suporte/ana                       # Chat com a Professora Ana (IA)
 ```
 
-## 🌓 Modo Noturno
+##  Modo Noturno
 - Alternância entre tema claro e escuro, com salvamento de preferência
 
-## 📄 Estrutura de Código
+##  Estrutura de Código
 ```bash
 apps/portal-do-aluno/
 ├── src/
@@ -143,16 +143,16 @@ apps/portal-do-aluno/
 └── tsconfig.json
 ```
 
-## 🛠️ Supabase (Schema portal_aluno)
+##  Supabase (Schema portal_aluno)
 | Tabela                  | Finalidade                             |
 |-------------------------|----------------------------------------|
-| usuarios_aluno        | Dados pessoais e vinculação à matrícula |
-| progresso_conteudo    | Registro de andamento e notas          |
-| documentos_uploads    | Upload e status de aprovação          |
-| certificados          | Certificados gerados e datas           |
-| bloqueios             | Regras de bloqueio e motivo            |
+| usuarios_aluno         | Dados pessoais e vinculação à matrícula |
+| progresso_conteudo     | Registro de andamento e notas           |
+| documentos_uploads     | Upload e status de aprovação            |
+| certificados           | Certificados gerados e datas            |
+| bloqueios              | Regras de bloqueio e motivo             |
 
-## 📒 Documentação Complementar
+##  Documentação Complementar
 > Este módulo integra-se ao monorepo da Edunéxia. Consulte o [README Principal](../../README.md) e os módulos de Matrículas e Material Didático para detalhes integrados.
 
 ---

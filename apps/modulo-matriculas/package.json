@@ -1,5 +1,5 @@
 {
-  "name": "modulo-matriculas",
+  "name": "@edunexia/modulo-matriculas",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.4",
-    "@repo/ui": "*",
+    "@edunexia/ui-components": "*",
     "@tanstack/react-query": "^5.24.1",
     "@tanstack/react-query-devtools": "^5.24.1",
     "next": "14.1.0",
@@ -21,9 +21,9 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@repo/eslint-config": "*",
-    "@repo/tailwind-config": "*",
-    "@repo/typescript-config": "*",
+    "@edunexia/eslint-config": "*",
+    "@edunexia/tailwind-config": "*",
+    "@edunexia/typescript-config": "*",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

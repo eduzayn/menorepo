@@ -1,5 +1,5 @@
 {
-  "name": "@repo/ui-components",
+  "name": "@edunexia/ui-components",
   "version": "0.0.0",
   "private": true,
   "exports": {
@@ -10,8 +10,8 @@
     "generate:component": "turbo gen react-component"
   },
   "devDependencies": {
-    "@repo/eslint-config": "*",
-    "@repo/typescript-config": "*",
+    "@edunexia/eslint-config": "*",
+    "@edunexia/typescript-config": "*",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
     "eslint": "^8.53.0",

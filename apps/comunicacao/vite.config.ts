@@ -12,8 +12,8 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
-      '@repo/auth': path.resolve(__dirname, '../../packages/auth/src'),
-      '@repo/ui-components': path.resolve(__dirname, '../../packages/ui-components/src'),
+      '@edunexia/auth': path.resolve(__dirname, '../../packages/auth/src'),
+      '@edunexia/ui-components': path.resolve(__dirname, '../../packages/ui-components/src'),
       '@components': resolve(__dirname, './src/components'),
       '@contexts': resolve(__dirname, './src/contexts'),
       '@hooks': resolve(__dirname, './src/hooks'),
