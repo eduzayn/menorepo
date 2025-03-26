@@ -1,45 +1,73 @@
-import React from 'react';
-import { cva, type VariantProps } from 'class-variance-authority';
-import { cn } from '../utils';
+import * as React from "react"
+import { cva, type VariantProps } from "class-variance-authority"
+import { cn } from "@/lib/utils"
 
 const textareaVariants = cva(
-  'flex min-h-[80px] w-full rounded-lg border bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-950 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
+  "flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
   {
     variants: {
       variant: {
-        default: 'border-gray-200',
-        error: 'border-red-500 focus:ring-red-500',
+        default: "border-input",
+        error: "border-red-500 focus-visible:ring-red-500",
       },
     },
     defaultVariants: {
-      variant: 'default',
+      variant: "default",
     },
   }
-);
+)
 
 export interface TextareaProps
   extends React.TextareaHTMLAttributes<HTMLTextAreaElement>,
     VariantProps<typeof textareaVariants> {
-  error?: string;
+  label?: string
+  error?: string
+  helperText?: string
 }
 
-export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
-  ({ className, variant, error, ...props }, ref) => {
+const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
+  ({ className, variant, label, error, helperText, ...props }, ref) => {
     return (
-      <div className="relative">
-        <textarea
-          className={cn(textareaVariants({ variant: error ? 'error' : variant }), className)}
-          ref={ref}
-          {...props}
-        />
+      <div className="w-full">
+        {label && (
+          <label
+            htmlFor={props.id}
+            className="block text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+          >
+            {label}
+          </label>
+        )}
+        <div className="relative mt-2">
+          <textarea
+            className={cn(textareaVariants({ variant: error ? "error" : variant }), className)}
+            ref={ref}
+            aria-invalid={error ? "true" : "false"}
+            aria-describedby={error ? `${props.id}-error` : helperText ? `${props.id}-helper` : undefined}
+            {...props}
+          />
+        </div>
         {error && (
-          <p className="mt-1 text-sm text-red-500" role="alert">
+          <p
+            className="mt-1 text-sm text-red-500"
+            id={`${props.id}-error`}
+            role="alert"
+          >
             {error}
           </p>
         )}
+        {helperText && !error && (
+          <p
+            className="mt-1 text-sm text-muted-foreground"
+            id={`${props.id}-helper`}
+          >
+            {helperText}
+          </p>
+        )}
       </div>
-    );
+    )
   }
-);
+)
 
-Textarea.displayName = 'Textarea'; 
+Textarea.displayName = "Textarea"
+
+export { Textarea, textareaVariants } 
