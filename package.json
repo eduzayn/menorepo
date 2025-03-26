@@ -6,24 +6,19 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "yarn workspace @edunexia/modulo-matriculas dev",
-    "build": "yarn workspaces run build",
-    "lint": "yarn workspaces run lint",
-    "clean": "yarn workspaces run clean"
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
   "devDependencies": {
-    "@rollup/rollup-win32-x64-msvc": "^4.37.0",
-    "@types/node": "^22.13.13",
-    "@types/react": "^19.0.12",
-    "@types/react-dom": "^19.0.4",
-    "@typescript-eslint/eslint-plugin": "^6.14.0",
-    "@typescript-eslint/parser": "^6.14.0",
-    "class-variance-authority": "^0.7.0",
-    "clsx": "^2.1.0",
-    "date-fns": "^3.3.1",
-    "eslint": "^8.55.0",
-    "tailwind-merge": "^2.2.1",
-    "typescript": "^5.2.2"
+    "@repo/typescript-config": "workspace:*",
+    "@turbo/gen": "^1.11.3",
+    "prettier": "^3.1.1",
+    "turbo": "^1.11.3"
   },
-  "packageManager": "yarn@4.7.0+sha512.5a0afa1d4c1d844b3447ee3319633797bcd6385d9a44be07993ae52ff4facabccafb4af5dcd1c2f9a94ac113e5e9ff56f6130431905884414229e284e37bb7c9"
+  "packageManager": "pnpm@8.9.0",
+  "engines": {
+    "node": ">=18"
+  }
 }

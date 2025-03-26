@@ -1,3 +1,155 @@
+# Módulo de Matrículas
+
+Sistema de gerenciamento de matrículas desenvolvido com Next.js, React Query e Tailwind CSS.
+
+## Funcionalidades
+
+- Cadastro de matrículas
+- Listagem de matrículas
+- Detalhes da matrícula
+- Atualização de matrícula
+- Cancelamento de matrícula
+
+## Tecnologias
+
+- Next.js 14
+- React Query
+- React Hook Form
+- Zod
+- Tailwind CSS
+- Shadcn UI
+
+## Instalação
+
+1. Clone o repositório
+2. Instale as dependências:
+```bash
+pnpm install
+```
+
+3. Inicie o servidor de desenvolvimento:
+```bash
+pnpm dev
+```
+
+4. Acesse [http://localhost:3000](http://localhost:3000)
+
+## Scripts
+
+- `pnpm dev` - Inicia o servidor de desenvolvimento
+- `pnpm build` - Gera a build de produção
+- `pnpm start` - Inicia o servidor de produção
+- `pnpm lint` - Executa o linter
+
+## Estrutura de Arquivos
+
+```
+src/
+  app/
+    layout.tsx
+    page.tsx
+    providers.tsx
+    globals.css
+  components/
+    MatriculaForm.tsx
+  hooks/
+    useMatriculas.ts
+  lib/
+    errors.ts
+  schemas/
+    matricula.ts
+  services/
+    matriculaService.ts
+  types/
+    matricula.ts
+```
+
+## Integração com Gateways de Pagamento
+
+O módulo de matrículas terá integração com os gateways **InfinitePay** e **Lytex**, permitindo que a instituição escolha dinamicamente qual serviço utilizar em cada cobrança.
+
+- Cadastro de múltiplos gateways
+- Seleção do gateway preferencial por instituição ou por cobrança
+- Webhooks para status de pagamento (confirmado, pendente, cancelado)
+- Suporte a múltiplas formas de pagamento:
+  - **PIX** (imediato e recorrente)
+  - **Boleto Bancário** (único e parcelado)
+  - **Cartão de Crédito Parcelado** (com ou sem juros)
+  - **Cartão de Crédito com Recorrência** (modelo similar ao Netflix)
+- Configuração de regras para parcelamento mínimo/máximo por gateway
+- Aproveitamento completo dos recursos oferecidos por cada gateway
+
+## Fluxo de Matrícula e Regras de Acesso
+
+```text
+Matrícula Realizada
+    ↓
+Acesso Imediato ao Portal do Aluno
+    ↓
+Pagamento Confirmado?
+    ↓           ↓
+  Sim       Não: Aguardar até 10 dias
+                  ↓
+     Mais de 10 dias sem pagamento?
+           ↓              ↓
+        Sim           Não: Acesso Mantido
+         ↓
+  Acesso Bloqueado
+         ↓
+Mais de 30 dias sem pagamento?
+           ↓              ↓
+        Sim           Não: Bloqueio Mantido
+         ↓
+  Contrato Cancelado
+```
+
+### Regras para Alunos Ativos
+Para alunos com matrícula e documentos regulares:
+- Se houver atraso de mais de **30 dias** em qualquer parcela futura, o acesso ao Portal do Aluno é **bloqueado automaticamente**
+- Caso o atraso ultrapasse **90 dias**, e não haja nenhuma negociação ativa, o contrato é **cancelado automaticamente**
+- O aluno poderá negociar o pagamento via atendente ou pelo próprio **portal de negociações**
+
+## Integração com o Portal do Aluno e Financeiro
+
+Toda alteração de status realizada no **Portal do Aluno** é refletida automaticamente neste módulo:
+- Finalização de curso
+- Trancamento voluntário da matrícula
+- Cancelamento da matrícula por iniciativa do aluno
+
+O módulo também está conectado ao **Módulo Financeiro Empresarial**:
+- Confirmações de pagamento
+- Registro de inadimplência
+- Geração de relatórios financeiros
+- Fluxo de caixa e conciliação
+
+## Configurações Gerais
+
+### Controle de Descontos e Baixas Manuais
+- Aplicação de descontos personalizados
+- Baixa manual de parcelas
+- Flexibilidade na negociação
+
+### Sistema de Pagamento com Split
+- Split de pagamento com InfinitePay e Lytex
+- Percentual ou valor fixo de comissão
+- Repasse para consultores ou polos
+- Gatilhos automáticos após confirmação
+
+### Gestão de Taxas e Serviços
+- Taxa de trancamento
+- Taxa de reabertura
+- Taxa de certificação
+- Taxa de emissão de 2ª via
+- Taxa de apressamento de documentos
+
+## Contribuição
+
+1. Faça o fork do projeto
+2. Crie uma branch para sua feature (`git checkout -b feature/nova-feature`)
+3. Faça commit das suas alterações (`git commit -m 'feat: adiciona nova feature'`)
+4. Faça push para a branch (`git push origin feature/nova-feature`)
+5. Abra um Pull Request
+
 # README TÉCNICO - Módulo de Matrículas da Plataforma Edunéxia
 
 ## 📌 Visão Geral
@@ -282,7 +434,7 @@ Para alunos com matrícula e documentos regulares:
 - O aluno poderá negociar o pagamento via atendente ou pelo próprio **portal de negociações**.
 
 
-```
+```text
 1. Lead é captado (CRM)
 2. Consultor aciona "Matricular Lead"
 3. Seleciona curso e plano

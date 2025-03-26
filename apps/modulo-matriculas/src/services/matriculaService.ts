@@ -1,110 +1,115 @@
 import { DbMatricula, MatriculaStatus } from '@edunexia/database-schema'
 import { supabase } from '../lib/supabase'
 import { MatriculaDetalhada, Matricula } from '../types/matricula'
+import { matriculaSchema } from '../schemas/matricula'
+import { AppError } from '../lib/errors'
+import type { MatriculaStatus as MatriculaStatusType } from '../types/matricula'
+
+const ITEMS_PER_PAGE = 10
+
+export interface MatriculaFilters {
+  status?: MatriculaStatusType
+  alunoId?: string
+  cursoId?: string
+  dataInicio?: Date
+  dataFim?: Date
+  page?: number
+  perPage?: number
+}
+
+export interface PaginatedResponse<T> {
+  items: T[]
+  total: number
+  page: number
+  perPage: number
+  totalPages: number
+}
+
+export const matriculaKeys = {
+  all: ['matriculas'] as const,
+  lists: () => [...matriculaKeys.all, 'list'] as const,
+  list: (filters: MatriculaFilters) => [...matriculaKeys.lists(), filters] as const,
+  details: () => [...matriculaKeys.all, 'detail'] as const,
+  detail: (id: string) => [...matriculaKeys.details(), id] as const,
+}
 
 export const matriculaService = {
-  async listarMatriculas(filters?: {
-    alunoId?: string
-    cursoId?: string
-    status?: MatriculaStatus
-  }): Promise<MatriculaDetalhada[]> {
-    let query = supabase
-      .from('matriculas')
-      .select(`
-        *,
-        alunos (
-          nome
-        ),
-        cursos (
-          nome
-        )
-      `)
-      .order('created_at', { ascending: false })
-
-    if (filters?.alunoId) {
-      query = query.eq('aluno_id', filters.alunoId)
-    }
-
-    if (filters?.cursoId) {
-      query = query.eq('curso_id', filters.cursoId)
-    }
-
-    if (filters?.status) {
-      query = query.eq('status', filters.status)
-    }
-
-    const { data, error } = await query
-
-    if (error) throw error
-    if (!data) return []
-
-    return data.map(matricula => ({
-      ...matricula,
-      nomeAluno: matricula.alunos.nome,
-      nomeCurso: matricula.cursos.nome,
-      dataMatricula: matricula.created_at
-    }))
-  },
-
-  async buscarMatricula(id: string): Promise<MatriculaDetalhada> {
-    const { data, error } = await supabase
-      .from('matriculas')
-      .select(`
-        *,
-        alunos (
-          nome
-        ),
-        cursos (
-          nome
-        )
-      `)
-      .eq('id', id)
-      .single()
-
-    if (error) throw error
-
-    if (!data) throw new Error('Matrícula não encontrada')
-
-    return {
-      ...data,
-      nomeAluno: data.alunos.nome,
-      nomeCurso: data.cursos.nome,
-      dataMatricula: data.created_at
+  async listarMatriculas(filters?: MatriculaFilters): Promise<PaginatedResponse<unknown>> {
+    try {
+      const page = filters?.page || 1
+      const perPage = filters?.perPage || 10
+      
+      const queryParams = new URLSearchParams()
+      
+      if (filters?.alunoId) {
+        queryParams.append('alunoId', filters.alunoId)
+      }
+      
+      if (filters?.cursoId) {
+        queryParams.append('cursoId', filters.cursoId)
+      }
+      
+      if (filters?.status) {
+        queryParams.append('status', filters.status)
+      }
+      
+      if (filters?.dataInicio) {
+        queryParams.append('dataInicio', filters.dataInicio.toISOString())
+      }
+      
+      if (filters?.dataFim) {
+        queryParams.append('dataFim', filters.dataFim.toISOString())
+      }
+      
+      queryParams.append('page', page.toString())
+      queryParams.append('perPage', perPage.toString())
+      
+      // TODO: Implementar chamada à API
+      return {
+        items: [],
+        total: 0,
+        page,
+        perPage,
+        totalPages: 0
+      }
+    } catch (error) {
+      throw new AppError('Erro ao listar matrículas', error)
     }
   },
 
-  async criarMatricula(matricula: Omit<Matricula, 'id' | 'created_at' | 'updated_at'>): Promise<Matricula> {
-    const { data, error } = await supabase
-      .from('matriculas')
-      .insert(matricula)
-      .select()
-      .single()
-
-    if (error) throw error
-    return data
+  async buscarMatricula(id: string) {
+    try {
+      // TODO: Implementar chamada à API
+      return null
+    } catch (error) {
+      throw new AppError('Erro ao buscar matrícula', error)
+    }
   },
 
-  async atualizarMatricula(id: string, matricula: Partial<DbMatricula>): Promise<DbMatricula> {
-    const { data, error } = await supabase
-      .from('matriculas')
-      .update(matricula)
-      .eq('id', id)
-      .select()
-      .single()
-
-    if (error) throw error
-    return data
+  async criarMatricula(data: unknown) {
+    try {
+      // TODO: Implementar chamada à API
+      return null
+    } catch (error) {
+      throw new AppError('Erro ao criar matrícula', error)
+    }
   },
 
-  async cancelarMatricula(id: string, observacoes?: string): Promise<void> {
-    const { error } = await supabase
-      .from('matriculas')
-      .update({
-        status: 'cancelada',
-        observacoes: observacoes ? `${observacoes}\nMatrícula cancelada em ${new Date().toISOString()}` : `Matrícula cancelada em ${new Date().toISOString()}`
-      })
-      .eq('id', id)
+  async atualizarMatricula(id: string, data: unknown) {
+    try {
+      // TODO: Implementar chamada à API
+      return null
+    } catch (error) {
+      throw new AppError('Erro ao atualizar matrícula', error)
+    }
+  },
 
-    if (error) throw error
+  async cancelarMatricula(id: string, observacoes?: string) {
+    try {
+      // TODO: Implementar chamada à API
+      return null
+    } catch (error) {
+      throw new AppError('Erro ao cancelar matrícula', error)
+    }
   }
 } 

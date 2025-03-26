@@ -1,36 +1,31 @@
 {
-  "name": "@edunexia/ui-components",
-  "version": "0.0.1",
+  "name": "@repo/ui-components",
+  "version": "0.0.0",
   "private": true,
-  "main": "dist/index.js",
-  "module": "dist/index.mjs",
-  "types": "dist/index.d.ts",
-  "scripts": {
-    "build": "tsc && vite build",
-    "dev": "vite",
-    "lint": "eslint src --ext .ts,.tsx",
-    "lint:fix": "eslint src --ext .ts,.tsx --fix"
+  "exports": {
+    "./components/*": "./src/components/*"
   },
-  "dependencies": {
-    "@headlessui/react": "^1.7.18",
-    "@heroicons/react": "^2.1.1",
-    "class-variance-authority": "^0.7.1",
-    "clsx": "^2.1.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "tailwind-merge": "^2.2.1",
-    "tailwindcss": "^3.4.1"
+  "scripts": {
+    "lint": "eslint . --max-warnings 0",
+    "generate:component": "turbo gen react-component"
   },
   "devDependencies": {
-    "@types/node": "^22.13.13",
-    "@types/react": "^19.0.12",
-    "@types/react-dom": "^19.0.4",
-    "@vitejs/plugin-react": "^4.2.1",
-    "typescript": "^5.2.2",
-    "vite": "^6.2.3"
-  },
-  "peerDependencies": {
+    "@repo/eslint-config": "*",
+    "@repo/typescript-config": "*",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "eslint": "^8.53.0",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "typescript": "^5.2.2"
+  },
+  "dependencies": {
+    "@radix-ui/react-dialog": "^1.0.5",
+    "@radix-ui/react-popover": "^1.0.7",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.0",
+    "cmdk": "^0.2.1",
+    "lucide-react": "^0.344.0",
+    "tailwind-merge": "^2.2.1",
+    "tailwindcss-animate": "^1.0.7"
   }
 }

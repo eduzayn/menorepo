@@ -1,6 +1,6 @@
 import { DbMatricula } from '@edunexia/database-schema'
 
-export type MatriculaStatus = 'pendente' | 'ativa' | 'cancelada' | 'trancada' | 'concluida'
+export type MatriculaStatus = 'ATIVA' | 'CANCELADA' | 'CONCLUIDA' | 'PENDENTE'
 
 export interface Aluno {
   id: string
@@ -8,53 +8,44 @@ export interface Aluno {
   email: string
   cpf: string
   telefone: string
-  data_nascimento: string
-  endereco?: string
-  created_at: string
-  updated_at: string
+  dataNascimento: Date
+  endereco: string
 }
 
 export interface Curso {
   id: string
   nome: string
-  descricao?: string
-  carga_horaria: number
-  duracao_meses: number
-  modalidade: string
-  coordenador_id?: string
-  institution_id: string
-  created_at: string
-  updated_at: string
+  descricao: string
+  cargaHoraria: number
+  duracaoMeses: number
+  modalidade: 'PRESENCIAL' | 'ONLINE' | 'HIBRIDO'
 }
 
 export interface PlanoPagamento {
   id: string
-  curso_id: string
   nome: string
-  valor_total: number
-  numero_parcelas: number
-  valor_parcela: number
-  taxa_matricula: number
-  desconto_pontualidade: number
-  dia_vencimento: number
-  created_at: string
-  updated_at: string
+  valorTotal: number
+  numeroParcelas: number
+  valorParcela: number
+  taxaMatricula: number
+  descontoPontualidade: number
+  diaVencimento: number
 }
 
 export interface Matricula {
   id: string
-  aluno_id: string
-  curso_id: string
-  plano_id: string
+  alunoId: string
+  cursoId: string
+  planoPagamentoId: string
   status: MatriculaStatus
-  data_inicio: string
-  data_conclusao_prevista: string
+  dataInicio: Date
+  dataFim?: Date
   observacoes?: string
-  created_at: string
-  updated_at: string
+  createdAt: Date
+  updatedAt: Date
 }
 
-export interface MatriculaDetalhada extends DbMatricula {
+export interface MatriculaDetalhada extends Matricula {
   aluno: Aluno
   curso: Curso
   plano: PlanoPagamento

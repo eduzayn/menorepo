@@ -1,177 +1,153 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { Button, Input, Select } from '@edunexia/ui-components'
-import { MatriculaFormData } from '../types/matricula'
-import { matriculaService } from '../services/matriculaService'
+'use client'
 
-export function MatriculaForm() {
-  const navigate = useNavigate()
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [formData, setFormData] = useState<MatriculaFormData>({
-    aluno_id: '',
-    curso_id: '',
-    plano_id: '',
-    data_inicio: '',
-    data_conclusao_prevista: '',
-    status: 'pendente',
-    observacoes: null
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Button } from '@repo/ui/components/ui/button'
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@repo/ui/components/ui/form'
+import { Input } from '@repo/ui/components/ui/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@repo/ui/components/ui/select'
+import { Textarea } from '@repo/ui/components/ui/textarea'
+import { useCriarMatricula } from '../hooks/useMatriculas'
+import { matriculaSchema, type MatriculaInput } from '../schemas/matricula'
+
+interface MatriculaFormProps {
+  onSuccess?: () => void
+}
+
+export function MatriculaForm({ onSuccess }: MatriculaFormProps) {
+  const form = useForm<MatriculaInput>({
+    resolver: zodResolver(matriculaSchema),
+    defaultValues: {
+      status: 'PENDENTE'
+    }
   })
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    try {
-      setLoading(true)
-      await matriculaService.criarMatricula(formData)
-      navigate('/matriculas')
-    } catch (err) {
-      setError('Erro ao criar matrícula')
-      console.error('Erro:', err)
-    } finally {
-      setLoading(false)
-    }
-  }
+  const { mutate: criarMatricula, isPending } = useCriarMatricula()
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }))
-  }
-
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500"></div>
-      </div>
-    )
+  function onSubmit(data: MatriculaInput) {
+    criarMatricula(data, {
+      onSuccess: () => {
+        form.reset()
+        onSuccess?.()
+      }
+    })
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-900">Nova Matrícula</h1>
-        <Button variant="outline" onClick={() => navigate('/matriculas')}>
-          Cancelar
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <FormField
+          control={form.control}
+          name="alunoId"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Aluno</FormLabel>
+              <FormControl>
+                <Input {...field} placeholder="ID do aluno" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="cursoId"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Curso</FormLabel>
+              <FormControl>
+                <Input {...field} placeholder="ID do curso" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="planoPagamentoId"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Plano de Pagamento</FormLabel>
+              <FormControl>
+                <Input {...field} placeholder="ID do plano de pagamento" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="status"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Status</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione o status" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="PENDENTE">Pendente</SelectItem>
+                  <SelectItem value="ATIVA">Ativa</SelectItem>
+                  <SelectItem value="CANCELADA">Cancelada</SelectItem>
+                  <SelectItem value="CONCLUIDA">Concluída</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="dataInicio"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Data de Início</FormLabel>
+              <FormControl>
+                <Input type="date" {...field} value={field.value ? new Date(field.value).toISOString().split('T')[0] : ''} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="dataFim"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Data de Fim</FormLabel>
+              <FormControl>
+                <Input type="date" {...field} value={field.value ? new Date(field.value).toISOString().split('T')[0] : ''} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="observacoes"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Observações</FormLabel>
+              <FormControl>
+                <Textarea {...field} placeholder="Observações sobre a matrícula" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <Button type="submit" disabled={isPending}>
+          {isPending ? 'Criando...' : 'Criar Matrícula'}
         </Button>
-      </div>
-
-      {error && (
-        <div className="bg-red-50 text-red-700 p-4 rounded-md">
-          {error}
-        </div>
-      )}
-
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div>
-          <label htmlFor="aluno_id" className="block text-sm font-medium text-gray-700">
-            ID do Aluno
-          </label>
-          <Input
-            type="text"
-            name="aluno_id"
-            id="aluno_id"
-            value={formData.aluno_id}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        <div>
-          <label htmlFor="curso_id" className="block text-sm font-medium text-gray-700">
-            ID do Curso
-          </label>
-          <Input
-            type="text"
-            name="curso_id"
-            id="curso_id"
-            value={formData.curso_id}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        <div>
-          <label htmlFor="plano_id" className="block text-sm font-medium text-gray-700">
-            ID do Plano
-          </label>
-          <Input
-            type="text"
-            name="plano_id"
-            id="plano_id"
-            value={formData.plano_id}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        <div>
-          <label htmlFor="data_inicio" className="block text-sm font-medium text-gray-700">
-            Data de Início
-          </label>
-          <Input
-            type="date"
-            name="data_inicio"
-            id="data_inicio"
-            value={formData.data_inicio}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        <div>
-          <label htmlFor="data_conclusao_prevista" className="block text-sm font-medium text-gray-700">
-            Data de Conclusão Prevista
-          </label>
-          <Input
-            type="date"
-            name="data_conclusao_prevista"
-            id="data_conclusao_prevista"
-            value={formData.data_conclusao_prevista}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        <div>
-          <label htmlFor="status" className="block text-sm font-medium text-gray-700">
-            Status
-          </label>
-          <Select
-            name="status"
-            id="status"
-            value={formData.status}
-            onChange={handleChange}
-            required
-          >
-            <option value="pendente">Pendente</option>
-            <option value="ativa">Ativa</option>
-            <option value="cancelada">Cancelada</option>
-            <option value="trancada">Trancada</option>
-            <option value="concluida">Concluída</option>
-          </Select>
-        </div>
-
-        <div>
-          <label htmlFor="observacoes" className="block text-sm font-medium text-gray-700">
-            Observações
-          </label>
-          <Input
-            type="text"
-            name="observacoes"
-            id="observacoes"
-            value={formData.observacoes || ''}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div className="flex justify-end">
-          <Button type="submit" disabled={loading}>
-            {loading ? 'Salvando...' : 'Salvar'}
-          </Button>
-        </div>
       </form>
-    </div>
+    </Form>
   )
 } 
