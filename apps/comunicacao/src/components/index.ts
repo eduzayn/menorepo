@@ -1,10 +1,17 @@
-// Este arquivo exportará todos os componentes do módulo de comunicação 
+// Componentes de chat
 export * from './chat';
-export * from './conversas';
+
+// Componentes de grupos
 export * from './grupos';
+
+// Componentes de notificações
 export * from './notificacoes';
-export * from './layout';
-export * from './ChatWindow';
-export * from './ConversationList';
-export * from './Pagination';
-export * from './SearchInput'; 
+
+// Componentes individuais
+export { SearchInput } from './SearchInput';
+export { Pagination } from './Pagination';
+export { ChatWindow } from './ChatWindow';
+export { ConversationList } from './ConversationList';
+export { DetalhesConversa } from './DetalhesConversa';
+export { EnvioMensagem } from './EnvioMensagem';
+export { RespostasRapidas } from './RespostasRapidas'; 

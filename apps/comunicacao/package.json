@@ -1,14 +1,21 @@
 {
-  "name": "comunicacao",
+  "name": "@edunexia/comunicacao",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
   },
   "dependencies": {
+    "@edunexia/api-client": "*",
+    "@edunexia/core": "*",
+    "@edunexia/ui-components": "*",
+    "@edunexia/auth": "*",
     "@headlessui/react": "^1.7.18",
     "@heroicons/react": "^2.1.1",
     "@hookform/resolvers": "^3.3.4",
@@ -46,6 +53,7 @@
     "postcss": "^8",
     "tailwindcss": "^3.3.0",
     "tailwindcss-animate": "^1.0.7",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^0.34.4"
   }
 }

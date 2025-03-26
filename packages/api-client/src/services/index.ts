@@ -11,4 +11,7 @@ export * from './matriculas';
 export * from './disciplinas';
 
 // Serviços de comunicação
-export * from './comunicacao'; 
+export * from './comunicacao';
+
+// Serviços de polos
+export * from './polos'; 

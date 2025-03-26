@@ -14,15 +14,15 @@ Este é o módulo de comunicação integrado, que permite gerenciar conversas, m
 ## Pré-requisitos
 
 - Node.js 18+
-- Yarn (utilizado para gerenciamento de workspaces)
+- Yarn ou pnpm (utilizado para gerenciamento de workspaces)
 - Conta no Supabase
 
 ## Instalação
 
-1. Todas as dependências são gerenciadas através do Yarn Workspaces do monorepo
+1. Todas as dependências são gerenciadas através do monorepo
 2. Instale as dependências na raiz do projeto:
    ```bash
-   yarn install
+   pnpm install
    ```
 3. Configure as variáveis do Supabase no arquivo `.env`:
    ```
@@ -35,7 +35,7 @@ Este é o módulo de comunicação integrado, que permite gerenciar conversas, m
 Para iniciar o servidor de desenvolvimento:
 
 ```bash
-yarn workspace @edunexia/comunicacao dev
+pnpm --filter @edunexia/comunicacao dev
 ```
 
 ## Build
@@ -43,7 +43,7 @@ yarn workspace @edunexia/comunicacao dev
 Para gerar o build de produção:
 
 ```bash
-yarn workspace @edunexia/comunicacao build
+pnpm --filter @edunexia/comunicacao build
 ```
 
 ## Testes
@@ -51,7 +51,7 @@ yarn workspace @edunexia/comunicacao build
 Para executar os testes:
 
 ```bash
-yarn workspace @edunexia/comunicacao test
+pnpm --filter @edunexia/comunicacao test
 ```
 
 ## Estrutura do Projeto
@@ -60,6 +60,11 @@ yarn workspace @edunexia/comunicacao test
 apps/comunicacao/
 ├── src/
 │   ├── components/    # Componentes React específicos do módulo
+│   │   ├── chat/      # Componentes de chat
+│   │   ├── grupos/    # Componentes de gerenciamento de grupos
+│   │   ├── layout/    # Componentes de layout
+│   │   ├── ui/        # Componentes de UI básicos
+│   │   └── ...        # Outros componentes organizados por contexto
 │   ├── contexts/      # Contextos React para estado global
 │   ├── hooks/         # Hooks personalizados
 │   ├── lib/           # Configurações e utilitários
@@ -86,13 +91,14 @@ apps/comunicacao/
 
 - React
 - TypeScript
+- Next.js
 - Tailwind CSS
 - Supabase
-- Vite
-- Vitest
+- React Query
 - Integração com o core através de @edunexia/core
 - Componentes de UI do @edunexia/ui-components
 - Autenticação via @edunexia/auth
+- API Client via @edunexia/api-client
 
 ## Integração com o Monorepo
 
@@ -116,4 +122,19 @@ Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para ma
 
 ## Documentação Complementar
 
-Para mais informações sobre a integração deste módulo com o restante da plataforma Edunéxia, consulte o [README Principal](../../README.md) do monorepo. 
+Para mais informações sobre a integração deste módulo com o restante da plataforma Edunéxia, consulte o [README Principal](../../README.md) do monorepo.
+
+## Notas de Padronização
+
+Este módulo foi padronizado para seguir as convenções do monorepo Edunéxia:
+
+1. Nome do pacote: `@edunexia/comunicacao`
+2. Estrutura de diretórios alinhada com o padrão do projeto
+3. Importação e utilização dos pacotes compartilhados
+4. Dependências atualizadas para a versão mais recente do monorepo
+
+Caso encontre divergências ou tenha sugestões, por favor, abra uma issue no repositório principal.
+
+## Notas de Integração
+
+O módulo de Material Didático foi movido para `apps/material-didatico/` na raiz do monorepo para melhor organização e separação de responsabilidades. A migração foi concluída com sucesso, e todas as funcionalidades do módulo agora estão disponíveis na nova localização. 

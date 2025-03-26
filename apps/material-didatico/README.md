@@ -1,144 +1,188 @@
-# Módulo de Material Didático - Edunéxia
+# README TÉCNICO - Módulo de Produção de Conteúdo (Portal do Professor) - Plataforma Edunéxia
 
-Este módulo é responsável pela criação, edição, visualização e exportação de materiais didáticos na plataforma Edunéxia.
+## 📁 Visão Geral
 
-## Funcionalidades Implementadas
+> O Módulo de Produção de Conteúdo é o ambiente exclusivo dos professores e conteudistas da plataforma Edunéxia. Aqui serão criados, revisados, publicados e gerenciados todos os materiais didáticos que compõem os cursos ofertados. O sistema foi projetado para garantir autonomia ao autor, controle de qualidade, escalabilidade e integração completa com os demais módulos da plataforma.
 
-### 1. Editor de Conteúdo
-- Editor flexível para diversos tipos de conteúdo (texto, vídeo, quiz, atividades, simulações)
-- Criação e edição de materiais didáticos de forma estruturada
-- Suporte a metadados (objetivos de aprendizagem, nível educacional, tags)
-- Gerenciamento de disciplinas e tópicos
+## ⚖️ Tecnologias Utilizadas
+- *React + TypeScript* (Frontend)
+- *TailwindCSS* (Design moderno)
+- *Supabase* (Banco, storage, autenticação)
+- *Yarn Workspaces* (Monorepo)
+- *Vite* (Build tool)
+- *IA (OpenAI ou Claude)* para geração assistida de conteúdo
+- *Shadcn UI* (Componentes base)
+- *Radix UI* (Componentes primitivos)
+- *Tailwind Aria* (Acessibilidade)
 
-### 2. Exportação SCORM Completa
-- Exportação de materiais para o formato SCORM 1.2 compatível com LMS
-- Inclusão de manifesto SCORM com metadados completos
-- Empacotamento de recursos em formato ZIP
-- API SCORM para comunicação com LMS e rastreamento de progresso
-- Preservação de estilos e recursos visuais no pacote exportado
+## 🔹 Funcionalidades Principais
 
-### 3. Sugestões de IA
-- Motor de sugestões de IA para geração de conteúdo
-- Painel interativo de sugestões durante o processo de edição
-- Modelo de sugestão personalizável para diferentes tipos de blocos
-- Sistema de feedback para melhorar as sugestões ao longo do tempo
-- Mecanismo de extração de tópicos para contextualização
+### 📖 Criação e Edição de Conteúdo
+- Editor inteligente com blocos (texto, vídeo, quiz, atividade, simulados, links)
+- Integração com IA para:
+  - Sugestão de conteúdo
+  - Resumos e objetivos
+  - Criação de atividades
+  - Correção automática
 
-### 4. Geração de PDFs
-- Exportação de materiais para PDF utilizando jsPDF
-- Formatação responsiva e preservação de estilos
-- Inclusão de cabeçalhos, rodapés e numeração de páginas
-- Suporte a imagens e tabelas no PDF gerado
+### 🌍 Publicação e Workflow
+- Criação de cursos, disciplinas, módulos e lições
+- Rascunho → Revisão → Aprovado → Publicado
+- Comentários e atribuição de revisores
 
-## Arquitetura do Módulo
+### ✍️ Coautoria e Permissões
+- Vários professores podem colaborar em um curso
+- Permissões de leitura, edição, revisão e publicação
 
+### 📄 Templates Inteligentes
+- Criação de modelos reutilizáveis para aulas e disciplinas
+- Sugestões automáticas de estrutura (introdução, objetivos, conclusão)
+
+### 🔄 Controle de Versões
+- Cada atualização de aula gera nova versão
+- Permite restaurar versões anteriores
+- Indica autor de cada versão
+
+### 🗃️ Exportação de Conteúdo
+- Exportação como:
+  - PDF
+  - HTML5 responsivo
+  - SCORM (para LMSs externos)
+
+### 📊 Dashboard do Autor
+- Quantidade de cursos criados
+- Disciplinas em revisão
+- Progresso geral de produção
+- Tempo médio de edição por aula
+
+### 🌐 Anexos e Mídias
+- Upload de imagens, áudios, PDFs, links externos
+- Suporte a YouTube, Vimeo e arquivos da nuvem (Supabase storage)
+
+### 🤝 Integrações
+- *Portal do Aluno*: publicação e exibição do conteúdo
+- *Matrículas*: vinculação com cursos comprados
+- *Inadimplência*: verifica se aluno pode acessar conteúdo
+- *IA Docente*: pode revisar e sugerir melhorias
+
+## 🌍 Layout Visual (Sugerido)
+```text
+┌───────────── Menu Lateral ─────────────┐
+│ Dashboard                             │
+│ Cursos Criados                        │
+│ Criar Novo Curso                      │
+│ Disciplinas                          │
+│ Meus Materiais                       │
+│ Templates                            │
+│ Publicações Pendentes                │
+│ Versões e Histórico                  │
+│ Configurações                       │
+└───────────────────────────────────────┘
 ```
+
+## 🚪 Rotas e Páginas
+```bash
+/dashboard                         # Painel principal do autor
+/cursos                            # Lista de cursos criados
+/cursos/novo                       # Novo curso
+/cursos/:id                        # Editar curso
+/disciplinas/:cursoId              # Disciplinas do curso
+/disciplinas/:id/editar            # Editar disciplina
+/materiais                         # Listagem geral de materiais
+/templates                         # Modelos reutilizáveis
+/publicacoes                       # Pendentes de revisão/publicação
+/historico                         # Controle de versões
+/configuracoes                     # Perfil e preferências
+```
+
+## 📦 Estrutura do Projeto
+```bash
 apps/material-didatico/
 ├── src/
-│   ├── ai/                       # Serviços de IA para sugestões
-│   │   ├── models/               # Modelos de IA para geração
-│   │   └── suggestion-engine.ts  # Motor de sugestões
-│   ├── components/               # Componentes React
-│   │   ├── ai/                   # Componentes de IA
-│   │   ├── disciplinas/          # Componentes de disciplinas
-│   │   └── editor/               # Componentes do editor
-│   ├── contexts/                 # Contextos React
-│   │   └── index.ts              # Exportação dos contextos
-│   ├── hooks/                    # Hooks personalizados
-│   │   └── index.ts              # Exportação dos hooks
-│   ├── pages/                    # Páginas do módulo
-│   │   └── index.ts              # Exportação das páginas
-│   ├── services/                 # Serviços e APIs
-│   │   ├── export.ts             # Serviço de exportação (SCORM, PDF)
-│   │   └── discipline.ts         # Serviço de gerenciamento de disciplinas
-│   ├── types/                    # Definições de tipos
-│   │   └── editor.ts             # Tipos para o editor
-│   └── utils/                    # Utilitários
-│       └── index.ts              # Exportação dos utilitários
-├── package.json                  # Dependências do módulo
-└── README.md                     # Documentação
+│   ├── pages/                    # Páginas da aplicação
+│   ├── components/               # Componentes específicos do módulo
+│   │   ├── editor/              # Componentes do editor
+│   │   ├── dashboard/           # Componentes do dashboard
+│   │   ├── cursos/              # Componentes de cursos
+│   │   └── templates/           # Componentes de templates
+│   ├── hooks/                   # Hooks personalizados
+│   ├── services/                # Serviços e APIs
+│   ├── flows/                   # Workflows editoriais
+│   ├── ai/                      # Integração IA
+│   └── types/                   # Tipos TypeScript
+├── public/                      # Arquivos estáticos
+├── package.json                 # Dependências e scripts
+└── tsconfig.json                # Configuração TypeScript
 ```
 
-## Como Utilizar
+## 🎨 Componentes Utilizados
+O módulo utiliza os seguintes componentes do design system compartilhado:
 
-### Criação de Material Didático
+### Layout
+- `Button` - Botões com animações
+- `Card` - Cards de conteúdo
+- `Spinner` - Indicador de carregamento
 
-```jsx
-import { EditorWithSuggestions } from '@/components/editor/EditorWithSuggestions';
-import { saveMaterial } from '@/services/discipline';
+### Formulários
+- `Input` - Inputs com ícones
+- `TextField` - Campo com label
+- `Textarea` - Área de texto
+- `Select` - Seleção
 
-// Componente de exemplo
-function CreateMaterial() {
-  const initialContent = {
-    metadata: {
-      title: 'Novo Material',
-      description: 'Descreva o material',
-      // outros metadados...
-    },
-    blocks: []
-  };
+### Exibição de Dados
+- `Avatar` - Avatares de usuários
+- `Badge` - Badges de status
+- `Chip` - Chips de categorias
+- `Tooltip` - Tooltips informativos
+- `Progress` - Barras de progresso
+- `Calendar` - Calendários
+- `Timeline` - Linhas do tempo
+- `Accordion` - Acordeões
 
-  const handleSave = async (content) => {
-    await saveMaterial(content);
-  };
+### Tabelas
+- `Table` - Tabelas de dados
+- `TableHeader` - Cabeçalho da tabela
+- `TableBody` - Corpo da tabela
+- `TableFooter` - Rodapé da tabela
+- `TableHead` - Cabeçalho das colunas
+- `TableRow` - Linhas da tabela
+- `TableCell` - Células da tabela
+- `TableCaption` - Legenda da tabela
+- `TablePagination` - Paginação
 
-  return (
-    <EditorWithSuggestions 
-      initialContent={initialContent}
-      onSave={handleSave}
-    />
-  );
-}
-```
+### Upload
+- `Upload` - Container de upload
+- `UploadDropzone` - Área de soltar arquivos
+- `UploadProgress` - Progresso do upload
 
-### Exportação SCORM
+### Diálogos
+- `Dialog` - Modais
+- `Command` - Dropdowns
 
-```javascript
-import { exportToSCORM } from '@/services/export';
+### Feedback
+- `Toast` - Notificações
+- `Alert` - Alertas
 
-// Exemplo de uso
-async function handleExportSCORM(content) {
-  try {
-    const scormUrl = await exportToSCORM(content);
-    // Download ou exibição do link
-  } catch (error) {
-    console.error('Erro ao exportar SCORM:', error);
-  }
-}
-```
+### Chat
+- `Chat` - Container de chat
+- `ChatMessage` - Mensagens
+- `ChatInput` - Input de mensagem
 
-### Utilização do Motor de Sugestões
+## 🔧 Supabase (Schema conteudo)
+| Tabela                | Finalidade                                     |
+|-----------------------|-----------------------------------------------|
+| cursos              | Cadastro básico do curso                      |
+| disciplinas         | Disciplinas e estrutura didática             |
+| aulas               | Blocos de conteúdo e atividades              |
+| templates           | Modelos reutilizáveis                        |
+| versoes             | Controle de versões e auditoria              |
+| autores             | Vínculo de professores ao conteúdo           |
+| midias              | Biblioteca de arquivos e anexações           |
+| publicacoes         | Status editorial de publicação               |
 
-```javascript
-import { SuggestionEngine } from '@/ai/suggestion-engine';
+## 📅 Documentação Complementar
+> Este módulo integra o monorepo da Edunéxia. Consulte os READMEs dos módulos *Portal do Aluno, **Matrículas* e *Comunicação* para mais detalhes sobre as integrações entre os sistemas.
 
-// Obter instância do motor de sugestões
-const suggestionEngine = SuggestionEngine.getInstance();
+---
 
-// Gerar sugestões
-const suggestions = await suggestionEngine.generateSuggestions({
-  contentTitle: 'Título do Material',
-  currentBlocks: existingBlocks,
-  topic: 'Matemática',
-  educationLevel: 'Ensino Médio'
-});
-```
-
-## Dependências
-
-Este módulo utiliza as seguintes bibliotecas:
-- jsPDF (^2.5.1) - Geração de PDFs
-- JSZip (^3.10.1) - Empacotamento de arquivos para SCORM
-- Pacotes compartilhados do monorepo
-  - `@edunexia/ui-components` - Componentes de UI
-  - `@edunexia/auth` - Autenticação
-  - `@edunexia/database-schema` - Esquema de banco de dados
-  - `@edunexia/api-client` - Cliente de API unificado
-  - `@edunexia/core` - Componentes e layouts compartilhados
-
-## Desenvolvimento Futuro
-
-- Implementação de testes automatizados
-- Suporte a mais formatos de exportação (xAPI, cmi5)
-- Melhorias no motor de IA com modelos mais avançados
-- Editor colaborativo em tempo real 
+Com esse módulo, a Edunéxia entrega uma experiência poderosa para os professores, com produção assistida por IA, controle de qualidade, exportação SCORM, coautoria e integração total ao ecossistema de ensino digital. 
