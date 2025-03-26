@@ -34,11 +34,33 @@ edunexia-monorepo/
 │   ├── auth/                  # Autenticação unificada (SSO)
 │   ├── database-schema/       # Tipos e schemas do banco de dados
 │   └── api-client/            # Cliente de API unificado para comunicação com o backend
+├── docs/                      # Documentação técnica detalhada
+│   ├── arquitetura/           # Detalhes arquiteturais
+│   ├── workflows/             # Fluxos de trabalho e processos
+│   └── guidelines/            # Diretrizes e melhores práticas
 ├── .gitignore
 ├── package.json               # Define os workspaces do Yarn
 ├── tsconfig.json              # Configuração TypeScript compartilhada
-└── README.md
+├── CHANGELOG.md               # Registro de alterações significativas
+└── README.md                  # Este documento
 ```
+
+## Estado Atual do Desenvolvimento
+
+### Módulos em Desenvolvimento Ativo
+Os seguintes módulos estão atualmente em desenvolvimento ativo:
+- ✅ **core** - Base arquitetural e componentes compartilhados
+- ✅ **portal-do-aluno** - Interface do estudante com features de documentos e notificações
+- ✅ **material-didatico** - Editor e visualizador de conteúdo didático
+- ✅ **financeiro-empresarial** - Gestão financeira institucional
+- ✅ **comunicacao** - Mensageria, notificações e CRM
+- ✅ **matriculas** - Processo de inscrição e matrícula
+
+### Pacotes Compartilhados Implementados
+- ✅ **ui-components** - Sistema de design unificado
+- ✅ **api-client** - Cliente padronizado para interação com o backend
+- ✅ **auth** - Sistema centralizado de autenticação
+- ✅ **database-schema** - Definições de tipos e modelos de dados
 
 ## Módulos Especiais e Infraestrutura
 
@@ -88,19 +110,6 @@ Será desenvolvido um **site de vendas independente (`site-vendas`)**, totalment
 
 Este modelo permite que as instituições realizem a contratação sem depender de equipe de vendas, facilitando a escalabilidade do negócio.
 
-## Módulos a Desenvolver
-Como o projeto será iniciado do zero, todos os módulos abaixo estão em planejamento e desenvolvimento:
-- **material-didatico**: Criação de cursos, organização de conteúdos e e-books inteligentes.
-- **matriculas**: Cadastro de cursos, planos e fluxo de inscrição.
-- **portal-do-aluno**: Acesso ao ambiente acadêmico, documentos e certificados.
-- **comunicacao**: Envio de mensagens, notificações, e integração com WhatsApp e chat com IA.
-- **financeiro-empresarial**: Controle de contas, emissão de boletos e fluxo de caixa.
-- **portal-parceiro**: Visão administrativa e de desempenho para parceiros comerciais.
-- **portal-polo**: Gestão pedagógica e operacional dos polos educacionais.
-- **rh**: Gerenciamento de colaboradores, produtividade e relatórios.
-- **contabilidade**: Relatórios fiscais, balanços e integração com contadores externos.
-- **site-vendas**: Site de apresentação e marketing self-service da plataforma.
-
 ## Estrutura Padrão dos Módulos
 Todos os módulos devem seguir rigorosamente a seguinte estrutura padronizada:
 
@@ -137,58 +146,73 @@ apps/nome-do-modulo/
 
 O cumprimento desta estrutura garante consistência e facilita a navegação entre módulos para todos os desenvolvedores do projeto.
 
+## Diretrizes de Contribuição
+
+### Convenções de Código e Commits
+- **Commits**: Use commits semânticos no formato `tipo(escopo): descrição`, por exemplo:
+  - `feat(portal-aluno): implementa sistema de notificações`
+  - `fix(financeiro): corrige cálculo de juros em boletos atrasados`
+  - `docs(readme): atualiza instruções de instalação`
+
+- **Branches**: Trabalhe diretamente na branch principal (`main`) para módulos individuais, criando branches apenas para features complexas.
+
+- **Code Style**: Siga as regras definidas no ESLint e Prettier do projeto.
+
+### Documentação
+- **README do módulo**: Mantenha atualizado com:
+  - Visão geral e propósito
+  - Funcionalidades implementadas
+  - Estrutura específica
+  - Integrações com outros módulos
+  
+- **JSDoc**: Documente todas as funções públicas, hooks, contexts e componentes principais.
+
+### Desenvolvimento
+- Reuse componentes do **ui-components** sempre que possível
+- Utilize o cliente **api-client** para todas as chamadas ao backend
+- Implemente testes para todos os novos componentes e lógica de negócio
+
 ## Estratégia de Integração
-1. Criação da estrutura base do monorepo com Yarn Workspaces.
-2. Desenvolvimento de cada módulo como um workspace em `apps/`.
-3. Criação de bibliotecas reutilizáveis em `packages/` (ex: autenticação, design system, API).
-4. Configuração de SSO (Single Sign-On) e compartilhamento de sessões.
-5. Padronização de ferramentas de desenvolvimento: ESLint, Prettier, Husky, Vite, etc.
-
-## Benefícios Esperados
-- Desenvolvimento simultâneo de múltiplos módulos.
-- Compartilhamento fácil de código entre os sistemas.
-- Redução de retrabalho e inconsistências.
-- Deploys independentes com controle centralizado.
-- Escalabilidade para inclusão de novos módulos com baixo custo técnico.
-- Venda automatizada e escalável para instituições EAD.
-- Integração total entre frontend na Vercel e backend no Supabase.
-
-## Organograma Expandido do Ecossistema Edunéxia
-```
-                              [ Interface Principal da Plataforma ]
-                                               |
-  --------------------------------------------------------------------------------------------------------------
-      |                          |                        |                        |                           |
-[ Material Didático ]      [ Matrículas ]     [ Portal do Aluno ]         [ Comunicação ]         [ Módulos Avançados ]
-[ IA Vídeo Generator]                                                     |                       -----------------------------
-[ Gestão de Planos ]       [ Área Acadêmica ]   [ Chat, Feed IA ]         [ Notificações ]       | Financeiro Empresarial |
-[ E-books e Conteúdo ]     [ Vinculação com    ]  [ Boletim, Docs ]       [ WhatsApp, e-mails ]  | Portal do Parceiro     |
-                           [ Material Didático ]  [ Certificados ]                              | Portal do Polo          |
-                                                   [ Tutoria ]                                   | Gestão de RH            |
-                                                                                                 | Contabilidade           |
-                                                                                                 | Site de Vendas          |
-```
+1. Criação da estrutura base do monorepo com Yarn Workspaces. ✅
+2. Desenvolvimento de cada módulo como um workspace em `apps/`. ✅
+3. Criação de bibliotecas reutilizáveis em `packages/` (ex: autenticação, design system, API). ✅
+4. Configuração de SSO (Single Sign-On) e compartilhamento de sessões. 🔄
+5. Padronização de ferramentas de desenvolvimento: ESLint, Prettier, Husky, Vite, etc. ✅
 
 ## Considerações Técnicas
-- Gerenciamento de pacotes via `Yarn Workspaces`
-- Integração contínua com CI/CD baseada em ramificações por módulo
-- Autenticação JWT com SSO centralizado (em `packages/auth`)
-- Compartilhamento de componentes em `ui-components`
-- Uso de TypeScript em todos os módulos e bibliotecas
-- Integração com gateway de pagamento no módulo `site-vendas`
-- Geração automática de credenciais e e-mails transacionais
-- Backend unificado no Supabase para todos os módulos usando `@supabase/supabase-js`
-- Deploy do frontend via Vercel com integrações automáticas
-- Tipos e schemas centralizados em `database-schema`
-- Cliente de API unificado em `api-client` para padronização de chamadas ao backend
+- Gerenciamento de pacotes via `Yarn Workspaces` ✅
+- Integração contínua com CI/CD baseada em ramificações por módulo 🔄
+- Autenticação JWT com SSO centralizado (em `packages/auth`) ✅
+- Compartilhamento de componentes em `ui-components` ✅
+- Uso de TypeScript em todos os módulos e bibliotecas ✅
+- Integração com gateway de pagamento no módulo `site-vendas` 🔄
+- Geração automática de credenciais e e-mails transacionais 🔄
+- Backend unificado no Supabase para todos os módulos usando `@supabase/supabase-js` ✅
+- Deploy do frontend via Vercel com integrações automáticas 🔄
+- Tipos e schemas centralizados em `database-schema` ✅
+- Cliente de API unificado em `api-client` para padronização de chamadas ao backend ✅
 
 ## Próximos Passos
-- Criar a estrutura base do monorepo no GitHub.
-- Desenvolver os módulos prioritários a partir de `apps/` e `packages/`.
-- Padronizar dependências e criar bibliotecas compartilhadas.
-- Desenvolver o módulo de vendas self-service com período de testes gratuitos.
-- Iniciar testes de integração entre módulos.
+
+### Curto Prazo (1-3 meses)
+- Finalizar a implementação das funcionalidades básicas dos módulos prioritários
+- Integrar completamente o sistema de autenticação centralizada
+- Implementar pipeline de CI/CD para todos os módulos
+
+### Médio Prazo (3-6 meses)
+- Desenvolver módulos secundários (portal-parceiro, portal-polo)
+- Implementar o módulo de vendas self-service
+- Iniciar testes de integração entre todos os módulos
+
+### Longo Prazo (6-12 meses)
+- Completar a implementação de todos os módulos
+- Realizar testes de carga e otimizações de performance
+- Preparar documentação para parceiros e integradores
 
 ---
 
 Com essa estrutura, a Edunéxia evolui para um ecossistema educacional escalável, modular e tecnicamente moderno, pronto para atender instituições de EAD de diferentes portes e necessidades, com possibilidade de contratação automatizada por meio do site.
+
+> **Nota:** Para informações detalhadas sobre cada módulo, consulte o README específico dentro da pasta do módulo correspondente.
+> 
+> Para detalhes técnicos mais aprofundados, consulte a documentação em `/docs`.
