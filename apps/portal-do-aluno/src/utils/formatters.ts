@@ -152,4 +152,93 @@ export const truncateText = (text: string, maxLength: number): string => {
   if (!text || text.length <= maxLength) return text || '';
   
   return `${text.substring(0, maxLength).trim()}...`;
-}; 
+};
+
+/**
+ * Formata um valor numérico para moeda brasileira (BRL)
+ * @param valor O valor a ser formatado
+ * @returns String formatada (ex: R$ 1.234,56)
+ */
+export function formatCurrency(valor: number): string {
+  return new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL'
+  }).format(valor);
+}
+
+/**
+ * Formata uma data para o formato brasileiro (DD/MM/YYYY)
+ * @param data Data a ser formatada
+ * @returns String formatada (ex: 31/12/2023)
+ */
+export function formatDate(data: Date | string): string {
+  if (typeof data === 'string') {
+    data = new Date(data);
+  }
+  
+  return new Intl.DateTimeFormat('pt-BR').format(data);
+}
+
+/**
+ * Formata uma data com hora para o formato brasileiro (DD/MM/YYYY HH:MM)
+ * @param data Data a ser formatada
+ * @returns String formatada (ex: 31/12/2023 23:59)
+ */
+export function formatDateTime(data: Date | string): string {
+  if (typeof data === 'string') {
+    data = new Date(data);
+  }
+  
+  return new Intl.DateTimeFormat('pt-BR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  }).format(data);
+}
+
+/**
+ * Formata o nome do aluno para exibição
+ * @param nome Nome completo do aluno
+ * @returns Nome formatado (primeiro nome + último sobrenome)
+ */
+export function formatNomeAluno(nome: string): string {
+  if (!nome) return '';
+  
+  const partesNome = nome.trim().split(' ');
+  
+  if (partesNome.length === 1) return partesNome[0];
+  
+  const primeiroNome = partesNome[0];
+  const ultimoSobrenome = partesNome[partesNome.length - 1];
+  
+  return `${primeiroNome} ${ultimoSobrenome}`;
+}
+
+/**
+ * Formata um CPF para exibição (###.###.###-##)
+ * @param cpf CPF sem formatação
+ * @returns CPF formatado
+ */
+export function formatCPF(cpf: string): string {
+  if (!cpf) return '';
+  
+  // Remove qualquer formatação existente
+  cpf = cpf.replace(/\D/g, '');
+  
+  // Adiciona a formatação
+  return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+}
+
+/**
+ * Trunca um texto longo adicionando reticências
+ * @param texto Texto a ser truncado
+ * @param tamanhoMaximo Tamanho máximo do texto
+ * @returns Texto truncado
+ */
+export function truncarTexto(texto: string, tamanhoMaximo: number): string {
+  if (!texto || texto.length <= tamanhoMaximo) return texto;
+  
+  return texto.substring(0, tamanhoMaximo) + '...';
+} 

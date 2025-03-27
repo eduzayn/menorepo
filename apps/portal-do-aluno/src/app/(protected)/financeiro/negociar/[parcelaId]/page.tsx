@@ -16,7 +16,11 @@ import {
   CalculatorIcon,
   BadgePercentIcon,
   CalendarIcon,
-  ArrowLeftIcon
+  ArrowLeftIcon,
+  InfoIcon,
+  PiggyBankIcon,
+  LoaderIcon,
+  CreditCardIcon
 } from 'lucide-react'
 import { 
   buscarDetalheParcela, 
@@ -25,7 +29,7 @@ import {
   criarPropostaNegociacao
 } from '@/services/financeiro'
 import { Parcela, RegrasNegociacao, PropostaNegociacao, MetodoPagamento } from '@/types/financeiro'
-import { formatCurrency } from '@/utils/formatters'
+import { formatCurrency, formatDate } from '@/utils/formatters'
 import { toast } from 'react-hot-toast'
 
 export default function NegociarParcelaPage() {
@@ -40,7 +44,7 @@ export default function NegociarParcelaPage() {
   const [canNegotiate, setCanNegotiate] = useState(false)
   
   // Estados do formulário
-  const [tipoNegociacao, setTipoNegociacao] = useState<'desconto' | 'parcelamento' | 'ambos'>('desconto')
+  const [tipoNegociacao, setTipoNegociacao] = useState<'avista' | 'parcelado'>('avista')
   const [percentualDesconto, setPercentualDesconto] = useState(0)
   const [numeroParcelas, setNumeroParcelas] = useState(1)
   const [metodoPagamento, setMetodoPagamento] = useState<MetodoPagamento>('pix')
@@ -51,6 +55,8 @@ export default function NegociarParcelaPage() {
   const [valorComDesconto, setValorComDesconto] = useState(0)
   const [valorPorParcela, setValorPorParcela] = useState(0)
   const [economiaTotal, setEconomiaTotal] = useState(0)
+  const [valorEntrada, setValorEntrada] = useState(0)
+  const [valorTotal, setValorTotal] = useState(0)
 
   useEffect(() => {
     const carregarDados = async () => {
@@ -63,22 +69,19 @@ export default function NegociarParcelaPage() {
         // Carrega dados da parcela
         const dadosParcela = await buscarDetalheParcela(parcelaId as string)
         setParcela(dadosParcela)
-        setValorOriginal(dadosParcela.valorAtualizado || dadosParcela.valor)
+        setValorOriginal(dadosParcela.valor)
         
         // Verifica se é possível negociar
-        const podeNegociar = await verificarPossibilidadeNegociacao(parcelaId as string)
+        const { podeNegociar, regras } = await verificarPossibilidadeNegociacao(parcelaId as string)
         setCanNegotiate(podeNegociar)
         
-        if (podeNegociar) {
-          // Carrega regras de negociação
-          const regrasNegociacao = await buscarRegrasNegociacao()
-          setRegras(regrasNegociacao)
+        if (podeNegociar && regras) {
+          // Define as regras de negociação
+          setRegras(regras)
           
           // Define valores iniciais com base nas regras
-          if (regrasNegociacao) {
-            setPercentualDesconto(regrasNegociacao.percentualDescontoMinimo)
-            setNumeroParcelas(regrasNegociacao.minimoParcelas)
-          }
+          setPercentualDesconto(regras.percentualDescontoMinimo || 5)
+          setNumeroParcelas(regras.minimoParcelas || 2)
         }
       } catch (erro) {
         console.error('Erro ao carregar dados para negociação:', erro)
@@ -98,7 +101,7 @@ export default function NegociarParcelaPage() {
     const valorBase = valorOriginal
     let desconto = 0
     
-    if (tipoNegociacao === 'desconto' || tipoNegociacao === 'ambos') {
+    if (tipoNegociacao === 'avista') {
       desconto = valorBase * (percentualDesconto / 100)
     }
     
@@ -106,9 +109,7 @@ export default function NegociarParcelaPage() {
     setValorComDesconto(valorFinal)
     setEconomiaTotal(desconto)
     
-    const numParcelas = tipoNegociacao === 'parcelamento' || tipoNegociacao === 'ambos' 
-      ? numeroParcelas 
-      : 1
+    const numParcelas = tipoNegociacao === 'parcelado' ? numeroParcelas : 1
     
     setValorPorParcela(valorFinal / numParcelas)
   }, [tipoNegociacao, percentualDesconto, numeroParcelas, valorOriginal, parcela, regras])
@@ -122,8 +123,8 @@ export default function NegociarParcelaPage() {
       const proposta: PropostaNegociacao = {
         parcelaId: parcela.id,
         tipoNegociacao,
-        percentualDesconto: tipoNegociacao === 'desconto' || tipoNegociacao === 'ambos' ? percentualDesconto : 0,
-        numeroParcelas: tipoNegociacao === 'parcelamento' || tipoNegociacao === 'ambos' ? numeroParcelas : 1,
+        percentualDesconto: tipoNegociacao === 'avista' ? percentualDesconto : 0,
+        numeroParcelas: tipoNegociacao === 'parcelado' ? numeroParcelas : 1,
         valorOriginal,
         valorNegociado: valorComDesconto,
         metodoPagamento,
@@ -265,26 +266,22 @@ export default function NegociarParcelaPage() {
             <Label>Tipo de Negociação</Label>
             <RadioGroup 
               value={tipoNegociacao} 
-              onValueChange={(v) => setTipoNegociacao(v as any)}
+              onValueChange={(v) => setTipoNegociacao(v as 'avista' | 'parcelado')}
               className="flex flex-col space-y-2"
             >
               <div className="flex items-center space-x-2">
-                <RadioGroupItem value="desconto" id="desconto" />
-                <Label htmlFor="desconto" className="cursor-pointer">Pagamento à vista com desconto</Label>
+                <RadioGroupItem value="avista" id="avista" />
+                <Label htmlFor="avista" className="cursor-pointer">Pagamento à vista</Label>
               </div>
               <div className="flex items-center space-x-2">
-                <RadioGroupItem value="parcelamento" id="parcelamento" />
-                <Label htmlFor="parcelamento" className="cursor-pointer">Parcelamento sem desconto</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="ambos" id="ambos" />
-                <Label htmlFor="ambos" className="cursor-pointer">Parcelamento com desconto</Label>
+                <RadioGroupItem value="parcelado" id="parcelado" />
+                <Label htmlFor="parcelado" className="cursor-pointer">Pagamento parcelado</Label>
               </div>
             </RadioGroup>
           </div>
           
           {/* Opções conforme o tipo escolhido */}
-          {(tipoNegociacao === 'desconto' || tipoNegociacao === 'ambos') && regras && (
+          {tipoNegociacao === 'avista' && regras && (
             <div className="space-y-3">
               <div className="flex justify-between items-center">
                 <Label>Porcentagem de Desconto: {percentualDesconto}%</Label>
@@ -311,7 +308,7 @@ export default function NegociarParcelaPage() {
             </div>
           )}
           
-          {(tipoNegociacao === 'parcelamento' || tipoNegociacao === 'ambos') && regras && (
+          {tipoNegociacao === 'parcelado' && regras && (
             <div className="space-y-3">
               <div className="flex justify-between items-center">
                 <Label>Número de Parcelas: {numeroParcelas}</Label>
@@ -388,7 +385,7 @@ export default function NegociarParcelaPage() {
                 <span>{formatCurrency(valorOriginal)}</span>
               </div>
               
-              {(tipoNegociacao === 'desconto' || tipoNegociacao === 'ambos') && (
+              {tipoNegociacao === 'avista' && (
                 <div className="flex justify-between py-1 border-b border-gray-200">
                   <span className="text-muted-foreground">Desconto ({percentualDesconto}%):</span>
                   <span className="text-green-600">- {formatCurrency(economiaTotal)}</span>
@@ -400,7 +397,7 @@ export default function NegociarParcelaPage() {
                 <span className="font-semibold">{formatCurrency(valorComDesconto)}</span>
               </div>
               
-              {(tipoNegociacao === 'parcelamento' || tipoNegociacao === 'ambos') && (
+              {tipoNegociacao === 'parcelado' && (
                 <div className="flex justify-between py-1 border-b border-gray-200">
                   <span className="text-muted-foreground">Parcelamento:</span>
                   <span>{numeroParcelas}x de {formatCurrency(valorPorParcela)}</span>

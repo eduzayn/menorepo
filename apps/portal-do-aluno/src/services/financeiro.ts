@@ -125,94 +125,50 @@ export async function buscarRegrasNegociacao(): Promise<RegrasNegociacao> {
 }
 
 /**
- * Verifica se o aluno pode negociar uma parcela
- * @param parcelaId ID da parcela
- * @param alunoId ID do aluno
- * @returns Objeto com informações sobre a possibilidade de negociação
+ * Verifica se é possível negociar uma parcela específica
+ * @param parcelaId ID da parcela a verificar
+ * @returns Objeto com a possibilidade de negociação, regras aplicáveis e motivo (se não for possível)
  */
 export async function verificarPossibilidadeNegociacao(
-  parcelaId: string,
-  alunoId: string
-): Promise<{ podeNegociar: boolean; motivo?: string; regras: RegrasNegociacao }> {
+  parcelaId: string
+): Promise<{ podeNegociar: boolean; motivo?: string; regras?: RegrasNegociacao }> {
   try {
-    // Busca a parcela
+    // Buscar detalhes da parcela
     const parcela = await buscarDetalheParcela(parcelaId)
     
-    // Verificar se a parcela pertence ao aluno
-    if (parcela.alunoId !== alunoId) {
+    // Verificar se a parcela está em atraso
+    if (parcela.status !== 'atrasada') {
       return { 
         podeNegociar: false, 
-        motivo: 'Parcela não pertence a este aluno',
-        regras: await buscarRegrasNegociacao()
+        motivo: 'Apenas parcelas em atraso podem ser negociadas.'
       }
     }
     
-    // Verifica se a parcela já está paga
-    if (parcela.status === 'paga') {
+    // Verificar se o aluno tem outras negociações pendentes
+    const alunoId = 'aluno-123' // Em produção, pegar do contexto de autenticação
+    const negociacoes = await buscarNegociacoes(alunoId)
+    
+    const temNegociacaoPendente = negociacoes.some(n => 
+      n.status === 'pendente' && n.parcelaIds.includes(parcelaId)
+    )
+    
+    if (temNegociacaoPendente) {
       return { 
         podeNegociar: false, 
-        motivo: 'Parcela já está paga',
-        regras: await buscarRegrasNegociacao()
+        motivo: 'Esta parcela já possui uma proposta de negociação pendente.'
       }
     }
     
-    // Verifica se a parcela já está em negociação
-    if (parcela.status === 'negociando' || parcela.status === 'acordo') {
-      return { 
-        podeNegociar: false, 
-        motivo: 'Parcela já está em negociação ou acordo',
-        regras: await buscarRegrasNegociacao()
-      }
-    }
-    
-    // Busca regras de negociação
+    // Buscar regras de negociação
     const regras = await buscarRegrasNegociacao()
     
-    // Verifica se o aluno tem múltiplas negociações e se isso é permitido
-    if (!regras.permitirMultiplasNegociacoes) {
-      const { data, error } = await supabase
-        .from('financeiro_negociacoes')
-        .select('count', { count: 'exact' })
-        .eq('aluno_id', alunoId)
-        .in('status', ['pendente', 'aprovada'])
-      
-      if (error) throw error
-      
-      if (data && data > 0) {
-        return { 
-          podeNegociar: false, 
-          motivo: 'Você já possui uma negociação em andamento',
-          regras
-        }
-      }
+    return { 
+      podeNegociar: true,
+      regras
     }
-    
-    // Verifica se a parcela está atrasada pelo mínimo de dias necessário
-    const dataVencimento = new Date(parcela.dataVencimento)
-    const hoje = new Date()
-    const diasAtraso = Math.floor((hoje.getTime() - dataVencimento.getTime()) / (1000 * 60 * 60 * 24))
-    
-    if (diasAtraso < regras.diasAtrasoMinimo) {
-      return { 
-        podeNegociar: false, 
-        motivo: `A parcela precisa estar atrasada há pelo menos ${regras.diasAtrasoMinimo} dias para negociação`,
-        regras
-      }
-    }
-    
-    // Verifica se o valor da parcela é maior que o mínimo para negociação
-    if (parcela.valor < regras.valorMinimoNegociacao) {
-      return { 
-        podeNegociar: false, 
-        motivo: `O valor da parcela precisa ser maior que R$${regras.valorMinimoNegociacao.toFixed(2)} para negociação`,
-        regras
-      }
-    }
-    
-    return { podeNegociar: true, regras }
-  } catch (error) {
-    console.error('Erro ao verificar possibilidade de negociação:', error)
-    throw new Error('Falha ao verificar possibilidade de negociação')
+  } catch (erro) {
+    console.error('Erro ao verificar possibilidade de negociação:', erro)
+    throw new Error('Não foi possível verificar a possibilidade de negociação.')
   }
 }
 
@@ -227,7 +183,7 @@ export async function criarPropostaNegociacao(
   try {
     // Verifica se todas as parcelas pertencem ao aluno
     for (const parcelaId of proposta.parcelaIds) {
-      const { podeNegociar, motivo } = await verificarPossibilidadeNegociacao(parcelaId, proposta.alunoId)
+      const { podeNegociar, motivo } = await verificarPossibilidadeNegociacao(parcelaId)
       if (!podeNegociar) {
         throw new Error(motivo)
       }

@@ -9,7 +9,7 @@ export type StatusParcela = 'aberta' | 'paga' | 'atrasada' | 'negociando' | 'aco
 export type StatusNegociacao = 'pendente' | 'aprovada' | 'rejeitada' | 'expirada' | 'concluida';
 
 // Métodos de pagamento
-export type MetodoPagamento = 'boleto' | 'pix' | 'cartao_credito' | 'cartao_debito';
+export type MetodoPagamento = 'boleto' | 'pix' | 'cartao';
 
 // Interface para parcela
 export interface Parcela {
@@ -101,4 +101,76 @@ export interface HistoricoNegociacao {
   usuarioId?: string; // ID do usuário que executou a ação (se aplicável)
   detalhes?: string; // Detalhes da ação
   created_at: string; // ISO date string
+}
+
+/**
+ * Serviços e Taxas Adicionais
+ */
+
+// Tipos de serviços
+export type TipoServico = 
+  | 'DECLARACAO_MATRICULA'
+  | 'HISTORICO_ESCOLAR'
+  | 'SEGUNDA_VIA_DIPLOMA'
+  | 'TRANCAMENTO_MATRICULA'
+  | 'MUDANCA_TURMA'
+  | 'REVISAO_NOTA'
+  | 'SEGUNDA_CHAMADA_PROVA'
+  | 'CERTIFICADO_CONCLUSAO'
+  | 'REVALIDACAO_DIPLOMA'
+  | 'OUTROS';
+
+// Status de solicitação
+export type StatusSolicitacao = 
+  | 'PENDENTE_PAGAMENTO'
+  | 'PROCESSANDO'
+  | 'CONCLUIDO'
+  | 'REJEITADO'
+  | 'CANCELADO';
+
+// Interface para serviço
+export interface ServicoAdicional {
+  id: string;
+  nome: string;
+  descricao: string;
+  tipo: TipoServico;
+  valor: number;
+  prazoEntrega: number; // em dias
+  requerJustificativa: boolean;
+  requerDocumentos: boolean;
+  tiposDocumentosAceitos?: string[];
+  ativo: boolean;
+  aplicarAutomaticamente?: boolean;
+  condicionaisAplicacaoAutomatica?: string; // Regras em formato JSON
+  created_at: string;
+  updated_at: string;
+}
+
+// Interface para solicitação de serviço
+export interface SolicitacaoServico {
+  id: string;
+  alunoId: string;
+  servicoId: string;
+  status: string;
+  valorCobrado: number;
+  dataEmissao: string;
+  dataPagamento?: string;
+  dataAtualizacao: string;
+  dataConclusao?: string;
+  justificativa?: string;
+  observacoes?: string;
+  motivoRejeicao?: string;
+  servico?: ServicoAdicional;
+  documentos?: {
+    id: string;
+    nome: string;
+    url: string;
+    tipo: string;
+  }[];
+  documentosEntregues?: {
+    id: string;
+    nome: string;
+    url: string;
+    tipo: string;
+  }[];
 } 
