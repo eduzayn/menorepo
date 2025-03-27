@@ -10,6 +10,7 @@ import {
   ArrowLeftOnRectangleIcon,
   BookOpenIcon,
   ArrowsRightLeftIcon,
+  ChartBarSquareIcon,
 } from '@heroicons/react/24/outline';
 import { useAuth } from '../../hooks/useAuth';
 import { useState } from 'react';
@@ -26,6 +27,7 @@ const navigation: NavItem[] = [
   { name: 'Leads', path: '/leads', icon: UserGroupIcon },
   { name: 'Campanhas', path: '/campanhas', icon: MegaphoneIcon },
   { name: 'Base de Conhecimento', path: '/base-conhecimento', icon: BookOpenIcon },
+  { name: 'Análise e Métricas', path: '/analytics', icon: ChartBarSquareIcon },
   { name: 'Atribuição Automática', path: '/atribuicao-automatica', icon: ArrowsRightLeftIcon },
   { name: 'Respostas Rápidas', path: '/respostas-rapidas', icon: DocumentTextIcon },
   { name: 'Notificações', path: '/notificacoes', icon: BellIcon },

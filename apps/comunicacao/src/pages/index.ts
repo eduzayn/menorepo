@@ -10,4 +10,5 @@ export { default as CRMPage } from './CRMPage';
 export { default as GruposPage } from './GruposPage';
 export { default as NotificacoesPage } from './NotificacoesPage';
 export { default as LoginPage } from './LoginPage';
-export { default as UnauthorizedPage } from './UnauthorizedPage'; 
+export { default as UnauthorizedPage } from './UnauthorizedPage';
+export { default as AnalyticsPage } from './AnalyticsPage'; 

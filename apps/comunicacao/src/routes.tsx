@@ -11,9 +11,12 @@ import {
   LoginPage,
   UnauthorizedPage,
   DetalheCampanhaPage,
-  LeadsKanbanPage
+  LeadsKanbanPage,
+  AtribuicaoAutomaticaPage,
+  WidgetConfigPage,
+  BaseConhecimentoPage,
+  AnalyticsPage
 } from './pages';
-import WidgetConfigPage from './pages/WidgetConfigPage';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { MainLayout } from './components/layout/MainLayout';
 
@@ -128,6 +131,16 @@ export function AppRoutes() {
         element={
           <ProtectedRoute>
             <NotificacoesPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/analytics"
+        element={
+          <ProtectedRoute>
+            <MainLayout>
+              <AnalyticsPage />
+            </MainLayout>
           </ProtectedRoute>
         }
       />
