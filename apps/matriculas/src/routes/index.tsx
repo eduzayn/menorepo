@@ -1,9 +1,10 @@
-import { createBrowserRouter } from 'react-router-dom'
+import { RouteObject } from 'react-router-dom'
 import { cursosRoutes } from './cursos'
 import { Login } from '../pages/Login'
 import { Layout } from '../components/Layout'
 
-export const router = createBrowserRouter([
+// Definindo as rotas como um array de objetos para uso direto no Routes
+export const routes: RouteObject[] = [
   {
     path: '/login',
     element: <Login />
@@ -11,8 +12,13 @@ export const router = createBrowserRouter([
   {
     path: '/',
     element: <Layout />,
-    children: [
-      ...cursosRoutes
-    ]
+    children: cursosRoutes
   }
-]) 
+]
+
+// Para compatibilidade com código existente
+export const router = {
+  routes
+}
+
+export default routes 

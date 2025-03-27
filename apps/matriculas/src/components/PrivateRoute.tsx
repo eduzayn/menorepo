@@ -1,9 +1,11 @@
 import { Navigate, useLocation } from 'react-router-dom'
-import { useAuth } from '../contexts/AuthContext'
+import { useAuth } from '@edunexia/auth'
+
+type UserRole = 'admin' | 'gestor' | 'coordenador' | 'professor' | 'tutor' | 'aluno' | 'secretaria' | 'financeiro' | 'parceiro' | 'visitante'
 
 interface PrivateRouteProps {
   children: React.ReactNode
-  requiredRoles?: string[]
+  requiredRoles?: UserRole[]
 }
 
 export function PrivateRoute({ children, requiredRoles = [] }: PrivateRouteProps) {
@@ -23,8 +25,9 @@ export function PrivateRoute({ children, requiredRoles = [] }: PrivateRouteProps
   }
 
   // Verifica se o usuário tem as roles necessárias
-  const userRoles = user.app_metadata?.roles || []
-  const hasRequiredRoles = requiredRoles.length === 0 || requiredRoles.some(role => userRoles.includes(role))
+  const hasRequiredRoles = 
+    requiredRoles.length === 0 || 
+    (user.perfil && requiredRoles.includes(user.perfil as UserRole))
 
   if (!hasRequiredRoles) {
     return (

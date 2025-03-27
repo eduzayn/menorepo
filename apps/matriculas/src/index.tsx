@@ -1,28 +1,20 @@
-import { createBrowserRouter } from 'react-router-dom'
-import { Layout } from './components/Layout'
-import { MatriculasList } from './components/MatriculasList'
-import { MatriculaForm } from './components/MatriculaForm'
-import { MatriculaDetails } from './components/MatriculaDetails'
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { BrowserRouter } from 'react-router-dom';
+import { AuthProvider } from '@edunexia/auth';
+import App from './App';
+import './index.css';
 
-export const router = createBrowserRouter([
-  {
-    path: '/matriculas',
-    element: <Layout />,
-    children: [
-      {
-        index: true,
-        element: <MatriculasList />
-      },
-      {
-        path: 'nova',
-        element: <MatriculaForm />
-      },
-      {
-        path: ':id',
-        element: <MatriculaDetails />
-      }
-    ]
-  }
-])
+const root = ReactDOM.createRoot(
+  document.getElementById('root') as HTMLElement
+);
 
-export default router 
+root.render(
+  <React.StrictMode>
+    <BrowserRouter>
+      <AuthProvider>
+        <App />
+      </AuthProvider>
+    </BrowserRouter>
+  </React.StrictMode>
+); 

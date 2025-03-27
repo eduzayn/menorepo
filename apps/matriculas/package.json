@@ -9,16 +9,19 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
   },
   "dependencies": {
-    "@hookform/resolvers": "^3.3.4",
-    "@edunexia/ui-components": "*",
     "@edunexia/api-client": "*",
     "@edunexia/core": "*",
+    "@edunexia/ui-components": "*",
+    "@hookform/resolvers": "^3.3.4",
     "@tanstack/react-query": "^5.24.1",
     "@tanstack/react-query-devtools": "^5.24.1",
+    "@types/react-signature-canvas": "^1.0.7",
+    "axios": "^1.8.4",
     "react": "^18",
     "react-dom": "^18",
-    "react-router-dom": "^6.18.0",
     "react-hook-form": "^7.50.1",
+    "react-router-dom": "^6.18.0",
+    "react-signature-canvas": "1.1.0-alpha.1",
     "sonner": "^1.4.0",
     "zod": "^3.22.4"
   },
@@ -38,6 +41,7 @@
     "eslint-plugin-react-refresh": "^0.4.3",
     "postcss": "^8",
     "tailwindcss": "^3.3.0",
+    "ts-node": "^10.9.2",
     "typescript": "^5",
     "vite": "^4.4.9"
   }
