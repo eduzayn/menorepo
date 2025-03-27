@@ -1,18 +1,24 @@
 {
+  "extends": "./packages/typescript-config/base.json",
   "compilerOptions": {
-    "target": "ES2020",
-    "module": "ESNext",
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
-    "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "noEmit": true,
-    "jsx": "react-jsx",
-    "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true,
-    "skipLibCheck": true
-  }
+    "baseUrl": ".",
+    "paths": {
+      "@edunexia/*": ["./packages/*/src"]
+    }
+  },
+  "exclude": ["node_modules"],
+  "include": [],
+  "references": [
+    { "path": "./apps/comunicacao" },
+    { "path": "./apps/core" },
+    { "path": "./apps/material-didatico" }, 
+    { "path": "./apps/matriculas" },
+    { "path": "./apps/portal-do-aluno" },
+    { "path": "./apps/portal-parceiro" },
+    { "path": "./apps/portal-polo" },
+    { "path": "./packages/api-client" },
+    { "path": "./packages/auth" },
+    { "path": "./packages/database-schema" },
+    { "path": "./packages/typescript-config" }
+  ]
 } 

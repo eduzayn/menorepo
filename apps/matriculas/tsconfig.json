@@ -1,5 +1,5 @@
 {
-  "extends": "@edunexia/typescript-config/react-library.json",
+  "extends": "@edunexia/typescript-config/vite.json",
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
@@ -13,10 +13,7 @@
       "@styles/*": ["./src/styles/*"],
       "@schemas/*": ["./src/schemas/*"],
       "@lib/*": ["./src/lib/*"]
-    },
-    "jsx": "react-jsx",
-    "esModuleInterop": true
+    }
   },
-  "include": ["src"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "include": ["src", "vite.config.ts"]
 }

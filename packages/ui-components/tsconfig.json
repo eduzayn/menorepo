@@ -1,5 +1,5 @@
 {
-  "extends": "@edunexia/typescript-config/base.json",
+  "extends": "@edunexia/typescript-config/react-library.json",
   "compilerOptions": {
     "baseUrl": ".",
     "outDir": "dist"

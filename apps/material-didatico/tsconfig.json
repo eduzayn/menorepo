@@ -1,30 +1,16 @@
 {
-  "extends": "../../../tsconfig.base.json",
+  "extends": "@edunexia/typescript-config/vite.json",
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"],
-      "@edunexia/ui-components": ["../../../packages/ui-components/src"]
+      "@edunexia/*": ["../../packages/*/src"]
     },
-    "jsx": "preserve",
-    "lib": ["dom", "dom.iterable", "esnext"],
-    "allowJs": true,
-    "skipLibCheck": true,
-    "strict": true,
-    "forceConsistentCasingInFileNames": true,
-    "noEmit": true,
-    "esModuleInterop": true,
-    "module": "esnext",
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "incremental": true,
     "plugins": [
       {
-        "name": "next"
+        "name": "typescript-plugin-css-modules"
       }
     ]
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules"]
+  "include": ["src", "vite.config.ts"]
 }
