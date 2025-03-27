@@ -37,6 +37,7 @@ const configSubnav = [
   { name: 'Geral', path: '/configuracoes' },
   { name: 'Perfil', path: '/configuracoes/perfil' },
   { name: 'Notificações', path: '/configuracoes/notificacoes' },
+  { name: 'Automações', path: '/configuracoes?tab=automacoes' },
   { name: 'Widget de Chat', path: '/configuracoes/widget' }
 ];
 

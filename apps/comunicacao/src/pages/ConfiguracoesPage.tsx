@@ -1,13 +1,15 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs'
 import PerfilConfig from '../components/configuracoes/PerfilConfig'
 import NotificacoesConfig from '../components/configuracoes/NotificacoesConfig'
 import ConfiguracoesGerais from '../components/configuracoes/ConfiguracoesGerais'
 import { IAConfig } from '../components/configuracoes/IAConfig'
-import { UserIcon, BellIcon, Cog6ToothIcon, SparklesIcon } from '@heroicons/react/24/outline'
+import AutomacoesConfig from '../components/configuracoes/AutomacoesConfig'
+import { UserIcon, BellIcon, Cog6ToothIcon, SparklesIcon, BoltIcon } from '@heroicons/react/24/outline'
 import { IAProvider } from '../contexts/IAContext'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 const tabs = [
   {
@@ -29,6 +31,12 @@ const tabs = [
     component: IAConfig,
   },
   {
+    id: 'automacoes',
+    label: 'Automações',
+    icon: BoltIcon,
+    component: AutomacoesConfig,
+  },
+  {
     id: 'geral',
     label: 'Geral',
     icon: Cog6ToothIcon,
@@ -38,6 +46,30 @@ const tabs = [
 
 export default function ConfiguracoesPage() {
   const [activeTab, setActiveTab] = useState('perfil')
+  const location = useLocation()
+  const navigate = useNavigate()
+  
+  // Detectar tab da URL
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search)
+    const tabParam = searchParams.get('tab')
+    
+    if (tabParam && tabs.some(tab => tab.id === tabParam)) {
+      setActiveTab(tabParam)
+    }
+  }, [location.search])
+  
+  // Atualizar URL quando mudar de tab
+  const handleTabChange = (value: string) => {
+    setActiveTab(value)
+    
+    // Atualizar URL sem recarregar a página
+    const newUrl = value === 'perfil' 
+      ? '/configuracoes' 
+      : `/configuracoes?tab=${value}`
+    
+    navigate(newUrl, { replace: true })
+  }
 
   return (
     <IAProvider>
@@ -49,8 +81,8 @@ export default function ConfiguracoesPage() {
           </p>
         </div>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-4 lg:w-[500px]">
+        <Tabs value={activeTab} onValueChange={handleTabChange}>
+          <TabsList className="grid w-full grid-cols-5 lg:w-[600px]">
             {tabs.map((tab) => (
               <TabsTrigger
                 key={tab.id}
