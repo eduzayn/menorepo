@@ -39,6 +39,46 @@ export type CategoriaFinanceira =
   | 'outros';
 
 /**
+ * Tipo de lançamento financeiro (entrada ou saída)
+ */
+export type TipoLancamento = 'entrada' | 'saida';
+
+/**
+ * Status do pagamento
+ */
+export type StatusPagamento = 'confirmado' | 'pendente' | 'cancelado' | 'estornado';
+
+/**
+ * Tipo de destinatário
+ */
+export type TipoDestinatario = 'aluno' | 'polo' | 'consultor' | 'fornecedor';
+
+/**
+ * Tipo de ação em logs financeiros
+ */
+export type TipoAcao = 'criacao' | 'alteracao' | 'cancelamento' | 'estorno' | 'pagamento';
+
+/**
+ * Tipo de entidade financeira
+ */
+export type TipoEntidade = 'cobranca' | 'pagamento' | 'comissao' | 'taxa';
+
+/**
+ * Tipo de beneficiário
+ */
+export type TipoBeneficiario = 'polo' | 'consultor';
+
+/**
+ * Ambiente de gateway
+ */
+export type AmbienteGateway = 'producao' | 'teste';
+
+/**
+ * Status da instituição
+ */
+export type StatusInstituicao = 'ativo' | 'inativo' | 'pendente';
+
+/**
  * Interface para cobrança
  */
 export interface Cobranca {
@@ -46,12 +86,17 @@ export interface Cobranca {
   aluno_id: string;
   aluno_nome: string;
   valor: number;
+  valor_total?: number;
+  valor_pago?: number;
   data_vencimento: string;
   data_pagamento?: string;
   status: StatusCobranca;
   tipo: TipoCobranca;
   forma_pagamento?: MetodoPagamento;
+  link_pagamento?: string;
   observacoes?: string;
+  gateway?: GatewayPagamento;
+  gateway_id?: string;
 }
 
 /**
@@ -60,14 +105,14 @@ export interface Cobranca {
 export interface Pagamento {
   id: string;
   cobranca_id?: string;
-  tipo: 'entrada' | 'saida';
+  tipo: TipoLancamento;
   categoria: CategoriaFinanceira;
   valor: number;
   data_pagamento: string;
   forma_pagamento: MetodoPagamento;
-  status: 'confirmado' | 'pendente' | 'cancelado' | 'estornado';
+  status: StatusPagamento;
   destinatario_id?: string;
-  destinatario_tipo?: 'aluno' | 'polo' | 'consultor' | 'fornecedor';
+  destinatario_tipo?: TipoDestinatario;
   descricao: string;
   comprovante_url?: string;
   instituicao_id: string;
@@ -88,7 +133,7 @@ export interface Comissao {
   base_calculo: number;
   data_referencia: string;
   data_pagamento?: string;
-  status: 'pendente' | 'pago' | 'cancelado';
+  status: StatusCobranca;
   observacoes?: string;
 }
 
@@ -128,7 +173,7 @@ export interface ConfiguracaoGateway {
   gateway: GatewayPagamento;
   chave_api?: string;
   token_secreto?: string;
-  ambiente: 'producao' | 'teste';
+  ambiente: AmbienteGateway;
   webhook_url?: string;
   taxa_percentual?: number;
   taxa_fixa?: number;
@@ -144,7 +189,7 @@ export interface ConfiguracaoGateway {
  */
 export interface RegraComissao {
   id: string;
-  tipo_beneficiario: 'polo' | 'consultor';
+  tipo_beneficiario: TipoBeneficiario;
   curso_id?: string;
   valor_fixo?: number;
   percentual?: number;
@@ -160,9 +205,9 @@ export interface RegraComissao {
  */
 export interface LogFinanceiro {
   id: string;
-  entidade_tipo: 'cobranca' | 'pagamento' | 'comissao' | 'taxa';
+  entidade_tipo: TipoEntidade;
   entidade_id: string;
-  acao: 'criacao' | 'alteracao' | 'cancelamento' | 'estorno' | 'pagamento';
+  acao: TipoAcao;
   valor_anterior?: Record<string, any>;
   valor_novo?: Record<string, any>;
   usuario_id: string;
@@ -206,7 +251,7 @@ export interface Instituicao {
   id: string;
   nome: string;
   cnpj: string;
-  status: 'ativo' | 'inativo' | 'pendente';
+  status: StatusInstituicao;
 }
 
 export interface PlanoFinanceiro {
@@ -225,13 +270,13 @@ export interface PlanoFinanceiro {
 
 export interface Lancamento {
   id: string;
-  tipo: 'receita' | 'despesa';
+  tipo: TipoLancamento;
   categoria: string;
   descricao: string;
   valor: number;
   data_vencimento: string;
   data_pagamento?: string;
-  status: 'pendente' | 'pago' | 'vencido' | 'cancelado';
+  status: StatusCobranca;
   aluno_id?: string;
   responsavel_id?: string;
   instituicao_id: string;
@@ -285,7 +330,7 @@ export interface Despesa {
 /**
  * Aplicação da taxa
  */
-export type TipoAplicacaoTaxa = 'matricula' | 'mensalidade' | 'material' | 'multa' | 'inadimplencia' | 'outro';
+export type TipoAplicacaoTaxa = 'matricula' | 'mensalidade' | 'material' | 'certificado' | 'todas';
 
 /**
  * Interface para o dashboard financeiro

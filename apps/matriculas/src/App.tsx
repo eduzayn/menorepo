@@ -1,16 +1,26 @@
-import { RouterProvider } from 'react-router-dom'
-import { AuthProvider } from '@edunexia/auth'
-import { router } from './routes'
+import { Routes, Route } from 'react-router-dom';
+import routes from './routes';
 
 function App() {
   return (
-    <AuthProvider
-      supabaseUrl={import.meta.env.VITE_SUPABASE_URL}
-      supabaseAnonKey={import.meta.env.VITE_SUPABASE_ANON_KEY}
-    >
-      <RouterProvider router={router} />
-    </AuthProvider>
-  )
+    <Routes>
+      {routes.map((route) => (
+        <Route 
+          key={route.path} 
+          path={route.path} 
+          element={route.element}
+        >
+          {route.children?.map((childRoute) => (
+            <Route
+              key={childRoute.path}
+              path={childRoute.path}
+              element={childRoute.element}
+            />
+          ))}
+        </Route>
+      ))}
+    </Routes>
+  );
 }
 
-export default App 
+export default App; 

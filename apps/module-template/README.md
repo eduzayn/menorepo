@@ -121,6 +121,26 @@ export function useMinhaFeature() {
 2. Instale as dependências com `yarn`
 3. Execute o módulo com `yarn workspace @edunexia/nome-do-modulo dev`
 
+### Ferramentas de Build
+
+Este módulo utiliza **Vite** como ferramenta de build padrão, proporcionando:
+- Hot Module Replacement (HMR) para desenvolvimento rápido e eficiente
+- Otimização de build para produção com code splitting automático
+- Suporte integrado para TypeScript, JSX, CSS e assets
+- Aliases para importações mais limpas e organizadas
+- Ambiente de desenvolvimento rápido com tempo de inicialização mínimo
+- Configuração simplificada através do arquivo `vite.config.ts`
+
+Para compilar o módulo para produção:
+```bash
+yarn workspace @edunexia/nome-do-modulo build
+```
+
+Para visualizar a versão de produção localmente:
+```bash
+yarn workspace @edunexia/nome-do-modulo preview
+```
+
 ## Testes
 
 Execute os testes com:

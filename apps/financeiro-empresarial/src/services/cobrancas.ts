@@ -3,7 +3,8 @@ import {
   Cobranca, 
   StatusCobranca, 
   MetodoPagamento, 
-  GatewayPagamento 
+  GatewayPagamento,
+  TipoCobranca
 } from '../types/financeiro';
 
 /**
@@ -24,7 +25,7 @@ interface FiltroCobranca {
 interface CobrancaInput {
   aluno_id?: string;
   matricula_id?: string;
-  tipo: 'mensalidade' | 'taxa' | 'matricula' | 'outros';
+  tipo: TipoCobranca;
   valor_total: number;
   status: StatusCobranca;
   data_emissao: string;
@@ -198,74 +199,62 @@ export async function registrarPagamento(
     // Determinar o status do pagamento
     let novoStatus: StatusCobranca = 'pendente';
     
-    if (totalPago >= cobrancaAtual.valor_total) {
+    if (totalPago >= cobrancaAtual.valor) {
       novoStatus = 'pago';
-    } else if (totalPago > 0) {
-      novoStatus = 'parcial';
+    } else {
+      novoStatus = 'pendente';
     }
     
     // Atualizar a cobrança
-    const atualizacao = {
-      valor_pago: totalPago,
+    return atualizarCobranca(client, id, {
       status: novoStatus,
       data_pagamento: dataPagamento,
-      metodo_pagamento: metodoPagamento,
-      updated_at: new Date().toISOString()
-    };
-    
-    return await atualizarCobranca(client, id, atualizacao);
+      valor_pago: totalPago,
+      forma_pagamento: metodoPagamento
+    });
   } catch (error) {
-    console.error(`Erro ao registrar pagamento para cobrança com ID ${id}:`, error);
+    console.error(`Erro ao registrar pagamento para cobrança ${id}:`, error);
     return { dados: null, erro: error as Error };
   }
 }
 
 /**
- * Cancela uma cobrança
+ * Cancela uma cobrança existente
  */
 export async function cancelarCobranca(
   client: { supabase: SupabaseClient },
   id: string,
-  motivoCancelamento: string
+  motivo: string
 ): Promise<RetornoUnicaCobranca> {
   try {
-    const atualizacao = {
-      status: 'cancelado' as StatusCobranca,
-      observacao: `Cancelado: ${motivoCancelamento}`,
-      updated_at: new Date().toISOString()
-    };
-    
-    return await atualizarCobranca(client, id, atualizacao);
+    return atualizarCobranca(client, id, {
+      status: 'cancelado',
+      observacoes: motivo
+    });
   } catch (error) {
-    console.error(`Erro ao cancelar cobrança com ID ${id}:`, error);
+    console.error(`Erro ao cancelar cobrança ${id}:`, error);
     return { dados: null, erro: error as Error };
   }
 }
 
 /**
- * Gera link de pagamento para uma cobrança
+ * Gera um link de pagamento para uma cobrança
  */
 export async function gerarLinkPagamento(
   client: { supabase: SupabaseClient },
-  id: string, 
+  id: string,
   gateway: GatewayPagamento
 ): Promise<RetornoUnicaCobranca> {
   try {
-    // Este método seria integrado com o gateway de pagamento real
-    // Por enquanto, apenas simula a criação de um link
+    // Mock da geração de link
+    const linkMock = `https://pay.exemplo.com/${gateway}/${id}?t=${Date.now()}`;
     
-    const link = `https://pagamento.edunexia.com.br/${gateway}/${id}`;
-    
-    const atualizacao = {
-      link_pagamento: link,
-      gateway: gateway,
-      gateway_id: `${gateway}_${Date.now()}`,
-      updated_at: new Date().toISOString()
-    };
-    
-    return await atualizarCobranca(client, id, atualizacao);
+    // Atualizar a cobrança com o link gerado
+    return atualizarCobranca(client, id, {
+      link_pagamento: linkMock
+    });
   } catch (error) {
-    console.error(`Erro ao gerar link de pagamento para cobrança com ID ${id}:`, error);
+    console.error(`Erro ao gerar link de pagamento para cobrança ${id}:`, error);
     return { dados: null, erro: error as Error };
   }
 }

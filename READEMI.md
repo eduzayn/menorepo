@@ -132,3 +132,13 @@ Como o projeto será iniciado do zero, todos os módulos abaixo estão em planej
 
 Com essa estrutura, a Edunéxia evolui para um ecossistema educacional escalável, modular e tecnicamente moderno, pronto para atender instituições de EAD de diferentes portes e necessidades, com possibilidade de contratação automatizada por meio do site.
 
+## Configurações Compartilhadas
+
+Para garantir consistência em todo o monorepo, utilizamos configurações compartilhadas para ESLint, Prettier e Tailwind CSS:
+
+- **ESLint** - Localizado em `packages/config-base/eslint`
+- **Prettier** - Localizado em `packages/config-base/prettier`
+- **Tailwind CSS** - Localizado em `packages/config-base/tailwind`
+
+Ao criar um novo módulo, estenda estas configurações conforme descrito no README do `packages/config-base`.
+

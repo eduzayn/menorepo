@@ -1,4 +1,4 @@
-import { createBrowserRouter, Navigate } from 'react-router-dom'
+import { Navigate } from 'react-router-dom'
 import { Layout } from './components/Layout'
 import { Login } from './pages/Login'
 import { MatriculasList } from './components/MatriculasList'
@@ -9,7 +9,7 @@ import { CursosList } from './components/cursos/CursosList'
 import { CursoForm } from './components/cursos/CursoForm'
 import { CursoDetails } from './components/cursos/CursoDetails'
 
-export const router = createBrowserRouter([
+const routes = [
   {
     path: '/login',
     element: <Login />,
@@ -23,7 +23,7 @@ export const router = createBrowserRouter([
     ),
     children: [
       {
-        index: true,
+        path: '',
         element: <CursosList />,
       },
       {
@@ -49,7 +49,7 @@ export const router = createBrowserRouter([
     ),
     children: [
       {
-        index: true,
+        path: '',
         element: <MatriculasList />,
       },
       {
@@ -66,4 +66,6 @@ export const router = createBrowserRouter([
     path: '*',
     element: <Navigate to="/matriculas" />,
   },
-]) 
+];
+
+export default routes; 

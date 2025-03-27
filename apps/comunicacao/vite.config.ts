@@ -1,45 +1,36 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import path from 'path';
-import { dirname, resolve } from 'path';
-
-const __filename = path.fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+import { resolve } from 'path';
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),
-      '@edunexia/auth': path.resolve(__dirname, '../../packages/auth/src'),
-      '@edunexia/ui-components': path.resolve(__dirname, '../../packages/ui-components/src'),
+      '@': resolve(__dirname, './src'),
       '@components': resolve(__dirname, './src/components'),
       '@contexts': resolve(__dirname, './src/contexts'),
       '@hooks': resolve(__dirname, './src/hooks'),
       '@pages': resolve(__dirname, './src/pages'),
       '@services': resolve(__dirname, './src/services'),
-      '@styles': resolve(__dirname, './src/styles'),
-      '@types': resolve(__dirname, './src/types'),
       '@utils': resolve(__dirname, './src/utils'),
-      '@edunexia/database-schema': resolve(__dirname, '../../packages/database-schema/src'),
+      '@types': resolve(__dirname, './src/types'),
+      '@styles': resolve(__dirname, './src/styles'),
+      '@assets': resolve(__dirname, './src/assets'),
     },
   },
   server: {
-    port: 3000,
-    host: true
+    port: 3400,
+    open: true,
   },
   build: {
     outDir: 'dist',
     sourcemap: true,
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-          'ui-vendor': ['@heroicons/react', 'antd'],
-          'auth-vendor': ['@edunexia/auth', '@supabase/supabase-js']
-        }
-      }
-    }
-  }
+  },
+  // Configuração para variáveis de ambiente
+  define: {
+    // Permitir acesso às variáveis de ambiente do Vite no código
+    'import.meta.env.VITE_SUPABASE_URL': JSON.stringify(process.env.VITE_SUPABASE_URL),
+    'import.meta.env.VITE_SUPABASE_ANON_KEY': JSON.stringify(process.env.VITE_SUPABASE_ANON_KEY),
+  },
 }); 

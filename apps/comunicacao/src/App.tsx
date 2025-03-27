@@ -1,19 +1,55 @@
-import { BrowserRouter } from 'react-router-dom'
-import { AuthProvider } from '@repo/auth'
-import { ComunicacaoProvider } from '@/contexts/ComunicacaoContext'
-import { AppRoutes } from './routes'
+import { Suspense, lazy } from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+// Carregamento lazy de componentes
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const Mensagens = lazy(() => import('./pages/Mensagens'));
+const Campanhas = lazy(() => import('./pages/Campanhas'));
+const Notificacoes = lazy(() => import('./pages/Notificacoes'));
+const Layout = lazy(() => import('./components/Layout'));
+const NotFound = lazy(() => import('./pages/NotFound'));
+const Login = lazy(() => import('./pages/Login'));
 
-export function App() {
+// Componente de carregamento
+import { Spinner } from '@edunexia/ui-components';
+
+// Hook para verificar autenticação
+import { useAuth } from '@edunexia/auth';
+
+const App = () => {
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <Spinner size="lg" />
+      </div>
+    );
+  }
+
   return (
-    <BrowserRouter>
-      <AuthProvider supabaseUrl={supabaseUrl} supabaseAnonKey={supabaseAnonKey}>
-        <ComunicacaoProvider>
-          <AppRoutes />
-        </ComunicacaoProvider>
-      </AuthProvider>
-    </BrowserRouter>
-  )
-} 
+    <Suspense fallback={
+      <div className="flex h-screen items-center justify-center">
+        <Spinner size="lg" />
+      </div>
+    }>
+      <Routes>
+        {/* Rotas públicas */}
+        <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/" />} />
+        
+        {/* Rotas protegidas */}
+        <Route path="/" element={isAuthenticated ? <Layout /> : <Navigate to="/login" />}>
+          <Route index element={<Dashboard />} />
+          <Route path="mensagens" element={<Mensagens />} />
+          <Route path="campanhas" element={<Campanhas />} />
+          <Route path="notificacoes" element={<Notificacoes />} />
+        </Route>
+        
+        {/* Página não encontrada */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </Suspense>
+  );
+};
+
+export default App; 

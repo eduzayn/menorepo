@@ -1,6 +1,6 @@
 import { DbMatricula } from '@edunexia/database-schema'
 
-export type MatriculaStatus = 'ATIVA' | 'CANCELADA' | 'CONCLUIDA' | 'PENDENTE'
+export type MatriculaStatus = 'pendente' | 'ativa' | 'cancelada' | 'trancada' | 'concluida' | 'em_processo' | 'inadimplente' | 'reativada'
 
 export interface Aluno {
   id: string
@@ -18,7 +18,7 @@ export interface Curso {
   descricao: string
   cargaHoraria: number
   duracaoMeses: number
-  modalidade: 'PRESENCIAL' | 'ONLINE' | 'HIBRIDO'
+  modalidade: 'presencial' | 'online' | 'hibrido'
 }
 
 export interface PlanoPagamento {

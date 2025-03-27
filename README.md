@@ -27,7 +27,6 @@ edunexia-monorepo/
 │   ├── contabilidade/
 │   ├── site-vendas/           # Site de apresentação e vendas self-service e whitelabel
 │   ├── core/                  # Módulo central com componentes, hooks e utilitários compartilhados
-│   ├── module-example/        # Módulo de exemplo funcional para referência de desenvolvedores
 │   └── module-template/       # Template para a criação de novos módulos
 ├── packages/
 │   ├── ui-components/         # Design System compartilhado
@@ -64,12 +63,10 @@ Os seguintes módulos estão atualmente em desenvolvimento ativo:
 
 ## Módulos Especiais e Infraestrutura
 
-### Module-Example e Module-Template
-Estes módulos servem como **referência e ponto de partida** para o desenvolvimento de novos módulos:
+### Module-Template
+Este módulo serve como **referência e ponto de partida** para o desenvolvimento de novos módulos:
 
-- **module-example**: Um módulo funcional completo com todas as práticas recomendadas implementadas, servindo como exemplo prático para consulta durante o desenvolvimento. Contém implementações reais de hooks, contexts, componentes e serviços seguindo os padrões do projeto.
-
-- **module-template**: Um esqueleto inicial para a criação de novos módulos, contendo a estrutura de diretórios e arquivos básicos. Deve ser copiado ao iniciar um novo módulo para garantir que a estrutura padrão seja seguida.
+- **module-template**: Um esqueleto inicial para a criação de novos módulos, contendo a estrutura de diretórios, arquivos básicos e exemplos funcionais. Deve ser copiado ao iniciar um novo módulo para garantir que a estrutura padrão seja seguida.
 
 ### Módulo Core
 O módulo **core** desempenha um papel fundamental na arquitetura da plataforma:
@@ -185,6 +182,11 @@ O cumprimento desta estrutura garante consistência e facilita a navegação ent
 - Autenticação JWT com SSO centralizado (em `packages/auth`) ✅
 - Compartilhamento de componentes em `ui-components` ✅
 - Uso de TypeScript em todos os módulos e bibliotecas ✅
+- **Vite como ferramenta de build padrão para todos os módulos** ✅
+  - Desenvolvimento rápido com Hot Module Replacement (HMR)
+  - Build optimizado para produção
+  - Suporte nativo para TypeScript e React
+  - Configuração simplificada e extensível
 - Integração com gateway de pagamento no módulo `site-vendas` 🔄
 - Geração automática de credenciais e e-mails transacionais 🔄
 - Backend unificado no Supabase para todos os módulos usando `@supabase/supabase-js` ✅
@@ -216,3 +218,13 @@ Com essa estrutura, a Edunéxia evolui para um ecossistema educacional escaláve
 > **Nota:** Para informações detalhadas sobre cada módulo, consulte o README específico dentro da pasta do módulo correspondente.
 > 
 > Para detalhes técnicos mais aprofundados, consulte a documentação em `/docs`.
+
+### Configurações Compartilhadas
+
+O monorepo inclui configurações compartilhadas para garantir consistência entre os módulos:
+
+- **`packages/config-base/eslint`**: Configuração base do ESLint para todos os módulos
+- **`packages/config-base/prettier`**: Configuração base do Prettier para todos os módulos  
+- **`packages/config-base/tailwind`**: Configuração base do Tailwind CSS para todos os módulos
+
+Cada módulo deve estender essas configurações conforme necessário. Consulte o [README do config-base](./packages/config-base/README.md) para mais detalhes.
