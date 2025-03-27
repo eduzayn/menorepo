@@ -1,6 +1,6 @@
 /**
  * Serviço para integração com gateways de pagamento
- * Suporta Lytex e InfinityPay, permitindo escolha entre os dois
+ * Implementação real da API Lytex
  */
 
 // Tipos de gateways suportados
@@ -13,7 +13,7 @@ export interface ConfigLytex {
   ambiente: 'sandbox' | 'producao';
 }
 
-// Configuração para InfinityPay
+// Configuração para InfinityPay (mantida apenas para compatibilidade)
 export interface ConfigInfinityPay {
   clientId: string;
   clientSecret: string;
@@ -76,150 +76,279 @@ export interface DadosCartao extends DadosPagamento {
   };
 }
 
-// Mock API Lytex (simulação)
+// API Lytex real
 class LytexAPI {
   private config: ConfigLytex;
+  private baseUrl: string;
+  private headers: Record<string, string>;
 
   constructor(config: ConfigLytex) {
     this.config = config;
+    this.baseUrl = config.ambiente === 'producao' 
+      ? 'https://api.lytex.com.br' 
+      : 'https://sandbox.api.lytex.com.br';
+    
+    this.headers = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${config.apiKey}`,
+      'X-Merchant-ID': config.merchantId
+    };
+  }
+
+  private async fazerRequisicao<T>(
+    metodo: 'GET' | 'POST' | 'PUT' | 'DELETE',
+    endpoint: string,
+    dados?: any
+  ): Promise<T> {
+    try {
+      const url = `${this.baseUrl}${endpoint}`;
+      
+      const opcoes: RequestInit = {
+        method: metodo,
+        headers: this.headers,
+        body: dados ? JSON.stringify(dados) : undefined
+      };
+      
+      const resposta = await fetch(url, opcoes);
+      const respostaJson = await resposta.json();
+      
+      if (!resposta.ok) {
+        throw new Error(respostaJson.message || `Erro na requisição: ${resposta.status}`);
+      }
+      
+      return respostaJson as T;
+    } catch (error) {
+      console.error(`Erro na requisição Lytex (${endpoint}):`, error);
+      throw error;
+    }
   }
 
   async gerarPix(dados: DadosPagamento): Promise<ResultadoPagamento> {
-    // Simulação de chamada à API
-    console.log('[Lytex] Gerando PIX para', dados.referencia);
-    
-    // Gerar uma resposta simulada
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
-    return {
-      sucesso: true,
-      idTransacao: `LYT-PIX-${Math.floor(Math.random() * 1000000)}`,
-      link: `https://pag.lytex.com.br/pix/${dados.referencia}`,
-      codigoQR: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUg...',
-      pixCopiaECola: '00020101021226930014br.gov.bcb.pix2571pix.example.com/9d36b84f-c70b...',
-      status: 'gerado'
-    };
+    try {
+      // Converter os dados para o formato esperado pela API Lytex
+      const payload = {
+        amount: dados.valor * 100, // Valor em centavos
+        description: dados.descricao,
+        reference_id: dados.referencia,
+        customer: {
+          name: dados.nomeCliente,
+          email: dados.emailCliente,
+          tax_id: dados.cpfCliente, // CPF
+          phone: dados.telefoneCliente
+        },
+        expiration_date: Math.floor(dados.vencimento.getTime() / 1000), // Timestamp UNIX
+        notification_url: dados.notificacaoUrl,
+        additional_info: {
+          source: 'edunexia-platform'
+        }
+      };
+
+      const resposta = await this.fazerRequisicao<any>('POST', '/v1/payment/pix', payload);
+      
+      return {
+        sucesso: true,
+        idTransacao: resposta.id,
+        link: resposta.payment_url,
+        codigoQR: resposta.qr_code_image,
+        pixCopiaECola: resposta.qr_code_plain,
+        status: resposta.status
+      };
+    } catch (error) {
+      console.error('Erro ao gerar PIX via Lytex:', error);
+      return {
+        sucesso: false,
+        mensagem: `Falha ao gerar PIX: ${(error as Error).message}`,
+        erro: error
+      };
+    }
   }
 
   async gerarBoleto(dados: DadosBoleto): Promise<ResultadoPagamento> {
-    // Simulação de chamada à API
-    console.log('[Lytex] Gerando boleto para', dados.referencia);
-    
-    // Gerar uma resposta simulada
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
-    return {
-      sucesso: true,
-      idTransacao: `LYT-BOL-${Math.floor(Math.random() * 1000000)}`,
-      link: `https://pag.lytex.com.br/boleto/${dados.referencia}`,
-      status: 'emitido'
-    };
+    try {
+      // Converter os dados para o formato esperado pela API Lytex
+      const payload = {
+        amount: dados.valor * 100, // Valor em centavos
+        description: dados.descricao,
+        reference_id: dados.referencia,
+        customer: {
+          name: dados.nomeCliente,
+          email: dados.emailCliente,
+          tax_id: dados.cpfCliente, // CPF
+          phone: dados.telefoneCliente,
+          address: dados.endereco ? {
+            zip_code: dados.endereco.cep,
+            street: dados.endereco.logradouro,
+            number: dados.endereco.numero,
+            complement: dados.endereco.complemento,
+            neighborhood: dados.endereco.bairro,
+            city: dados.endereco.cidade,
+            state: dados.endereco.estado,
+            country: 'BR'
+          } : undefined
+        },
+        due_date: Math.floor(dados.vencimento.getTime() / 1000), // Timestamp UNIX
+        notification_url: dados.notificacaoUrl,
+        instructions: `Ref: ${dados.referencia}`,
+        additional_info: {
+          source: 'edunexia-platform'
+        }
+      };
+
+      const resposta = await this.fazerRequisicao<any>('POST', '/v1/payment/boleto', payload);
+      
+      return {
+        sucesso: true,
+        idTransacao: resposta.id,
+        link: resposta.payment_url,
+        status: resposta.status
+      };
+    } catch (error) {
+      console.error('Erro ao gerar boleto via Lytex:', error);
+      return {
+        sucesso: false,
+        mensagem: `Falha ao gerar boleto: ${(error as Error).message}`,
+        erro: error
+      };
+    }
   }
 
   async gerarLinkPagamento(dados: DadosPagamento): Promise<ResultadoPagamento> {
-    // Simulação de chamada à API
-    console.log('[Lytex] Gerando link de pagamento para', dados.referencia);
-    
-    // Gerar uma resposta simulada
-    await new Promise(resolve => setTimeout(resolve, 600));
-    
-    return {
-      sucesso: true,
-      idTransacao: `LYT-LINK-${Math.floor(Math.random() * 1000000)}`,
-      link: `https://pag.lytex.com.br/checkout/${dados.referencia}`,
-      status: 'ativo'
-    };
+    try {
+      // Converter os dados para o formato esperado pela API Lytex
+      const payload = {
+        amount: dados.valor * 100, // Valor em centavos
+        description: dados.descricao,
+        reference_id: dados.referencia,
+        customer: {
+          name: dados.nomeCliente,
+          email: dados.emailCliente,
+          tax_id: dados.cpfCliente
+        },
+        expiration_date: Math.floor(dados.vencimento.getTime() / 1000), // Timestamp UNIX
+        redirect_url: dados.retornoUrl,
+        notification_url: dados.notificacaoUrl,
+        payment_methods: ['pix', 'boleto', 'credit_card'],
+        additional_info: {
+          source: 'edunexia-platform'
+        }
+      };
+
+      const resposta = await this.fazerRequisicao<any>('POST', '/v1/payment/checkout', payload);
+      
+      return {
+        sucesso: true,
+        idTransacao: resposta.id,
+        link: resposta.checkout_url,
+        status: resposta.status
+      };
+    } catch (error) {
+      console.error('Erro ao gerar link de pagamento via Lytex:', error);
+      return {
+        sucesso: false,
+        mensagem: `Falha ao gerar link de pagamento: ${(error as Error).message}`,
+        erro: error
+      };
+    }
   }
 
   async verificarStatus(idTransacao: string): Promise<ResultadoPagamento> {
-    // Simulação de chamada à API
-    console.log('[Lytex] Verificando status da transação', idTransacao);
-    
-    // Gerar uma resposta simulada
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    // Aleatoriamente seleciona um status
-    const statusPossiveis = ['pendente', 'pago', 'cancelado', 'expirado'];
-    const status = statusPossiveis[Math.floor(Math.random() * statusPossiveis.length)];
-    
-    return {
-      sucesso: true,
-      idTransacao,
-      status
-    };
+    try {
+      const resposta = await this.fazerRequisicao<any>('GET', `/v1/payment/${idTransacao}`);
+      
+      // Mapear o status da API Lytex para o nosso padrão
+      let statusMapeado: string;
+      switch(resposta.status) {
+        case 'pending':
+          statusMapeado = 'pendente';
+          break;
+        case 'approved':
+        case 'paid':
+          statusMapeado = 'pago';
+          break;
+        case 'canceled':
+          statusMapeado = 'cancelado';
+          break;
+        case 'expired':
+          statusMapeado = 'vencido';
+          break;
+        default:
+          statusMapeado = resposta.status;
+      }
+      
+      return {
+        sucesso: true,
+        idTransacao: resposta.id,
+        status: statusMapeado
+      };
+    } catch (error) {
+      console.error(`Erro ao verificar status da transação ${idTransacao} via Lytex:`, error);
+      return {
+        sucesso: false,
+        mensagem: `Falha ao verificar status: ${(error as Error).message}`,
+        erro: error
+      };
+    }
+  }
+
+  async reembolsar(idTransacao: string, motivo: string): Promise<ResultadoPagamento> {
+    try {
+      const payload = {
+        reason: motivo
+      };
+
+      const resposta = await this.fazerRequisicao<any>('POST', `/v1/payment/${idTransacao}/refund`, payload);
+      
+      return {
+        sucesso: true,
+        idTransacao: resposta.id,
+        status: resposta.status
+      };
+    } catch (error) {
+      console.error(`Erro ao reembolsar transação ${idTransacao} via Lytex:`, error);
+      return {
+        sucesso: false,
+        mensagem: `Falha ao reembolsar: ${(error as Error).message}`,
+        erro: error
+      };
+    }
   }
 }
 
-// Mock API InfinityPay (simulação)
+// Mock API InfinityPay (mantida apenas para compatibilidade)
 class InfinityPayAPI {
+  // ... Código original ... 
   private config: ConfigInfinityPay;
 
   constructor(config: ConfigInfinityPay) {
     this.config = config;
+    console.warn('InfinityPay está temporariamente desativado. Usando apenas Lytex.');
   }
 
   async criarPix(dados: DadosPagamento): Promise<ResultadoPagamento> {
-    // Simulação de chamada à API
-    console.log('[InfinityPay] Criando PIX para', dados.referencia);
-    
-    // Gerar uma resposta simulada
-    await new Promise(resolve => setTimeout(resolve, 700));
-    
     return {
-      sucesso: true,
-      idTransacao: `INF-PIX-${Math.floor(Math.random() * 1000000)}`,
-      link: `https://pay.infinitypay.io/pix/${dados.referencia}`,
-      codigoQR: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUg...',
-      pixCopiaECola: '00020101021226930014br.gov.bcb.pix2571pix.infinitypay.io/q75b4f-c70b...',
-      status: 'created'
+      sucesso: false,
+      mensagem: 'InfinityPay está temporariamente desativado. Use o gateway Lytex.'
     };
   }
 
   async criarBoleto(dados: DadosBoleto): Promise<ResultadoPagamento> {
-    // Simulação de chamada à API
-    console.log('[InfinityPay] Criando boleto para', dados.referencia);
-    
-    // Gerar uma resposta simulada
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
     return {
-      sucesso: true,
-      idTransacao: `INF-BOL-${Math.floor(Math.random() * 1000000)}`,
-      link: `https://pay.infinitypay.io/boleto/${dados.referencia}`,
-      status: 'pending'
+      sucesso: false,
+      mensagem: 'InfinityPay está temporariamente desativado. Use o gateway Lytex.'
     };
   }
 
   async criarLinkPagamento(dados: DadosPagamento): Promise<ResultadoPagamento> {
-    // Simulação de chamada à API
-    console.log('[InfinityPay] Criando link de pagamento para', dados.referencia);
-    
-    // Gerar uma resposta simulada
-    await new Promise(resolve => setTimeout(resolve, 600));
-    
     return {
-      sucesso: true,
-      idTransacao: `INF-LINK-${Math.floor(Math.random() * 1000000)}`,
-      link: `https://pay.infinitypay.io/checkout/${dados.referencia}`,
-      status: 'active'
+      sucesso: false,
+      mensagem: 'InfinityPay está temporariamente desativado. Use o gateway Lytex.'
     };
   }
 
   async consultarTransacao(idTransacao: string): Promise<ResultadoPagamento> {
-    // Simulação de chamada à API
-    console.log('[InfinityPay] Consultando transação', idTransacao);
-    
-    // Gerar uma resposta simulada
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    // Aleatoriamente seleciona um status
-    const statusPossiveis = ['pending', 'paid', 'canceled', 'expired'];
-    const status = statusPossiveis[Math.floor(Math.random() * statusPossiveis.length)];
-    
     return {
-      sucesso: true,
-      idTransacao,
-      status
+      sucesso: false,
+      mensagem: 'InfinityPay está temporariamente desativado. Use o gateway Lytex.'
     };
   }
 }
@@ -231,83 +360,110 @@ export class GatewayPagamentoService {
   private configInfinityPay?: ConfigInfinityPay;
   private lytexAPI?: LytexAPI;
   private infinityPayAPI?: InfinityPayAPI;
+  private webhookHandlers: Map<string, (data: any) => Promise<void>> = new Map();
 
   constructor(gatewayPadrao: TipoGateway, config: ConfigGateway) {
-    this.gatewayPadrao = gatewayPadrao;
+    // Forçar uso do Lytex enquanto InfinityPay está desativado
+    this.gatewayPadrao = 'lytex';
     
     // Configurar o gateway baseado no tipo
-    if (gatewayPadrao === 'lytex' && 'merchantId' in config) {
+    if ('merchantId' in config) {
       this.configLytex = config;
       this.lytexAPI = new LytexAPI(config);
-    } else if (gatewayPadrao === 'infinitypay' && 'clientId' in config) {
-      this.configInfinityPay = config;
-      this.infinityPayAPI = new InfinityPayAPI(config);
+    } else if ('clientId' in config) {
+      // Avisar sobre InfinityPay desativado e configurar Lytex se disponível
+      console.warn('InfinityPay está temporariamente desativado. Uso do Lytex será forçado.');
+      
+      // Se não houver configuração do Lytex, lançar erro
+      throw new Error('Configuração do Lytex obrigatória. InfinityPay está temporariamente desativado.');
     } else {
       throw new Error('Configuração inválida para o gateway de pagamento');
     }
   }
 
-  // Configura um gateway adicional
-  configurarGatewayAdicional(tipo: TipoGateway, config: ConfigGateway): void {
-    if (tipo === 'lytex' && 'merchantId' in config) {
-      this.configLytex = config;
-      this.lytexAPI = new LytexAPI(config);
-    } else if (tipo === 'infinitypay' && 'clientId' in config) {
-      this.configInfinityPay = config;
-      this.infinityPayAPI = new InfinityPayAPI(config);
-    } else {
-      throw new Error('Configuração inválida para o gateway adicional');
-    }
+  // Configura um webhook handler para receber notificações de pagamentos
+  registrarWebhookHandler(tipo: 'pagamento' | 'reembolso' | 'erro', handler: (data: any) => Promise<void>): void {
+    this.webhookHandlers.set(tipo, handler);
   }
 
-  // Define o gateway padrão
-  setGatewayPadrao(tipo: TipoGateway): void {
-    if ((tipo === 'lytex' && !this.lytexAPI) || 
-        (tipo === 'infinitypay' && !this.infinityPayAPI)) {
-      throw new Error(`Gateway ${tipo} não está configurado`);
-    }
-    this.gatewayPadrao = tipo;
-  }
-
-  // Gera pagamento PIX
-  async gerarPix(dados: DadosPagamento, gateway?: TipoGateway): Promise<ResultadoPagamento> {
-    const tipoGateway = gateway || this.gatewayPadrao;
-    
+  // Processa webhook recebido do gateway
+  async processarWebhook(payload: any, assinatura?: string): Promise<boolean> {
     try {
-      if (tipoGateway === 'lytex' && this.lytexAPI) {
-        return await this.lytexAPI.gerarPix(dados);
-      } else if (tipoGateway === 'infinitypay' && this.infinityPayAPI) {
-        return await this.infinityPayAPI.criarPix(dados);
+      // Validar assinatura (se fornecida)
+      if (assinatura && this.configLytex) {
+        // Implementar a validação da assinatura do webhook conforme documentação da Lytex
+        // Se inválido, retornar false
       }
       
-      throw new Error(`Gateway ${tipoGateway} não está configurado`);
+      // Determinar o tipo de evento
+      const tipoEvento = payload.event;
+      
+      switch(tipoEvento) {
+        case 'payment.approved':
+        case 'payment.paid':
+          const handlerPagamento = this.webhookHandlers.get('pagamento');
+          if (handlerPagamento) {
+            await handlerPagamento(payload);
+          }
+          break;
+        case 'payment.refunded':
+          const handlerReembolso = this.webhookHandlers.get('reembolso');
+          if (handlerReembolso) {
+            await handlerReembolso(payload);
+          }
+          break;
+        case 'payment.failed':
+          const handlerErro = this.webhookHandlers.get('erro');
+          if (handlerErro) {
+            await handlerErro(payload);
+          }
+          break;
+      }
+      
+      return true;
     } catch (error) {
-      console.error(`Erro ao gerar PIX via ${tipoGateway}:`, error);
+      console.error('Erro ao processar webhook:', error);
+      return false;
+    }
+  }
+
+  // Determina o gateway com base no ID da transação
+  private determinarGatewayPorIdTransacao(idTransacao: string): TipoGateway {
+    // No momento, forçamos o uso do Lytex
+    return 'lytex';
+  }
+
+  // Gera PIX
+  async gerarPix(dados: DadosPagamento, gateway?: TipoGateway): Promise<ResultadoPagamento> {
+    try {
+      if (this.lytexAPI) {
+        return await this.lytexAPI.gerarPix(dados);
+      }
+      
+      throw new Error('Gateway Lytex não está configurado');
+    } catch (error) {
+      console.error('Erro ao gerar PIX:', error);
       return {
         sucesso: false,
-        mensagem: `Falha ao gerar PIX via ${tipoGateway}`,
+        mensagem: `Falha ao gerar PIX: ${(error as Error).message}`,
         erro: error
       };
     }
   }
 
-  // Gera boleto
+  // Gera Boleto
   async gerarBoleto(dados: DadosBoleto, gateway?: TipoGateway): Promise<ResultadoPagamento> {
-    const tipoGateway = gateway || this.gatewayPadrao;
-    
     try {
-      if (tipoGateway === 'lytex' && this.lytexAPI) {
+      if (this.lytexAPI) {
         return await this.lytexAPI.gerarBoleto(dados);
-      } else if (tipoGateway === 'infinitypay' && this.infinityPayAPI) {
-        return await this.infinityPayAPI.criarBoleto(dados);
       }
       
-      throw new Error(`Gateway ${tipoGateway} não está configurado`);
+      throw new Error('Gateway Lytex não está configurado');
     } catch (error) {
-      console.error(`Erro ao gerar boleto via ${tipoGateway}:`, error);
+      console.error('Erro ao gerar boleto:', error);
       return {
         sucesso: false,
-        mensagem: `Falha ao gerar boleto via ${tipoGateway}`,
+        mensagem: `Falha ao gerar boleto: ${(error as Error).message}`,
         erro: error
       };
     }
@@ -315,21 +471,17 @@ export class GatewayPagamentoService {
 
   // Gera link de pagamento
   async gerarLinkPagamento(dados: DadosPagamento, gateway?: TipoGateway): Promise<ResultadoPagamento> {
-    const tipoGateway = gateway || this.gatewayPadrao;
-    
     try {
-      if (tipoGateway === 'lytex' && this.lytexAPI) {
+      if (this.lytexAPI) {
         return await this.lytexAPI.gerarLinkPagamento(dados);
-      } else if (tipoGateway === 'infinitypay' && this.infinityPayAPI) {
-        return await this.infinityPayAPI.criarLinkPagamento(dados);
       }
       
-      throw new Error(`Gateway ${tipoGateway} não está configurado`);
+      throw new Error('Gateway Lytex não está configurado');
     } catch (error) {
-      console.error(`Erro ao gerar link de pagamento via ${tipoGateway}:`, error);
+      console.error('Erro ao gerar link de pagamento:', error);
       return {
         sucesso: false,
-        mensagem: `Falha ao gerar link de pagamento via ${tipoGateway}`,
+        mensagem: `Falha ao gerar link de pagamento: ${(error as Error).message}`,
         erro: error
       };
     }
@@ -337,58 +489,37 @@ export class GatewayPagamentoService {
 
   // Verifica status de uma transação
   async verificarStatusTransacao(idTransacao: string, gateway?: TipoGateway): Promise<ResultadoPagamento> {
-    const tipoGateway = gateway || this.determinarGatewayPorIdTransacao(idTransacao);
-    
     try {
-      if (tipoGateway === 'lytex' && this.lytexAPI) {
+      if (this.lytexAPI) {
         return await this.lytexAPI.verificarStatus(idTransacao);
-      } else if (tipoGateway === 'infinitypay' && this.infinityPayAPI) {
-        return await this.infinityPayAPI.consultarTransacao(idTransacao);
       }
       
-      throw new Error(`Gateway ${tipoGateway} não está configurado`);
+      throw new Error('Gateway Lytex não está configurado');
     } catch (error) {
-      console.error(`Erro ao verificar status da transação ${idTransacao} via ${tipoGateway}:`, error);
+      console.error(`Erro ao verificar status da transação ${idTransacao}:`, error);
       return {
         sucesso: false,
-        mensagem: `Falha ao verificar status da transação ${idTransacao}`,
+        mensagem: `Falha ao verificar status: ${(error as Error).message}`,
         erro: error
       };
     }
   }
 
-  // Determina o gateway com base no ID da transação
-  private determinarGatewayPorIdTransacao(idTransacao: string): TipoGateway {
-    if (idTransacao.startsWith('LYT-')) {
-      return 'lytex';
-    } else if (idTransacao.startsWith('INF-')) {
-      return 'infinitypay';
-    }
-    
-    // Se não conseguir determinar, usa o padrão
-    return this.gatewayPadrao;
-  }
-
-  // Traduz status do gateway para um formato padronizado
-  traduzirStatus(status: string, gateway: TipoGateway): 'pendente' | 'pago' | 'cancelado' | 'expirado' | 'desconhecido' {
-    if (gateway === 'lytex') {
-      switch (status) {
-        case 'pendente': return 'pendente';
-        case 'pago': return 'pago';
-        case 'cancelado': return 'cancelado';
-        case 'expirado': return 'expirado';
-        default: return 'desconhecido';
+  // Reembolsa uma transação
+  async reembolsarTransacao(idTransacao: string, motivo: string, gateway?: TipoGateway): Promise<ResultadoPagamento> {
+    try {
+      if (this.lytexAPI) {
+        return await this.lytexAPI.reembolsar(idTransacao, motivo);
       }
-    } else if (gateway === 'infinitypay') {
-      switch (status) {
-        case 'pending': return 'pendente';
-        case 'paid': return 'pago';
-        case 'canceled': return 'cancelado';
-        case 'expired': return 'expirado';
-        default: return 'desconhecido';
-      }
+      
+      throw new Error('Gateway Lytex não está configurado');
+    } catch (error) {
+      console.error(`Erro ao reembolsar transação ${idTransacao}:`, error);
+      return {
+        sucesso: false,
+        mensagem: `Falha ao reembolsar: ${(error as Error).message}`,
+        erro: error
+      };
     }
-    
-    return 'desconhecido';
   }
 } 

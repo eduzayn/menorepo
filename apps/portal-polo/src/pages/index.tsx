@@ -5,14 +5,11 @@ export { Dashboard } from './Dashboard';
 export { AlunosLista } from './AlunosLista';
 export { Comissoes } from './Comissoes';
 export { Relatorios } from './Relatorios';
+export { Repasses } from './Repasses';
 
 // Páginas que serão implementadas posteriormente (placeholders)
 export const AlunoDetalhe = () => {
   return <div className="p-4">Detalhes do Aluno - Em construção</div>;
-};
-
-export const Repasses = () => {
-  return <div className="p-4">Repasses - Em construção</div>;
 };
 
 export const Configuracoes = () => {

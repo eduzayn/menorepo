@@ -4,6 +4,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { usePermissoes } from '../../hooks/usePermissoes';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { ComissoesReport } from './ComissoesReport';
 
 // Tipos de relatórios disponíveis
 type TipoRelatorio = 
@@ -251,366 +252,66 @@ export const RelatoriosPage: React.FC = () => {
     }));
   };
 
+  // Renderiza o conteúdo do relatório selecionado
+  const renderConteudoRelatorio = () => {
+    if (!relatorioSelecionado) {
+      return (
+        <div className="text-center py-10">
+          <p className="text-gray-500">Selecione um tipo de relatório para começar</p>
+        </div>
+      );
+    }
+
+    switch (relatorioSelecionado) {
+      case 'fluxo-caixa':
+        return <p>Conteúdo do relatório de Fluxo de Caixa</p>;
+      case 'receitas-despesas':
+        return <p>Conteúdo do relatório de Receitas x Despesas</p>;
+      case 'inadimplencia':
+        return <p>Conteúdo do relatório de Inadimplência</p>;
+      case 'previsao-financeira':
+        return <p>Conteúdo do relatório de Previsão Financeira</p>;
+      case 'alunos-adimplentes':
+        return <p>Conteúdo do relatório de Adimplência de Alunos</p>;
+      case 'comissoes':
+        return <ComissoesReport />;
+      case 'contratos':
+        return <p>Conteúdo do relatório de Contratos</p>;
+      default:
+        return <p>Relatório não encontrado</p>;
+    }
+  };
+
   return (
     <div className="p-6">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold mb-2">Relatórios Financeiros</h1>
-        <p className="text-gray-600">Gere relatórios detalhados para análise financeira</p>
-      </div>
-
-      {/* Seleção de tipo de relatório */}
-      <div className="mb-8">
-        <h2 className="text-lg font-semibold mb-4">Selecione o tipo de relatório</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {relatoriosDisponiveis
-            .filter(rel => !rel.permissao || verificarPermissao(rel.permissao, 'visualizar'))
-            .map(rel => (
-              <RelatorioCard
-                key={rel.tipo}
-                tipo={rel.tipo}
-                titulo={rel.titulo}
-                descricao={rel.descricao}
-                icone={rel.icone}
-                selecionado={relatorioSelecionado === rel.tipo}
-                onClick={() => setRelatorioSelecionado(rel.tipo)}
-              />
-            ))}
-        </div>
-      </div>
-
-      {relatorioSelecionado && (
-        <>
-          {/* Filtros do relatório */}
-          <div className="bg-white p-6 rounded-lg shadow mb-6">
-            <h2 className="text-lg font-semibold mb-4">Filtros e configurações</h2>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <h3 className="font-medium text-sm text-gray-700 mb-2">Período</h3>
-                <div className="flex flex-wrap gap-2 mb-4">
-                  <PeriodoButton 
-                    label="Hoje"
-                    dataInicio={format(new Date(), 'yyyy-MM-dd')}
-                    dataFim={format(new Date(), 'yyyy-MM-dd')}
-                    ativo={filtros.dataInicio === format(new Date(), 'yyyy-MM-dd') && 
-                           filtros.dataFim === format(new Date(), 'yyyy-MM-dd')}
-                    onClick={() => selecionarPeriodo('hoje')}
+      <h1 className="text-2xl font-bold mb-6">Relatórios Financeiros</h1>
+      
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        {/* Coluna de seleção de relatórios */}
+        <div className="md:col-span-1">
+          <div className="bg-white rounded-lg shadow p-6">
+            <h2 className="text-lg font-medium mb-4">Escolha um Relatório</h2>
+            <div className="flex flex-col space-y-3">
+              {relatoriosDisponiveis
+                .filter(r => !r.permissao || verificarPermissao(r.permissao, 'visualizar'))
+                .map(relatorio => (
+                  <RelatorioCard
+                    key={relatorio.tipo}
+                    tipo={relatorio.tipo}
+                    titulo={relatorio.titulo}
+                    descricao={relatorio.descricao}
+                    icone={relatorio.icone}
+                    selecionado={relatorioSelecionado === relatorio.tipo}
+                    onClick={() => setRelatorioSelecionado(relatorio.tipo)}
                   />
-                  <PeriodoButton 
-                    label="Ontem"
-                    dataInicio={format(new Date(new Date().getTime() - 24 * 60 * 60 * 1000), 'yyyy-MM-dd')}
-                    dataFim={format(new Date(new Date().getTime() - 24 * 60 * 60 * 1000), 'yyyy-MM-dd')}
-                    ativo={filtros.dataInicio === format(new Date(new Date().getTime() - 24 * 60 * 60 * 1000), 'yyyy-MM-dd') && 
-                           filtros.dataFim === format(new Date(new Date().getTime() - 24 * 60 * 60 * 1000), 'yyyy-MM-dd')}
-                    onClick={() => selecionarPeriodo('ontem')}
-                  />
-                  <PeriodoButton 
-                    label="Semana"
-                    dataInicio={format(new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000), 'yyyy-MM-dd')}
-                    dataFim={format(new Date(), 'yyyy-MM-dd')}
-                    ativo={filtros.dataInicio === format(new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000), 'yyyy-MM-dd') && 
-                           filtros.dataFim === format(new Date(), 'yyyy-MM-dd')}
-                    onClick={() => selecionarPeriodo('semana')}
-                  />
-                  <PeriodoButton 
-                    label="Mês atual"
-                    dataInicio={format(new Date(new Date().getFullYear(), new Date().getMonth(), 1), 'yyyy-MM-dd')}
-                    dataFim={format(new Date(), 'yyyy-MM-dd')}
-                    ativo={filtros.dataInicio === format(new Date(new Date().getFullYear(), new Date().getMonth(), 1), 'yyyy-MM-dd') && 
-                           filtros.dataFim === format(new Date(), 'yyyy-MM-dd')}
-                    onClick={() => selecionarPeriodo('mes')}
-                  />
-                  <PeriodoButton 
-                    label="Trimestre"
-                    dataInicio={format(new Date(new Date().getFullYear(), new Date().getMonth() - 2, 1), 'yyyy-MM-dd')}
-                    dataFim={format(new Date(), 'yyyy-MM-dd')}
-                    ativo={filtros.dataInicio === format(new Date(new Date().getFullYear(), new Date().getMonth() - 2, 1), 'yyyy-MM-dd') && 
-                           filtros.dataFim === format(new Date(), 'yyyy-MM-dd')}
-                    onClick={() => selecionarPeriodo('trimestre')}
-                  />
-                  <PeriodoButton 
-                    label="Ano atual"
-                    dataInicio={format(new Date(new Date().getFullYear(), 0, 1), 'yyyy-MM-dd')}
-                    dataFim={format(new Date(), 'yyyy-MM-dd')}
-                    ativo={filtros.dataInicio === format(new Date(new Date().getFullYear(), 0, 1), 'yyyy-MM-dd') && 
-                           filtros.dataFim === format(new Date(), 'yyyy-MM-dd')}
-                    onClick={() => selecionarPeriodo('ano')}
-                  />
-                </div>
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Data inicial
-                    </label>
-                    <input
-                      type="date"
-                      name="dataInicio"
-                      value={filtros.dataInicio}
-                      onChange={handleChange}
-                      className="w-full p-2 border border-gray-300 rounded-lg"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Data final
-                    </label>
-                    <input
-                      type="date"
-                      name="dataFim"
-                      value={filtros.dataFim}
-                      onChange={handleChange}
-                      className="w-full p-2 border border-gray-300 rounded-lg"
-                    />
-                  </div>
-                </div>
-              </div>
-              
-              <div>
-                <h3 className="font-medium text-sm text-gray-700 mb-2">Configurações do relatório</h3>
-                
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Agrupar por
-                  </label>
-                  <select
-                    name="agruparPor"
-                    value={filtros.agruparPor}
-                    onChange={handleChange}
-                    className="w-full p-2 border border-gray-300 rounded-lg"
-                  >
-                    <option value="dia">Dia</option>
-                    <option value="semana">Semana</option>
-                    <option value="mes">Mês</option>
-                    <option value="trimestre">Trimestre</option>
-                    <option value="ano">Ano</option>
-                  </select>
-                </div>
-
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Formato de saída
-                  </label>
-                  <select
-                    name="formato"
-                    value={filtros.formato}
-                    onChange={handleChange}
-                    className="w-full p-2 border border-gray-300 rounded-lg"
-                  >
-                    <option value="pdf">PDF</option>
-                    <option value="excel">Excel</option>
-                    <option value="csv">CSV</option>
-                  </select>
-                </div>
-
-                <div className="mb-4">
-                  <label className="flex items-center text-sm font-medium text-gray-700">
-                    <input
-                      type="checkbox"
-                      name="incluirGraficos"
-                      checked={filtros.incluirGraficos}
-                      onChange={e => setFiltros(prev => ({ ...prev, incluirGraficos: e.target.checked }))}
-                      className="mr-2 h-4 w-4"
-                    />
-                    Incluir gráficos no relatório
-                  </label>
-                </div>
-              </div>
+                ))}
             </div>
-
-            {/* Filtros específicos por tipo de relatório */}
-            {relatorioSelecionado === 'receitas-despesas' && (
-              <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-                <h3 className="font-medium text-sm text-gray-700 mb-2">Filtros adicionais</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Categorias de receita
-                    </label>
-                    <select
-                      multiple
-                      name="categoriasReceita"
-                      className="w-full p-2 border border-gray-300 rounded-lg h-24"
-                    >
-                      <option value="mensalidade">Mensalidades</option>
-                      <option value="matricula">Matrículas</option>
-                      <option value="material">Material didático</option>
-                      <option value="taxas">Taxas administrativas</option>
-                      <option value="outros">Outros</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Categorias de despesa
-                    </label>
-                    <select
-                      multiple
-                      name="categoriasDespesa"
-                      className="w-full p-2 border border-gray-300 rounded-lg h-24"
-                    >
-                      <option value="folha">Folha de pagamento</option>
-                      <option value="aluguel">Aluguel</option>
-                      <option value="utilidades">Utilidades (água, luz, etc)</option>
-                      <option value="marketing">Marketing</option>
-                      <option value="software">Software</option>
-                      <option value="outros">Outros</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {relatorioSelecionado === 'inadimplencia' && (
-              <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-                <h3 className="font-medium text-sm text-gray-700 mb-2">Filtros adicionais</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Período de atraso
-                    </label>
-                    <select
-                      name="periodoAtraso"
-                      className="w-full p-2 border border-gray-300 rounded-lg"
-                    >
-                      <option value="todos">Todos</option>
-                      <option value="ate15">Até 15 dias</option>
-                      <option value="15a30">15 a 30 dias</option>
-                      <option value="30a60">30 a 60 dias</option>
-                      <option value="60a90">60 a 90 dias</option>
-                      <option value="acima90">Acima de 90 dias</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Tipo de cobrança
-                    </label>
-                    <select
-                      name="tipoCobranca"
-                      className="w-full p-2 border border-gray-300 rounded-lg"
-                    >
-                      <option value="todos">Todos</option>
-                      <option value="mensalidade">Mensalidades</option>
-                      <option value="taxas">Taxas administrativas</option>
-                      <option value="material">Material didático</option>
-                      <option value="outros">Outros</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
-
-          {/* Botão para gerar o relatório */}
-          <div className="flex justify-end">
-            <button
-              type="button"
-              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
-              onClick={gerarRelatorio}
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <>
-                  <span className="animate-spin mr-2">⏳</span>
-                  Gerando relatório...
-                </>
-              ) : (
-                <>
-                  <FileText size={18} className="mr-2" />
-                  Gerar relatório
-                </>
-              )}
-            </button>
-          </div>
-        </>
-      )}
-
-      {/* Relatórios recentes */}
-      <div className="mt-8">
-        <h2 className="text-lg font-semibold mb-4">Relatórios recentes</h2>
-        <div className="bg-white rounded-lg shadow overflow-hidden">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Nome
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Tipo
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Data de geração
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Usuário
-                </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Ações
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              <tr>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">Fluxo de Caixa - Maio 2023</div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">Fluxo de Caixa</div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">15/05/2023</div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">João Silva</div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <button className="text-blue-600 hover:text-blue-800 flex items-center justify-end">
-                    <Download size={16} className="mr-1" />
-                    Download
-                  </button>
-                </td>
-              </tr>
-              <tr>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">Inadimplência - Abril 2023</div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">Inadimplência</div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">03/05/2023</div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">Ana Costa</div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <button className="text-blue-600 hover:text-blue-800 flex items-center justify-end">
-                    <Download size={16} className="mr-1" />
-                    Download
-                  </button>
-                </td>
-              </tr>
-              <tr>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">Receitas x Despesas - Trimestre 1</div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">Receitas x Despesas</div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">10/04/2023</div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">Carlos Oliveira</div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <button className="text-blue-600 hover:text-blue-800 flex items-center justify-end">
-                    <Download size={16} className="mr-1" />
-                    Download
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+        </div>
+        
+        {/* Coluna de conteúdo do relatório */}
+        <div className="md:col-span-3">
+          {renderConteudoRelatorio()}
         </div>
       </div>
     </div>

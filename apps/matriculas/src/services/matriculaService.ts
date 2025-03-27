@@ -1,28 +1,18 @@
 import { ApiClient } from '@edunexia/api-client'
+import { ITEMS_PER_PAGE } from '../constants'
+import { AppError } from '../errors/AppError'
+import { matriculaSchema, matriculaFiltersSchema } from '../schemas/matricula'
+import { 
+  Matricula, 
+  MatriculaFilters,
+  PaginatedResponse,
+  SolicitacaoCancelamento, 
+  SolicitacaoCancelamentoForm,
+  StatusSolicitacaoCancelamento,
+  AnaliseCancelamentoForm
+} from '../types/matricula'
 import { DbMatricula, MatriculaStatus } from '@edunexia/database-schema'
-import { AppError } from '../lib/errors'
-import { MatriculaDetalhada, Matricula } from '../types/matricula'
-import { matriculaSchema } from '../schemas/matricula'
-
-const ITEMS_PER_PAGE = 10
-
-export interface MatriculaFilters {
-  status?: MatriculaStatus
-  alunoId?: string
-  cursoId?: string
-  dataInicio?: Date
-  dataFim?: Date
-  page?: number
-  perPage?: number
-}
-
-export interface PaginatedResponse<T> {
-  items: T[]
-  total: number
-  page: number
-  perPage: number
-  totalPages: number
-}
+import { MatriculaDetalhada } from '../types/matricula'
 
 export const matriculaKeys = {
   all: ['matriculas'] as const,
@@ -222,6 +212,212 @@ export const createMatriculaService = (apiClient: ApiClient) => ({
       return true
     } catch (error) {
       throw new AppError('Erro ao cancelar matrícula', error)
+    }
+  },
+
+  async solicitarCancelamento(matriculaId: string, dados: SolicitacaoCancelamentoForm): Promise<SolicitacaoCancelamento> {
+    try {
+      // Primeiro, buscar a matrícula para garantir que existe e pegar o aluno_id
+      const { data: matricula, error: matriculaError } = await apiClient.supabase
+        .from('matriculas')
+        .select('id, aluno_id, status')
+        .eq('id', matriculaId)
+        .single()
+      
+      if (matriculaError) throw matriculaError
+      if (!matricula) throw new Error('Matrícula não encontrada')
+      
+      // Verificar se a matrícula está ativa (ou em outro status que permita cancelamento)
+      if (matricula.status !== 'ativa' && matricula.status !== 'inadimplente') {
+        throw new Error(`Não é possível solicitar cancelamento para matrículas com status: ${matricula.status}`)
+      }
+      
+      // Criar a solicitação de cancelamento
+      const { data, error } = await apiClient.supabase
+        .from('solicitacoes_cancelamento')
+        .insert({
+          matricula_id: matriculaId,
+          aluno_id: matricula.aluno_id,
+          motivo: dados.motivo,
+          descricao: dados.descricao,
+          status: 'pendente',
+          data_solicitacao: new Date().toISOString(),
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        })
+        .select()
+        .single()
+      
+      if (error) throw error
+      return data
+    } catch (error) {
+      throw new AppError('Erro ao solicitar cancelamento da matrícula', error)
+    }
+  },
+
+  async listarSolicitacoesCancelamento(
+    filtros?: {
+      status?: StatusSolicitacaoCancelamento,
+      dataInicio?: string,
+      dataFim?: string,
+      page?: number,
+      perPage?: number
+    }
+  ): Promise<PaginatedResponse<SolicitacaoCancelamento>> {
+    try {
+      const page = filtros?.page || 1
+      const perPage = filtros?.perPage || ITEMS_PER_PAGE
+      
+      // Construir query para o Supabase
+      let query = apiClient.supabase
+        .from('solicitacoes_cancelamento')
+        .select('*, matriculas(id, curso(nome)), alunos(nome)', { count: 'exact' })
+      
+      if (filtros?.status) {
+        query = query.eq('status', filtros.status)
+      }
+      
+      if (filtros?.dataInicio) {
+        query = query.gte('data_solicitacao', filtros.dataInicio)
+      }
+      
+      if (filtros?.dataFim) {
+        query = query.lte('data_solicitacao', filtros.dataFim)
+      }
+      
+      // Paginação
+      const from = (page - 1) * perPage
+      const to = from + perPage - 1
+      
+      query = query
+        .order('data_solicitacao', { ascending: false })
+        .range(from, to)
+      
+      const { data, error, count } = await query
+      
+      if (error) throw error
+      
+      return {
+        data: data || [],
+        meta: {
+          total: count || 0,
+          page,
+          perPage,
+          pageCount: Math.ceil((count || 0) / perPage)
+        }
+      }
+    } catch (error) {
+      throw new AppError('Erro ao listar solicitações de cancelamento', error)
+    }
+  },
+
+  async obterSolicitacaoCancelamento(id: string): Promise<SolicitacaoCancelamento | null> {
+    try {
+      const { data, error } = await apiClient.supabase
+        .from('solicitacoes_cancelamento')
+        .select('*, matriculas(id, curso(nome)), alunos(nome)')
+        .eq('id', id)
+        .single()
+      
+      if (error) throw error
+      return data
+    } catch (error) {
+      throw new AppError('Erro ao obter solicitação de cancelamento', error)
+    }
+  },
+
+  async analisarSolicitacaoCancelamento(id: string, analise: AnaliseCancelamentoForm): Promise<SolicitacaoCancelamento> {
+    try {
+      // Atualizar a solicitação
+      const { data: solicitacao, error: solicitacaoError } = await apiClient.supabase
+        .from('solicitacoes_cancelamento')
+        .update({
+          status: analise.status,
+          observacoes_analise: analise.observacoes,
+          data_analise: new Date().toISOString(),
+          analisado_por: apiClient.session?.user?.id,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', id)
+        .select('*, matriculas(id)')
+        .single()
+      
+      if (solicitacaoError) throw solicitacaoError
+      
+      // Se aprovada, cancelar a matrícula
+      if (analise.status === 'aprovada' && solicitacao?.matriculas?.id) {
+        await this.cancelarMatricula(
+          solicitacao.matriculas.id,
+          `Cancelamento solicitado pelo aluno. Motivo: ${solicitacao.motivo}. Observações da análise: ${analise.observacoes}`
+        )
+      }
+      
+      return solicitacao
+    } catch (error) {
+      throw new AppError('Erro ao analisar solicitação de cancelamento', error)
+    }
+  },
+
+  async processarCancelamentosAutomaticos(): Promise<number> {
+    try {
+      // Obter data atual e data de 90 dias atrás para inadimplentes
+      const dataAtual = new Date()
+      const data90DiasAtras = new Date(dataAtual)
+      data90DiasAtras.setDate(dataAtual.getDate() - 90)
+      
+      // Buscar matrículas inadimplentes por mais de 90 dias
+      const { data: matriculasParaCancelar, error } = await apiClient.supabase
+        .from('matriculas')
+        .select('id, aluno_id, status, updated_at')
+        .eq('status', 'inadimplente')
+        .lt('updated_at', data90DiasAtras.toISOString())
+      
+      if (error) throw error
+      
+      let cancelamentosRealizados = 0
+      
+      // Processar cada matrícula elegível para cancelamento
+      for (const matricula of matriculasParaCancelar || []) {
+        // Verificar se já existe uma solicitação de cancelamento pendente
+        const { data: solicitacoesPendentes, error: solicitacoesError } = await apiClient.supabase
+          .from('solicitacoes_cancelamento')
+          .select('id')
+          .eq('matricula_id', matricula.id)
+          .eq('status', 'pendente')
+          
+        if (solicitacoesError) throw solicitacoesError
+        
+        // Se não existir solicitação pendente, criar uma automática
+        if (!solicitacoesPendentes?.length) {
+          await apiClient.supabase
+            .from('solicitacoes_cancelamento')
+            .insert({
+              matricula_id: matricula.id,
+              aluno_id: matricula.aluno_id,
+              motivo: 'financeiro',
+              descricao: 'Cancelamento automático por inadimplência superior a 90 dias',
+              status: 'aprovada', // Já aprovado automaticamente
+              data_solicitacao: new Date().toISOString(),
+              data_analise: new Date().toISOString(),
+              analisado_por: 'sistema',
+              observacoes_analise: 'Cancelamento automático conforme política da instituição',
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            })
+            
+          // Cancelar a matrícula
+          await this.cancelarMatricula(
+            matricula.id,
+            'Cancelamento automático por inadimplência superior a 90 dias'
+          )
+          
+          cancelamentosRealizados++
+        }
+      }
+      
+      return cancelamentosRealizados
+    } catch (error) {
+      throw new AppError('Erro ao processar cancelamentos automáticos', error)
     }
   }
 }) 

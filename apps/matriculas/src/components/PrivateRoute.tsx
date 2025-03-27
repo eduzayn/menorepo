@@ -1,7 +1,5 @@
 import { Navigate, useLocation } from 'react-router-dom'
-import { useAuth } from '@edunexia/auth'
-
-type UserRole = 'admin' | 'gestor' | 'coordenador' | 'professor' | 'tutor' | 'aluno' | 'secretaria' | 'financeiro' | 'parceiro' | 'visitante'
+import { useAuth, UserRole } from '../hooks/useAuth'
 
 interface PrivateRouteProps {
   children: React.ReactNode
@@ -9,10 +7,10 @@ interface PrivateRouteProps {
 }
 
 export function PrivateRoute({ children, requiredRoles = [] }: PrivateRouteProps) {
-  const { user, loading } = useAuth()
+  const { user, isLoading } = useAuth()
   const location = useLocation()
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500"></div>
@@ -27,7 +25,7 @@ export function PrivateRoute({ children, requiredRoles = [] }: PrivateRouteProps
   // Verifica se o usuário tem as roles necessárias
   const hasRequiredRoles = 
     requiredRoles.length === 0 || 
-    (user.perfil && requiredRoles.includes(user.perfil as UserRole))
+    requiredRoles.some(role => user.roles.includes(role))
 
   if (!hasRequiredRoles) {
     return (

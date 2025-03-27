@@ -10,7 +10,9 @@ import {
   UserGroupIcon,
   CreditCardIcon,
   ClipboardDocumentCheckIcon,
-  Cog6ToothIcon
+  Cog6ToothIcon,
+  ChartBarIcon,
+  BanknotesIcon
 } from '@heroicons/react/24/outline'
 
 const menuItems = [
@@ -43,6 +45,18 @@ const menuItems = [
     label: 'Contratos', 
     roles: ['admin', 'secretaria', 'financeiro', 'aluno'],
     icon: ClipboardDocumentCheckIcon
+  },
+  { 
+    path: '/dashboard', 
+    label: 'Dashboard', 
+    roles: ['admin', 'secretaria', 'financeiro'],
+    icon: ChartBarIcon
+  },
+  { 
+    path: '/dashboard/financeiro', 
+    label: 'Relatório Financeiro', 
+    roles: ['admin', 'financeiro'],
+    icon: BanknotesIcon
   },
   { 
     path: '/configuracoes', 

@@ -126,15 +126,23 @@ export interface Pagamento {
  */
 export interface Comissao {
   id: string;
-  colaborador_id: string;
-  colaborador_nome: string;
+  beneficiario_id: string;
+  beneficiario_tipo: 'polo' | 'consultor';
+  aluno_id?: string;
+  matricula_id?: string;
+  curso_id?: string;
+  pagamento_id?: string;
   valor: number;
   percentual: number;
   base_calculo: number;
+  tipo: 'matricula' | 'mensalidade' | 'certificacao' | 'material';
   data_referencia: string;
-  data_pagamento?: string;
+  data_calculo: string;
   status: StatusCobranca;
+  repasse_id?: string;
   observacoes?: string;
+  created_at: string;
+  updated_at: string;
 }
 
 /**

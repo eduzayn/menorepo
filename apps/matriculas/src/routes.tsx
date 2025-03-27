@@ -3,6 +3,7 @@ import { Layout } from './components/Layout'
 import { Login } from './pages/Login'
 import { MatriculasList } from './components/MatriculasList'
 import { MatriculaForm } from './components/MatriculaForm'
+import { MatriculaFormMultiStep } from './components/MatriculaFormMultiStep'
 import { MatriculaDetails } from './components/MatriculaDetails'
 import { PrivateRoute } from './components/PrivateRoute'
 import { CursosList } from './components/cursos/CursosList'
@@ -18,6 +19,7 @@ import { ContratosList } from './components/contratos/ContratosList'
 import { GerarBoleto } from './components/pagamentos/GerarBoleto'
 import { ConfiguracoesList } from './components/configuracoes/ConfiguracoesList'
 import { ConfiguracoesForm } from './components/configuracoes/ConfiguracoesForm'
+import { Dashboard, RelatorioFinanceiro } from './pages/dashboard'
 
 const routes = [
   {
@@ -91,6 +93,10 @@ const routes = [
       {
         path: 'nova',
         element: <MatriculaForm />,
+      },
+      {
+        path: 'nova-matricula',
+        element: <MatriculaFormMultiStep />,
       },
       {
         path: ':id',
@@ -171,6 +177,24 @@ const routes = [
       {
         path: ':tipo/:id/editar',
         element: <ConfiguracoesForm />,
+      },
+    ],
+  },
+  {
+    path: '/dashboard',
+    element: (
+      <PrivateRoute requiredRoles={['admin', 'secretaria', 'financeiro']}>
+        <Layout />
+      </PrivateRoute>
+    ),
+    children: [
+      {
+        path: '',
+        element: <Dashboard />,
+      },
+      {
+        path: 'financeiro',
+        element: <RelatorioFinanceiro />,
       },
     ],
   },
