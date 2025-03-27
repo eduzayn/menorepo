@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { TableCellsIcon, ViewColumnsIcon, PlusIcon } from '@heroicons/react/24/outline';
+import { Link } from 'react-router-dom';
 import { KanbanColumn } from '@/components/crm/KanbanColumn';
 import type { Lead } from '@/types/comunicacao';
 import { classNames } from '@/lib/utils';
@@ -88,6 +89,14 @@ export default function LeadsPage() {
               <ViewColumnsIcon className="h-5 w-5" />
             </button>
           </div>
+
+          <Link
+            to="/leads/kanban"
+            className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+          >
+            <ViewColumnsIcon className="h-5 w-5 mr-2" />
+            Kanban Completo
+          </Link>
 
           <button
             type="button"

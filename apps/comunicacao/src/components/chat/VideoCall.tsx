@@ -18,6 +18,7 @@ export const VideoCall: React.FC<VideoCallProps> = ({ conversaId, participanteId
   const { play, stop } = useNotificationSound();
   const [audioEnabled, setAudioEnabled] = useState(true);
   const [videoEnabled, setVideoEnabled] = useState(true);
+  const [showScreenShareTips, setShowScreenShareTips] = useState(false);
   
   const {
     localStream,
@@ -92,14 +93,47 @@ export const VideoCall: React.FC<VideoCallProps> = ({ conversaId, participanteId
     try {
       if (isScreenSharing) {
         stopScreenShare();
-        toast.success('Compartilhamento de tela finalizado');
+        toast.success('Compartilhamento de tela finalizado', {
+          duration: 3000,
+          position: 'top-right',
+          style: { backgroundColor: '#10B981', color: 'white' }
+        });
       } else {
-        await startScreenShare();
-        toast.success('Compartilhando tela');
+        // Mostra as dicas antes de iniciar o compartilhamento
+        setShowScreenShareTips(true);
+        
+        // Inicia após 500ms para permitir que o modal seja exibido
+        setTimeout(async () => {
+          try {
+            await startScreenShare();
+            toast.success('Tela compartilhada com sucesso', {
+              duration: 3000,
+              position: 'top-right',
+              style: { backgroundColor: '#10B981', color: 'white' }
+            });
+          } catch (err) {
+            console.error('Erro no compartilhamento de tela:', err);
+            toast.error('Não foi possível compartilhar a tela. Verifique as permissões do navegador.', {
+              duration: 5000,
+              position: 'top-right',
+              style: { backgroundColor: '#EF4444', color: 'white' }
+            });
+          } finally {
+            // Esconde as dicas após 3 segundos
+            setTimeout(() => {
+              setShowScreenShareTips(false);
+            }, 3000);
+          }
+        }, 500);
       }
     } catch (err) {
       console.error('Erro no compartilhamento de tela:', err);
-      toast.error('Não foi possível compartilhar a tela');
+      toast.error('Não foi possível compartilhar a tela. Verifique as permissões do navegador.', {
+        duration: 5000,
+        position: 'top-right',
+        style: { backgroundColor: '#EF4444', color: 'white' }
+      });
+      setShowScreenShareTips(false);
     }
   };
 
@@ -176,6 +210,22 @@ export const VideoCall: React.FC<VideoCallProps> = ({ conversaId, participanteId
             </div>
           )}
           
+          {/* Modal de dicas para compartilhamento de tela */}
+          {showScreenShareTips && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-70 z-10">
+              <div className="bg-white rounded-lg p-5 max-w-md text-center">
+                <Icons.monitor className="h-8 w-8 mx-auto mb-3 text-blue-500" />
+                <h3 className="text-lg font-semibold mb-2">Compartilhamento de tela</h3>
+                <p className="mb-3">Selecione qual janela, guia ou tela completa você deseja compartilhar no diálogo que aparecerá.</p>
+                <div className="flex flex-col space-y-2 text-sm text-gray-600">
+                  <p>• Aplicativo: compartilhar uma janela específica</p>
+                  <p>• Guia: compartilhar uma aba do navegador</p>
+                  <p>• Tela: compartilhar sua tela inteira</p>
+                </div>
+              </div>
+            </div>
+          )}
+          
           {/* Vídeo local (pequeno no canto) */}
           <div className="absolute bottom-4 right-4 w-1/4 h-1/4 border-2 border-white rounded-lg overflow-hidden shadow-lg">
             <video
@@ -186,8 +236,11 @@ export const VideoCall: React.FC<VideoCallProps> = ({ conversaId, participanteId
               className="w-full h-full object-cover"
             />
             {isScreenSharing && (
-              <div className="absolute top-1 left-1 bg-red-500 text-white text-xs px-1 py-0.5 rounded-sm">
-                Compartilhando
+              <div className="absolute inset-0 flex flex-col items-center justify-center bg-black bg-opacity-30">
+                <div className="bg-red-500 text-white text-xs px-2 py-1 rounded-sm flex items-center space-x-1 mb-1">
+                  <Icons.monitor className="h-3 w-3 mr-1" />
+                  <span>Compartilhando tela</span>
+                </div>
               </div>
             )}
           </div>
@@ -231,7 +284,7 @@ export const VideoCall: React.FC<VideoCallProps> = ({ conversaId, participanteId
           <Button
             variant="secondary"
             onClick={handleScreenShare}
-            className={`rounded-full p-3 ${isScreenSharing ? 'bg-green-100' : ''}`}
+            className={`rounded-full p-3 ${isScreenSharing ? 'bg-green-600 text-white hover:bg-green-700' : 'bg-gray-200 hover:bg-gray-300'}`}
             title={isScreenSharing ? "Parar compartilhamento" : "Compartilhar tela"}
             disabled={!isCallActive}
           >

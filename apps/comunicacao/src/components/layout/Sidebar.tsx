@@ -34,11 +34,13 @@ const navigation: NavItem[] = [
 
 // Subnavegação para configurações
 const configSubnav = [
-  { name: 'Geral', path: '/configuracoes' },
-  { name: 'Perfil', path: '/configuracoes/perfil' },
-  { name: 'Notificações', path: '/configuracoes/notificacoes' },
+  { name: 'Perfil', path: '/configuracoes?tab=perfil' },
+  { name: 'Notificações', path: '/configuracoes?tab=notificacoes' },
+  { name: 'Assistente IA', path: '/configuracoes?tab=ia' },
   { name: 'Automações', path: '/configuracoes?tab=automacoes' },
-  { name: 'Widget de Chat', path: '/configuracoes/widget' }
+  { name: 'Listas', path: '/configuracoes?tab=automacoes&subtab=listas' },
+  { name: 'Campanhas', path: '/configuracoes?tab=automacoes&subtab=campanhas' },
+  { name: 'Geral', path: '/configuracoes?tab=geral' },
 ];
 
 export default function Sidebar() {
@@ -179,14 +181,14 @@ export default function Sidebar() {
         <div className="flex-shrink-0">
           <img
             className="h-8 w-8 rounded-full"
-            src={user?.user_metadata?.avatar_url || `https://ui-avatars.com/api/?name=${user?.email}`}
+            src={(user as any)?.user_metadata?.avatar_url || `https://ui-avatars.com/api/?name=${user?.email}`}
             alt={user?.email}
           />
         </div>
         <div className="ml-3 flex-1">
           <p className="text-sm font-medium text-gray-900">{user?.email}</p>
           <p className="text-xs text-neutral-dark">
-            {user?.user_metadata?.role || 'Usuário'}
+            {(user as any)?.user_metadata?.role || 'Usuário'}
           </p>
         </div>
         <button

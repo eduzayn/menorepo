@@ -41,7 +41,6 @@
   },
   "devDependencies": {
     "@edunexia/eslint-config": "workspace:*",
-    "@edunexia/tailwind-config": "workspace:*",
     "@edunexia/typescript-config": "workspace:*",
     "@types/node": "^20.11.16",
     "@types/react": "^18.2.43",

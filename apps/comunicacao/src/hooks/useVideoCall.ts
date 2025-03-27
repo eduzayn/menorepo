@@ -265,11 +265,21 @@ export function useVideoCall({ conversaId }: UseVideoCallOptions = {}): UseVideo
     }
 
     try {
+      // Verifica se o navegador suporta compartilhamento de tela
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) {
+        throw new Error('Seu navegador não suporta compartilhamento de tela');
+      }
+
       // Captura o stream da tela
       const stream = await navigator.mediaDevices.getDisplayMedia({
         video: true,
         audio: false
       });
+
+      // Verifica se o usuário cancelou a seleção
+      if (!stream || stream.getVideoTracks().length === 0) {
+        throw new Error('Seleção de tela cancelada');
+      }
 
       // Salva o stream da tela
       screenStream.current = stream;
@@ -283,8 +293,20 @@ export function useVideoCall({ conversaId }: UseVideoCallOptions = {}): UseVideo
         // Salva o sender original para restaurar mais tarde
         originalVideoSender.current = videoSender;
         
-        // Substitui a trilha de vídeo pelo stream da tela
+        // Obtém a trilha de vídeo da tela
         const screenTrack = stream.getVideoTracks()[0];
+        
+        if (!screenTrack) {
+          throw new Error('Nenhuma trilha de vídeo disponível no compartilhamento de tela');
+        }
+        
+        // Configura tratamento para quando o usuário parar o compartilhamento pelo navegador
+        screenTrack.addEventListener('ended', () => {
+          console.log('Usuário encerrou o compartilhamento de tela pelo navegador');
+          stopScreenShare();
+        });
+        
+        // Substitui a trilha de vídeo pelo stream da tela
         await videoSender.replaceTrack(screenTrack);
 
         // Atualiza o stream local para mostrar a tela sendo compartilhada
@@ -293,54 +315,90 @@ export function useVideoCall({ conversaId }: UseVideoCallOptions = {}): UseVideo
           screenTrack
         ]);
         setLocalStream(newLocalStream);
-        
-        // Configura tratamento para quando o usuário parar o compartilhamento pelo navegador
-        screenTrack.onended = () => {
-          stopScreenShare();
-        };
 
         setIsScreenSharing(true);
+      } else {
+        throw new Error('Não foi possível encontrar o emissor de vídeo');
       }
     } catch (err) {
-      setError(err instanceof Error ? err : new Error('Erro ao compartilhar tela'));
+      // Para todas as trilhas se houver falha
+      if (screenStream.current) {
+        screenStream.current.getTracks().forEach(track => track.stop());
+        screenStream.current = null;
+      }
+      
+      if (err instanceof Error) {
+        // Não considera como erro quando o usuário cancela a seleção
+        if (err.name === 'NotAllowedError' || err.message === 'Seleção de tela cancelada') {
+          console.log('Usuário cancelou o compartilhamento de tela');
+          return; // Retorna silenciosamente sem gerar erro
+        }
+        setError(err);
+      } else {
+        setError(new Error('Erro ao compartilhar tela'));
+      }
       throw err;
     }
   }, [localStream]);
 
   // Para o compartilhamento de tela
   const stopScreenShare = useCallback(() => {
-    if (!peerConnection.current || !localStream || !screenStream.current || !originalVideoSender.current) {
+    if (!peerConnection.current || !localStream) {
       return;
     }
 
     try {
+      // Interrompe as trilhas do stream de tela
+      if (screenStream.current) {
+        screenStream.current.getTracks().forEach(track => track.stop());
+        screenStream.current = null;
+      }
+
       // Encontra o sender de vídeo atual
       const videoSender = peerConnection.current.connection.getSenders().find(
         sender => sender.track?.kind === 'video'
       );
 
-      if (videoSender) {
-        // Encontra a trilha de vídeo original da câmera
+      // Restaura a trilha de vídeo original da câmera
+      if (videoSender && originalVideoSender.current && originalVideoSender.current.track) {
+        // Obtém a trilha original da câmera
         const originalVideoTrack = originalVideoSender.current.track;
         
-        if (originalVideoTrack) {
-          // Substitui de volta pela trilha da câmera
-          videoSender.replaceTrack(originalVideoTrack);
-          
-          // Atualiza o stream local para mostrar a câmera novamente
-          const newLocalStream = new MediaStream([
-            ...localStream.getAudioTracks(),
-            originalVideoTrack
-          ]);
-          setLocalStream(newLocalStream);
-        }
+        // Substitui de volta pela trilha da câmera
+        videoSender.replaceTrack(originalVideoTrack).catch(err => {
+          console.error('Erro ao restaurar vídeo da câmera:', err);
+        });
+        
+        // Atualiza o stream local para mostrar a câmera novamente
+        const newLocalStream = new MediaStream([
+          ...localStream.getAudioTracks(),
+          originalVideoTrack
+        ]);
+        setLocalStream(newLocalStream);
+      } else {
+        // Se não conseguir restaurar a trilha original, tenta obter novo stream da câmera
+        navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+          .then(stream => {
+            const videoTrack = stream.getVideoTracks()[0];
+            if (videoSender && videoTrack) {
+              videoSender.replaceTrack(videoTrack);
+              
+              // Atualiza o stream local
+              const newLocalStream = new MediaStream([
+                ...localStream.getAudioTracks(),
+                videoTrack
+              ]);
+              setLocalStream(newLocalStream);
+            }
+          })
+          .catch(err => {
+            console.error('Erro ao recuperar vídeo da câmera:', err);
+          });
       }
 
-      // Para todas as trilhas do stream de tela
-      screenStream.current.getTracks().forEach(track => track.stop());
-      screenStream.current = null;
       setIsScreenSharing(false);
     } catch (err) {
+      console.error('Erro ao parar compartilhamento de tela:', err);
       setError(err instanceof Error ? err : new Error('Erro ao parar compartilhamento de tela'));
     }
   }, [localStream]);

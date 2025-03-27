@@ -23,22 +23,22 @@
 > - Avatares, chips, tooltips, badges
 > - Modais, dropdowns e tabs modernos
 
-> **🖥️ Interface Inspirada no Chatwoot:**
+> **Interface Inspirada no Chatwoot:**
 > A estrutura visual segue o padrão moderno de CRMs omnichannel, com menu lateral, painel principal de conversas e painel de detalhes do contato.
 
-> **🗂️ Organização do Código:**
+> **Organização do Código:**
 > Este módulo integra o monorepo da plataforma Edunéxia, que utiliza Yarn Workspaces. Isso garante compartilhamento de bibliotecas, padronização de estrutura e integração escalável entre os módulos.
 
 O Módulo de Comunicação centraliza todas as interações entre instituição, leads, alunos e parceiros. Atua como hub de relacionamento com suporte a IA, mensagens, campanhas e CRM visual.
 
-## ⚙️ Tecnologias Utilizadas
+## Tecnologias Utilizadas
 - **React + TypeScript** (Frontend)
 - **Supabase** (Banco de dados e autenticação)
 - **TailwindCSS** (Estilização)
 - **Vite** (Dev server e build)
 - **Yarn Workspaces** (Monorepo e compartilhamento de pacotes)
 
-## 📁 Estrutura do Projeto
+## Estrutura do Projeto
 ```bash
 apps/comunicacao/
 ├── src/
@@ -53,13 +53,13 @@ apps/comunicacao/
 └── tsconfig.json
 ```
 
-### 🔗 Pacotes Compartilhados
+### Pacotes Compartilhados
 - `packages/auth`: autenticação centralizada (SSO)
 - `packages/ui-components`: design system global reutilizável
 - `packages/api-client`: cliente HTTP centralizado com Supabase
 - `packages/utils`: funções auxiliares reutilizáveis
 
-## 🔐 Perfis e Permissões
+## Perfis e Permissões
 | Perfil de Usuário        | Acesso ao Módulo de Comunicação                |
 |--------------------------|------------------------------------------------|
 | `super_admin`            | Acesso total                                   |
@@ -73,7 +73,7 @@ apps/comunicacao/
 - **Financeiro**: envio de alertas de cobrança
 - **Supabase**: banco e sessão compartilhados entre todos os módulos
 
-## 🧠 Funcionalidades Principais
+##🧠 Funcionalidades Principais
 - 📤 Notificações: push, WhatsApp, e-mail
 - 🤖 IA para atendimento automatizado
 - 📊 CRM: filtros e visão Kanban por funil

@@ -10,7 +10,8 @@ import {
   NotificacoesPage,
   LoginPage,
   UnauthorizedPage,
-  DetalheCampanhaPage
+  DetalheCampanhaPage,
+  LeadsKanbanPage
 } from './pages';
 import WidgetConfigPage from './pages/WidgetConfigPage';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
@@ -51,6 +52,16 @@ export function AppRoutes() {
         }
       />
       <Route
+        path="/configuracoes/automacoes"
+        element={
+          <ProtectedRoute requiredRole="admin">
+            <MainLayout>
+              <ConfiguracoesPage />
+            </MainLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/respostas-rapidas"
         element={
           <ProtectedRoute>
@@ -83,6 +94,14 @@ export function AppRoutes() {
         element={
           <ProtectedRoute>
             <LeadsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/leads/kanban"
+        element={
+          <ProtectedRoute>
+            <LeadsKanbanPage />
           </ProtectedRoute>
         }
       />

@@ -1,8 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import AtribuicaoAutomaticaConfig from './AtribuicaoAutomaticaConfig';
 import WhatsAppIntegrationConfig from './WhatsAppIntegrationConfig';
+import RespostasAutomaticasConfig from './RespostasAutomaticasConfig';
+import AgendamentoMensagensConfig from './AgendamentoMensagensConfig';
+import EventosGatilhosConfig from './EventosGatilhosConfig';
+import ListasDistribuicaoConfig from '../campanhas/ListasDistribuicaoConfig';
+import GerenciadorCampanhasConfig from '../campanhas/GerenciadorCampanhasConfig';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 interface TabItem {
   id: string;
@@ -12,6 +18,8 @@ interface TabItem {
 
 export default function AutomacoesConfig() {
   const [activeTab, setActiveTab] = useState('atribuicao');
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const tabs: TabItem[] = [
     {
@@ -27,42 +35,51 @@ export default function AutomacoesConfig() {
     {
       id: 'respostas',
       label: 'Respostas Automáticas',
-      component: (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-xl">Respostas Automáticas</CardTitle>
-            <CardDescription>
-              Configure mensagens automáticas para diferentes situações.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="py-8 text-center text-gray-500">
-              Esta funcionalidade estará disponível em breve.
-            </div>
-          </CardContent>
-        </Card>
-      )
+      component: <RespostasAutomaticasConfig />
     },
     {
       id: 'agendamento',
       label: 'Agendamento',
-      component: (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-xl">Agendamento de Mensagens</CardTitle>
-            <CardDescription>
-              Configure horários para envio automático de mensagens.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="py-8 text-center text-gray-500">
-              Esta funcionalidade estará disponível em breve.
-            </div>
-          </CardContent>
-        </Card>
-      )
+      component: <AgendamentoMensagensConfig />
+    },
+    {
+      id: 'eventos',
+      label: 'Eventos e Gatilhos',
+      component: <EventosGatilhosConfig />
+    },
+    {
+      id: 'listas',
+      label: 'Listas Distribuição',
+      component: <ListasDistribuicaoConfig />
+    },
+    {
+      id: 'campanhas',
+      label: 'Gerenciador Campanhas',
+      component: <GerenciadorCampanhasConfig />
     }
   ];
+
+  // Detectar subtab da URL
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const subtabParam = searchParams.get('subtab');
+    
+    if (subtabParam && tabs.some(tab => tab.id === subtabParam)) {
+      setActiveTab(subtabParam);
+    }
+  }, [location.search]);
+  
+  // Atualizar URL quando mudar de tab
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    
+    // Manter o parâmetro tab=automacoes e atualizar subtab
+    const searchParams = new URLSearchParams(location.search);
+    searchParams.set('tab', 'automacoes');
+    searchParams.set('subtab', value);
+    
+    navigate(`/configuracoes?${searchParams.toString()}`, { replace: true });
+  };
 
   return (
     <div className="space-y-6">
@@ -73,8 +90,8 @@ export default function AutomacoesConfig() {
         </p>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="grid w-full grid-cols-4 h-auto p-1">
+      <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-4">
+        <TabsList className="grid w-full grid-cols-7 h-auto p-1">
           {tabs.map((tab) => (
             <TabsTrigger 
               key={tab.id} 

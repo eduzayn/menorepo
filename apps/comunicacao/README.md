@@ -161,10 +161,35 @@ O módulo de comunicação suporta videochamadas em tempo real entre usuários, 
 - Exibição em tela cheia
 - Compartilhamento de tela durante as chamadas
 
+**Compartilhamento de Tela:**
+O compartilhamento de tela permite que os participantes de uma videochamada compartilhem seu conteúdo visual, facilitando apresentações, demonstrações e suporte técnico.
+
 **Como usar o compartilhamento de tela:**
-1. Durante uma videochamada ativa, clique no ícone de monitor
-2. Selecione a tela ou aplicativo que deseja compartilhar
-3. Para interromper o compartilhamento, clique novamente no ícone de monitor
+1. Durante uma videochamada ativa, clique no ícone de monitor nos controles da chamada
+2. Aparecerá um diálogo do navegador para selecionar o que compartilhar:
+   - Tela inteira: compartilha tudo o que está sendo exibido no monitor
+   - Janela de aplicativo: compartilha apenas uma aplicação específica
+   - Guia do navegador: compartilha apenas a guia atual do navegador
+3. Após selecionar, o compartilhamento começa imediatamente
+4. Um indicador visual informa que você está compartilhando sua tela
+5. Para interromper o compartilhamento, clique novamente no ícone de monitor ou termine a chamada
+
+**Compatibilidade do Compartilhamento de Tela:**
+- Navegadores suportados: Chrome, Firefox, Edge, Safari 13+
+- Sistemas operacionais: Windows, macOS, Linux, Android (parcial)
+- iOS: suporte limitado, dependendo da versão do Safari
+
+**Detalhes técnicos da implementação:**
+- Utiliza a API `getDisplayMedia()` do navegador para capturar o conteúdo da tela
+- Substitui a trilha de vídeo na conexão WebRTC para transmitir a tela
+- Gerencia estados e feedback visual para o usuário
+- Detecta automaticamente quando o usuário encerra o compartilhamento pelo próprio navegador
+- Restaura a transmissão da webcam quando o compartilhamento é encerrado
+
+**Limitações conhecidas:**
+- Compartilhamento de áudio da tela disponível apenas no Chrome
+- Qualidade e taxa de quadros adaptativas conforme a largura de banda
+- Algumas aplicações protegidas podem não permitir compartilhamento (exemplo: players DRM)
 
 **Implementação técnica:**
 - Utiliza WebRTC para comunicação ponto a ponto

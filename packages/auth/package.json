@@ -26,7 +26,6 @@
     "react-router-dom": "^6.18.0"
   },
   "devDependencies": {
-    "@edunexia/config-base": "workspace:*",
     "@edunexia/eslint-config": "workspace:*",
     "@edunexia/typescript-config": "workspace:*",
     "@types/react": "^18.2.15",

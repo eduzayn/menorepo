@@ -24,7 +24,6 @@
   },
   "devDependencies": {
     "@edunexia/eslint-config": "*",
-    "@edunexia/tailwind-config": "*",
     "@edunexia/typescript-config": "*",
     "@types/node": "^20.6.3",
     "@types/react": "^18.2.15",
