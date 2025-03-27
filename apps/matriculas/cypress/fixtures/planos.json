@@ -1,0 +1,57 @@
+[
+  {
+    "id": "plano-1",
+    "nome": "À Vista",
+    "descricao": "Pagamento integral à vista com desconto especial.",
+    "tipo": "A_VISTA",
+    "desconto_percentual": 15,
+    "parcelas": 1,
+    "ativo": true,
+    "taxa_juros": 0,
+    "status": "ATIVO"
+  },
+  {
+    "id": "plano-2",
+    "nome": "Padrão em 12x",
+    "descricao": "Pagamento parcelado em até 12 vezes sem juros.",
+    "tipo": "PARCELADO",
+    "desconto_percentual": 0,
+    "parcelas": 12,
+    "ativo": true,
+    "taxa_juros": 0,
+    "status": "ATIVO"
+  },
+  {
+    "id": "plano-3",
+    "nome": "Semestral",
+    "descricao": "Pagamento por semestre com desconto.",
+    "tipo": "SEMESTRAL",
+    "desconto_percentual": 10,
+    "parcelas": 2,
+    "ativo": true,
+    "taxa_juros": 0,
+    "status": "ATIVO"
+  },
+  {
+    "id": "plano-4",
+    "nome": "Parcelado 24x",
+    "descricao": "Parcelamento em até 24 vezes com taxa de juros.",
+    "tipo": "PARCELADO",
+    "desconto_percentual": 0,
+    "parcelas": 24,
+    "ativo": true,
+    "taxa_juros": 0.99,
+    "status": "ATIVO"
+  },
+  {
+    "id": "plano-5",
+    "nome": "Parcelado 36x",
+    "descricao": "Parcelamento em até 36 vezes com taxa de juros.",
+    "tipo": "PARCELADO",
+    "desconto_percentual": 0,
+    "parcelas": 36,
+    "ativo": true,
+    "taxa_juros": 1.49,
+    "status": "ATIVO"
+  }
+] 
