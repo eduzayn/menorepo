@@ -26,6 +26,9 @@ import {
   SMSMessage,
   PushMessage
 } from '../providers';
+import { consentimentoService } from './consentimento';
+import { auditoriaService } from './auditoria';
+import { segurancaService } from './seguranca';
 
 // Configurações dos provedores (em produção, seriam carregados de variáveis de ambiente)
 const emailConfig = {
@@ -217,8 +220,37 @@ export const enviarPorCanal = async (
   destinatarios: string[],
   conteudo: string,
   assunto: string,
-  canal: ComunicacaoCanal
+  canal: ComunicacaoCanal,
+  usuarioId: string
 ) => {
+  // Verificar consentimento para cada destinatário
+  for (const destinatario of destinatarios) {
+    const consentimento = await consentimentoService.verificarConsentimento(
+      destinatario,
+      canal
+    );
+
+    if (!consentimento) {
+      throw new Error(`Usuário ${destinatario} não consentiu com ${canal}`);
+    }
+  }
+
+  // Registrar na auditoria
+  await auditoriaService.registrarLog({
+    usuario_id: usuarioId,
+    acao: `Envio de mensagem por ${canal}`,
+    tipo: 'CRIACAO',
+    entidade: 'mensagens',
+    entidade_id: `temp_${Date.now()}`,
+    dados_novos: {
+      destinatarios,
+      assunto,
+      canal
+    },
+    ip: '', // TODO: Implementar captura de IP
+    user_agent: '' // TODO: Implementar captura de User Agent
+  });
+
   switch (canal) {
     case 'EMAIL':
       return await emailProvider.sendEmail({
@@ -242,7 +274,6 @@ export const enviarPorCanal = async (
     
     case 'WHATSAPP':
       // Para WhatsApp, usamos o serviço existente
-      // Aqui seria a integração com a API do WhatsApp Business
       console.log('Enviando por WhatsApp:', { destinatarios, conteudo });
       return { success: true, messageId: `whatsapp_${Date.now()}` };
     
@@ -255,8 +286,39 @@ export const enviarPorCanal = async (
 export const enviarCampanha = async (
   campanha: Campanha,
   destinatarios: { id: string, email: string, telefone: string, pushToken?: string }[],
-  canais: ComunicacaoCanal[]
+  canais: ComunicacaoCanal[],
+  usuarioId: string
 ) => {
+  // Verificar consentimento para cada destinatário e canal
+  for (const destinatario of destinatarios) {
+    for (const canal of canais) {
+      const consentimento = await consentimentoService.verificarConsentimento(
+        destinatario.id,
+        canal
+      );
+
+      if (!consentimento) {
+        throw new Error(`Usuário ${destinatario.id} não consentiu com ${canal}`);
+      }
+    }
+  }
+
+  // Registrar na auditoria
+  await auditoriaService.registrarLog({
+    usuario_id: usuarioId,
+    acao: 'Envio de campanha',
+    tipo: 'CRIACAO',
+    entidade: 'campanhas',
+    entidade_id: campanha.id,
+    dados_novos: {
+      campanha,
+      destinatarios: destinatarios.map(d => d.id),
+      canais
+    },
+    ip: '', // TODO: Implementar captura de IP
+    user_agent: '' // TODO: Implementar captura de User Agent
+  });
+
   const resultados: Record<ComunicacaoCanal, { sucesso: number, falha: number }> = {
     'EMAIL': { sucesso: 0, falha: 0 },
     'SMS': { sucesso: 0, falha: 0 },
