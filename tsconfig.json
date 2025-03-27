@@ -17,8 +17,8 @@
     { "path": "./apps/portal-parceiro" },
     { "path": "./apps/portal-polo" },
     { "path": "./packages/api-client" },
-    { "path": "./packages/auth" },
-    { "path": "./packages/database-schema" },
+    { "path": "./packages/auth/tsconfig.json" },
+    { "path": "./packages/database-schema/tsconfig.json" },
     { "path": "./packages/typescript-config" }
   ]
 } 

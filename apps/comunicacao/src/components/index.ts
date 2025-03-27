@@ -7,6 +7,12 @@ export * from './grupos';
 // Componentes de notificações
 export * from './notificacoes';
 
+// Componentes CRM
+export * from './crm';
+
+// Configurações
+export * from './configuracoes/SoundSettings';
+
 // Componentes individuais
 export { SearchInput } from './SearchInput';
 export { Pagination } from './Pagination';

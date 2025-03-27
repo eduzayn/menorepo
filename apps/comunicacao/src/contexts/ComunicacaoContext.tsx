@@ -2,6 +2,9 @@ import { createContext, useContext, useEffect, useState } from 'react'
 import type { Tables, Enums } from '@/types/database'
 import { supabase } from '@/lib/supabase'
 import { criarConversa } from '@/services/comunicacao'
+import { useAuth } from './AuthContext'
+import { toast } from 'sonner'
+import { useNavigate } from 'react-router-dom'
 
 type Conversa = Tables<'conversas'>
 type Mensagem = Tables<'mensagens'>
@@ -26,6 +29,7 @@ interface ComunicacaoContextType {
   enviarMensagem: (conteudo: string, tipo: TipoMensagem) => Promise<void>
   marcarComoLida: (conversaId: string) => Promise<void>
   iniciarConversa: (params: IniciarConversaParams) => Promise<void>
+  iniciarCampanha: (destinatarioIds: string[], conteudo: string, titulo: string) => Promise<void>
 }
 
 const ComunicacaoContext = createContext<ComunicacaoContextType | null>(null)
@@ -36,6 +40,8 @@ export function ComunicacaoProvider({ children }: { children: React.ReactNode })
   const [mensagens, setMensagens] = useState<Mensagem[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<Error | null>(null)
+  const { user } = useAuth()
+  const navigate = useNavigate()
 
   useEffect(() => {
     const carregarConversas = async () => {
@@ -182,6 +188,54 @@ export function ComunicacaoProvider({ children }: { children: React.ReactNode })
     }
   }
 
+  const iniciarCampanha = async (destinatarioIds: string[], conteudo: string, titulo: string) => {
+    if (!user) {
+      toast.error('Você precisa estar autenticado para criar uma campanha')
+      return
+    }
+
+    try {
+      setLoading(true)
+
+      // Criar campanha
+      const { data: novaCampanha, error: errorCampanha } = await supabase
+        .from('campanhas')
+        .insert({
+          titulo,
+          descricao: conteudo.substring(0, 100) + (conteudo.length > 100 ? '...' : ''),
+          tipo: 'marketing',
+          status: 'ATIVO',
+          data_inicio: new Date().toISOString(),
+          criado_por: user.id
+        })
+        .select()
+        .single()
+
+      if (errorCampanha) throw errorCampanha
+
+      // Adicionar destinatários
+      const destinatarios = destinatarioIds.map((id) => ({
+        campanha_id: novaCampanha.id,
+        destinatario_id: id,
+        status: 'ATIVO'
+      }))
+
+      const { error: errorDestinatarios } = await supabase
+        .from('campanha_destinatarios')
+        .insert(destinatarios)
+
+      if (errorDestinatarios) throw errorDestinatarios
+
+      toast.success('Campanha criada com sucesso!')
+      navigate(`/campanhas/${novaCampanha.id}`)
+    } catch (error) {
+      console.error('Erro ao criar campanha:', error)
+      toast.error('Não foi possível criar a campanha')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <ComunicacaoContext.Provider
       value={{
@@ -193,7 +247,8 @@ export function ComunicacaoProvider({ children }: { children: React.ReactNode })
         selecionarConversa,
         enviarMensagem,
         marcarComoLida,
-        iniciarConversa
+        iniciarConversa,
+        iniciarCampanha
       }}
     >
       {children}

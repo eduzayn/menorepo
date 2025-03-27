@@ -5,12 +5,15 @@ import {
   RespostasRapidasPage,
   CampanhasPage,
   LeadsPage,
+  CRMPage,
   GruposPage,
   NotificacoesPage,
   LoginPage,
   UnauthorizedPage,
+  DetalheCampanhaPage
 } from './pages';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
+import { MainLayout } from './components/layout/MainLayout';
 
 export function AppRoutes() {
   return (
@@ -48,7 +51,19 @@ export function AppRoutes() {
         path="/campanhas"
         element={
           <ProtectedRoute>
-            <CampanhasPage />
+            <MainLayout>
+              <CampanhasPage />
+            </MainLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/campanhas/:id"
+        element={
+          <ProtectedRoute>
+            <MainLayout>
+              <DetalheCampanhaPage />
+            </MainLayout>
           </ProtectedRoute>
         }
       />
@@ -57,6 +72,16 @@ export function AppRoutes() {
         element={
           <ProtectedRoute>
             <LeadsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/crm"
+        element={
+          <ProtectedRoute>
+            <MainLayout>
+              <CRMPage />
+            </MainLayout>
           </ProtectedRoute>
         }
       />

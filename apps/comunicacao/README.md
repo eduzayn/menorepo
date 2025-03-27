@@ -10,6 +10,12 @@ Este é o módulo de comunicação integrado, que permite gerenciar conversas, m
 - Suporte a múltiplos canais (chat, email, SMS, WhatsApp)
 - Notificações e indicadores de status
 - Integração com Supabase para persistência e tempo real
+- Videochamadas em tempo real com WebRTC
+- Compartilhamento de tela durante videochamadas
+- Notificações sonoras para mensagens e chamadas
+- Configurações personalizáveis para notificações e comportamento do aplicativo
+- Sistema de CRM com gerenciamento de leads
+- Automações e cenários de atendimento personalizáveis
 
 ## Pré-requisitos
 
@@ -95,6 +101,7 @@ apps/comunicacao/
 - Tailwind CSS
 - Supabase
 - React Query
+- WebRTC para videochamadas e compartilhamento de tela
 - Integração com o core através de @edunexia/core
 - Componentes de UI do @edunexia/ui-components
 - Autenticação via @edunexia/auth
@@ -137,4 +144,67 @@ Caso encontre divergências ou tenha sugestões, por favor, abra uma issue no re
 
 ## Notas de Integração
 
-O módulo de Material Didático foi movido para `apps/material-didatico/` na raiz do monorepo para melhor organização e separação de responsabilidades. A migração foi concluída com sucesso, e todas as funcionalidades do módulo agora estão disponíveis na nova localização. 
+O módulo de Material Didático foi movido para `apps/material-didatico/` na raiz do monorepo para melhor organização e separação de responsabilidades. A migração foi concluída com sucesso, e todas as funcionalidades do módulo agora estão disponíveis na nova localização.
+
+## Recursos Avançados
+
+### Videochamadas e Compartilhamento de Tela
+
+O módulo de comunicação suporta videochamadas em tempo real entre usuários, utilizando WebRTC para uma comunicação ponto a ponto segura e eficiente.
+
+**Recursos de Videochamada:**
+- Iniciar e receber chamadas diretamente da interface de chat
+- Controles para ativar/desativar câmera e microfone
+- Indicador de status de chamada
+- Notificações sonoras para chamadas recebidas
+- Exibição em tela cheia
+- Compartilhamento de tela durante as chamadas
+
+**Como usar o compartilhamento de tela:**
+1. Durante uma videochamada ativa, clique no ícone de monitor
+2. Selecione a tela ou aplicativo que deseja compartilhar
+3. Para interromper o compartilhamento, clique novamente no ícone de monitor
+
+**Implementação técnica:**
+- Utiliza WebRTC para comunicação ponto a ponto
+- Sinalização via canais do Supabase
+- Fallback para servidores STUN públicos
+- Troca segura de streams de mídia
+
+### Sistema de CRM
+
+O módulo inclui um sistema completo de CRM (Customer Relationship Management) para gerenciamento de leads e oportunidades de negócio.
+
+**Recursos de CRM:**
+- Visualização de leads em formato Kanban ou tabela
+- Pipeline de oportunidades com arrastar e soltar
+- Sistema de pontuação de leads (lead scoring)
+- Histórico de interações com leads
+- Segmentação de leads por critérios personalizados
+- Relatórios de conversão e desempenho
+- Atribuição de responsáveis e acompanhamento
+
+**Gerenciamento de leads:**
+- Cadastro e atualização de informações
+- Classificação por status (novo, em contato, qualificado, etc.)
+- Tags e campos personalizados
+- Histórico completo de atividades
+- Visualização de métricas e indicadores
+
+### Automações e Cenários de Atendimento
+
+O sistema permite criar automações baseadas em regras para executar ações automáticas com base em eventos e condições.
+
+**Recursos de automação:**
+- Interface para criação e gerenciamento de cenários
+- Múltiplos gatilhos como criação de lead, mudança de status, etc.
+- Condições personalizáveis baseadas em atributos dos leads
+- Ações automáticas como envio de e-mails, SMS, criação de tarefas
+- Execução em tempo real ou agendada
+- Métricas de desempenho das automações
+
+**Como criar uma automação:**
+1. Acesse a seção de Automações na página de um lead ou no menu CRM
+2. Clique em "Nova Automação"
+3. Configure o gatilho, condições e ações desejadas
+4. Ative a automação para que ela comece a funcionar 

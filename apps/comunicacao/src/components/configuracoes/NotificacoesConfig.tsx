@@ -11,6 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { SoundSettings } from '../configuracoes/SoundSettings'
 
 const tiposNotificacao = [
   { id: 'nova_mensagem', label: 'Nova Mensagem' },
@@ -106,6 +107,8 @@ export default function NotificacoesConfig() {
 
   return (
     <div className="space-y-6">
+      <SoundSettings />
+      
       <div>
         <h3 className="text-lg font-medium">Tipos de Notificação</h3>
         <p className="text-sm text-muted-foreground">

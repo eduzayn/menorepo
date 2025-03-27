@@ -5,6 +5,21 @@ import TopBar from './TopBar';
 import DetailPanel from './DetailPanel';
 import { useComunicacao } from '@/contexts/ComunicacaoContext';
 import type { Conversa } from '@/lib/config';
+import {
+  HomeIcon,
+  UsersIcon,
+  CogIcon,
+  BellIcon,
+  EnvelopeIcon as MailIcon,
+  DocumentTextIcon as DocumentReportIcon,
+  UserGroupIcon,
+  PhoneIcon,
+  UserIcon,
+  ChartBarIcon
+} from '@heroicons/react/24/outline';
+import { NavLink, Outlet } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
+import { ComunicacaoProvider } from '../../contexts/ComunicacaoContext';
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -15,78 +30,95 @@ interface MainLayoutProps {
   };
 }
 
+const navigation = [
+  { name: 'Chat', href: '/', icon: HomeIcon },
+  { name: 'Campanhas', href: '/campanhas', icon: MailIcon },
+  { name: 'CRM', href: '/crm', icon: ChartBarIcon },
+  { name: 'Leads', href: '/leads', icon: UserIcon },
+  { name: 'Respostas Rápidas', href: '/respostas-rapidas', icon: DocumentReportIcon },
+  { name: 'Grupos', href: '/grupos', icon: UserGroupIcon, admin: true },
+  { name: 'Notificações', href: '/notificacoes', icon: BellIcon },
+  { name: 'Configurações', href: '/configuracoes', icon: CogIcon },
+];
+
 export function MainLayout({ children, showDetails = false, detailsProps }: MainLayoutProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isDetailsOpen, setIsDetailsOpen] = useState(showDetails);
   const { conversaAtual } = useComunicacao();
+  const { user } = useAuth();
 
   // Determina se deve mostrar o painel de detalhes
   const shouldShowDetails = showDetails || !!conversaAtual;
 
+  const filteredNavigation = navigation.filter(item => 
+    !item.admin || (item.admin && user?.roles.includes('admin'))
+  );
+
   return (
-    <div className="h-screen flex overflow-hidden bg-neutral-lightest">
-      {/* Sidebar Mobile Overlay */}
-      <div
-        className={`fixed inset-0 bg-gray-600 bg-opacity-75 transition-opacity lg:hidden ${
-          isSidebarOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
-        }`}
-        onClick={() => setIsSidebarOpen(false)}
-      />
-
-      {/* Sidebar */}
-      <div
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-white transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${
-          isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
-      >
-        <Sidebar />
-      </div>
-
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Top Bar */}
-        <div className="flex-shrink-0 h-auto bg-white border-b">
-          <div className="flex items-center h-16 px-4">
-            <button
-              type="button"
-              className="lg:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100"
-              onClick={() => setIsSidebarOpen(true)}
-            >
-              <Bars3Icon className="h-6 w-6" />
-            </button>
-            <TopBar />
-          </div>
-        </div>
-
-        {/* Main Content Area */}
-        <div className="flex-1 flex overflow-hidden">
-          {/* Primary Content */}
-          <div className="flex-1 overflow-y-auto">
-            <div className="container mx-auto px-4 py-6">
-              {children}
+    <ComunicacaoProvider>
+      <div className="h-screen flex overflow-hidden bg-gray-100">
+        {/* Sidebar */}
+        <div className="hidden md:flex md:flex-shrink-0">
+          <div className="flex flex-col w-64">
+            <div className="flex flex-col h-0 flex-1 border-r border-gray-200 bg-white">
+              <div className="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto">
+                <div className="flex items-center flex-shrink-0 px-4">
+                  <span className="text-xl font-bold text-indigo-600">Edunéxia</span>
+                </div>
+                <nav className="mt-5 flex-1 px-2 bg-white space-y-1">
+                  {filteredNavigation.map((item) => (
+                    <NavLink
+                      key={item.name}
+                      to={item.href}
+                      className={({ isActive }) =>
+                        `${
+                          isActive
+                            ? 'bg-indigo-50 text-indigo-600'
+                            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                        } group flex items-center px-2 py-2 text-sm font-medium rounded-md`
+                      }
+                    >
+                      <item.icon
+                        className="mr-3 flex-shrink-0 h-6 w-6 text-gray-400 group-hover:text-gray-500"
+                        aria-hidden="true"
+                      />
+                      {item.name}
+                    </NavLink>
+                  ))}
+                </nav>
+              </div>
+              <div className="flex-shrink-0 flex border-t border-gray-200 p-4">
+                <div className="flex-shrink-0 w-full group block">
+                  <div className="flex items-center">
+                    <div>
+                      <img
+                        className="inline-block h-9 w-9 rounded-full"
+                        src={user?.avatar_url || 'https://avatar.vercel.sh/' + user?.nome}
+                        alt=""
+                      />
+                    </div>
+                    <div className="ml-3">
+                      <p className="text-sm font-medium text-gray-700 group-hover:text-gray-900">
+                        {user?.nome}
+                      </p>
+                      <p className="text-xs font-medium text-gray-500 group-hover:text-gray-700">
+                        {user?.roles.join(', ')}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-
-          {/* Details Panel */}
-          {shouldShowDetails && (
-            <div
-              className={`fixed inset-y-0 right-0 z-50 w-80 bg-white transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${
-                isDetailsOpen ? 'translate-x-0' : 'translate-x-full'
-              }`}
-            >
-              <DetailPanel
-                onClose={detailsProps?.onClose}
-                data={conversaAtual ? {
-                  name: conversaAtual.titulo,
-                  email: conversaAtual.participante_id,
-                  status: conversaAtual.status,
-                  lastContact: conversaAtual.ultima_mensagem_at,
-                } : undefined}
-              />
-            </div>
-          )}
+        </div>
+        
+        {/* Main content */}
+        <div className="flex flex-col w-0 flex-1 overflow-hidden">
+          <main className="flex-1 relative z-0 overflow-y-auto focus:outline-none p-6">
+            {children}
+          </main>
         </div>
       </div>
-    </div>
+    </ComunicacaoProvider>
   );
 } 

@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../services/supabase';
+import { useNotificationSound } from './useNotificationSound';
 import type { Mensagem, ComunicacaoTipoMensagem, Lead, Aluno, Interacao } from '../types/comunicacao';
 import { RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 
@@ -26,6 +27,7 @@ export function useChat({ conversaId }: UseChatOptions = {}): UseChatResult {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const [digitando, setDigitando] = useState(false);
+  const { play } = useNotificationSound();
 
   // Carregar mensagens
   useEffect(() => {
@@ -34,7 +36,7 @@ export function useChat({ conversaId }: UseChatOptions = {}): UseChatResult {
     const carregarMensagens = async () => {
       try {
         setLoading(true);
-        setError(undefined);
+        setError(null);
 
         const { data, error } = await supabase
           .from('mensagens')
@@ -65,7 +67,14 @@ export function useChat({ conversaId }: UseChatOptions = {}): UseChatResult {
           filter: `conversa_id=eq.${conversaId}`
         },
         (payload: RealtimePostgresChangesPayload<Mensagem>) => {
-          setMensagens((prev: Mensagem[]) => [...prev, payload.new as Mensagem]);
+          const novaMensagem = payload.new as Mensagem;
+          
+          // Tocar som apenas se a mensagem não for do usuário atual
+          if (novaMensagem.remetente_id !== user.id) {
+            play('message');
+          }
+          
+          setMensagens((prev: Mensagem[]) => [...prev, novaMensagem]);
         }
       )
       .subscribe();
@@ -73,7 +82,7 @@ export function useChat({ conversaId }: UseChatOptions = {}): UseChatResult {
     return () => {
       subscription.unsubscribe();
     };
-  }, [conversaId, user]);
+  }, [conversaId, user, play]);
 
   // Enviar mensagem
   const enviarMensagem = useCallback(async (conversaId: string, texto: string): Promise<Mensagem> => {

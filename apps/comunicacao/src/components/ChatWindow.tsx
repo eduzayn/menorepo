@@ -2,7 +2,9 @@ import { useState, useRef, useEffect } from 'react';
 import { Conversa, Mensagem } from '../types/comunicacao';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { PaperAirplaneIcon } from '@heroicons/react/outline';
+import { Icons } from './ui/icons';
+import { VideoCall } from './chat/VideoCall';
+import { Button } from './ui/button';
 
 interface ChatWindowProps {
   conversa: Conversa;
@@ -20,6 +22,7 @@ export function ChatWindow({
   onIndicarDigitando
 }: ChatWindowProps) {
   const [texto, setTexto] = useState('');
+  const [isVideoCallActive, setIsVideoCallActive] = useState(false);
   const mensagensRef = useRef<HTMLDivElement>(null);
 
   // Rolar para a última mensagem
@@ -47,6 +50,9 @@ export function ChatWindow({
     ? conversa.participantes.find(p => p.id === conversa.digitando)
     : undefined;
 
+  // Obtém o ID do participante principal (excluindo o usuário atual)
+  const participanteId = conversa.participantes.find(p => p.id !== conversa.usuario_id)?.id || '';
+
   return (
     <div className="flex flex-col h-full">
       {/* Cabeçalho */}
@@ -58,6 +64,16 @@ export function ChatWindow({
           </p>
         </div>
         <div className="flex items-center space-x-2">
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex items-center"
+            onClick={() => setIsVideoCallActive(true)}
+            title="Iniciar chamada de vídeo"
+          >
+            <Icons.camera className="h-4 w-4 mr-1" />
+            <span>Chamada</span>
+          </Button>
           <span
             className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
               conversa.status === 'ATIVO'
@@ -71,6 +87,26 @@ export function ChatWindow({
           </span>
         </div>
       </div>
+
+      {/* Chamada de vídeo (modal) */}
+      {isVideoCallActive && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl h-[80vh] overflow-hidden relative">
+            <button
+              onClick={() => setIsVideoCallActive(false)}
+              className="absolute top-4 right-4 z-10 bg-gray-700 bg-opacity-50 text-white rounded-full p-1"
+              title="Fechar"
+            >
+              <Icons.x className="h-5 w-5" />
+            </button>
+            <VideoCall
+              conversaId={conversa.id}
+              participanteId={participanteId}
+              onClose={() => setIsVideoCallActive(false)}
+            />
+          </div>
+        </div>
+      )}
 
       {/* Mensagens */}
       <div
@@ -140,7 +176,7 @@ export function ChatWindow({
             disabled={!texto.trim()}
             className="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <PaperAirplaneIcon className="h-5 w-5" />
+            <Icons.send className="h-5 w-5" />
           </button>
         </div>
       </form>

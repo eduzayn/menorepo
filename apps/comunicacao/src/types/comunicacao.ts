@@ -7,6 +7,12 @@ export type GrupoRole = 'admin' | 'moderador' | 'membro';
 export type TipoNotificacao = 'mensagem' | 'campanha' | 'sistema' | 'lembrete';
 export type LeadStatus = 'NOVO' | 'EM_CONTATO' | 'QUALIFICADO' | 'CONVERTIDO' | 'PERDIDO';
 
+// Tipos para CRM avançado
+export type LeadScoreCategoria = 'DEMOGRAFICO' | 'COMPORTAMENTAL' | 'ENGAJAMENTO' | 'INTERESSE' | 'INTERACAO';
+export type AutomacaoTrigger = 'LEAD_CRIADO' | 'STATUS_ALTERADO' | 'PONTUACAO_ATINGIDA' | 'TEMPO_INATIVO' | 'INTERACAO_RECEBIDA';
+export type AutomacaoAcao = 'ENVIAR_EMAIL' | 'ENVIAR_SMS' | 'ATRIBUIR_RESPONSAVEL' | 'MUDAR_STATUS' | 'ADICIONAR_TAREFA' | 'AGENDAR_REUNIAO';
+export type PipelineEtapa = 'PROSPECCAO' | 'QUALIFICACAO' | 'PROPOSTA' | 'NEGOCIACAO' | 'FECHAMENTO' | 'POS_VENDA';
+
 // Interfaces base
 export interface Participante {
   id: string;
@@ -135,6 +141,16 @@ export interface Lead {
   ultimo_acesso?: string;
   criado_at: string;
   atualizado_at: string;
+  // Novos campos para CRM avançado
+  score?: number;
+  responsavel_id?: string;
+  segmento?: string[];
+  tags?: string[];
+  pipeline_etapa?: PipelineEtapa;
+  pipeline_valor?: number;
+  pipeline_probabilidade?: number;
+  fonte_aquisicao?: string;
+  ultima_campanha_id?: string;
 }
 
 export interface Aluno {
@@ -176,4 +192,115 @@ export interface InsertCampanhaDestinatario extends Omit<CampanhaDestinatario, '
 export interface UpdateCampanhaDestinatario extends Partial<InsertCampanhaDestinatario> {}
 
 export interface InsertRespostaRapida extends Omit<RespostaRapida, 'id' | 'criado_at' | 'atualizado_at'> {}
-export interface UpdateRespostaRapida extends Partial<InsertRespostaRapida> {} 
+export interface UpdateRespostaRapida extends Partial<InsertRespostaRapida> {}
+
+// Novas interfaces para CRM avançado
+
+export interface LeadScore {
+  id: string;
+  lead_id: string;
+  categoria: LeadScoreCategoria;
+  nome: string;
+  valor: number;
+  descricao: string;
+  criado_at: string;
+  atualizado_at: string;
+}
+
+export interface LeadSegmento {
+  id: string;
+  nome: string;
+  criterios: Record<string, any>;
+  descricao: string;
+  criado_por: string;
+  criado_at: string;
+  atualizado_at: string;
+}
+
+export interface Automacao {
+  id: string;
+  nome: string;
+  descricao: string;
+  ativo: boolean;
+  trigger: AutomacaoTrigger;
+  condicoes: Record<string, any>;
+  acoes: {
+    tipo: AutomacaoAcao;
+    parametros: Record<string, any>;
+    intervalo?: number;
+  }[];
+  segmento_id?: string;
+  criado_por: string;
+  criado_at: string;
+  atualizado_at: string;
+}
+
+export interface Oportunidade {
+  id: string;
+  lead_id: string;
+  titulo: string;
+  descricao: string;
+  valor: number;
+  etapa: PipelineEtapa;
+  probabilidade: number;
+  data_estimada_fechamento: string;
+  responsavel_id: string;
+  produtos?: {
+    produto_id: string;
+    quantidade: number;
+    valor_unitario: number;
+  }[];
+  criado_at: string;
+  atualizado_at: string;
+}
+
+export interface Reuniao {
+  id: string;
+  lead_id?: string;
+  oportunidade_id?: string;
+  titulo: string;
+  descricao: string;
+  data_inicio: string;
+  data_fim: string;
+  local?: string;
+  link_virtual?: string;
+  responsavel_id: string;
+  participantes: string[];
+  notas?: string;
+  criado_at: string;
+  atualizado_at: string;
+}
+
+export interface RelatorioConversao {
+  id: string;
+  nome: string;
+  descricao?: string;
+  filtros: Record<string, any>;
+  periodo: {
+    inicio: string;
+    fim: string;
+  };
+  agrupamento: 'dia' | 'semana' | 'mes' | 'trimestre' | 'ano';
+  criado_por: string;
+  criado_at: string;
+  atualizado_at: string;
+}
+
+// Tipos para inserção e atualização - CRM avançado
+export interface InsertLeadScore extends Omit<LeadScore, 'id' | 'criado_at' | 'atualizado_at'> {}
+export interface UpdateLeadScore extends Partial<InsertLeadScore> {}
+
+export interface InsertLeadSegmento extends Omit<LeadSegmento, 'id' | 'criado_at' | 'atualizado_at'> {}
+export interface UpdateLeadSegmento extends Partial<InsertLeadSegmento> {}
+
+export interface InsertAutomacao extends Omit<Automacao, 'id' | 'criado_at' | 'atualizado_at'> {}
+export interface UpdateAutomacao extends Partial<InsertAutomacao> {}
+
+export interface InsertOportunidade extends Omit<Oportunidade, 'id' | 'criado_at' | 'atualizado_at'> {}
+export interface UpdateOportunidade extends Partial<InsertOportunidade> {}
+
+export interface InsertReuniao extends Omit<Reuniao, 'id' | 'criado_at' | 'atualizado_at'> {}
+export interface UpdateReuniao extends Partial<InsertReuniao> {}
+
+export interface InsertRelatorioConversao extends Omit<RelatorioConversao, 'id' | 'criado_at' | 'atualizado_at'> {}
+export interface UpdateRelatorioConversao extends Partial<InsertRelatorioConversao> {} 
