@@ -11,4 +11,5 @@ export * from './useAutomacoes';
 export * from './useSegmentacao';
 export * from './useReunioes';
 export * from './useVideoCall';
-export * from './useBaseConhecimento'; 
+export * from './useBaseConhecimento';
+export * from './useAtribuicaoAutomatica'; 

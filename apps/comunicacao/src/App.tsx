@@ -13,6 +13,7 @@ const Layout = lazy(() => import('./components/Layout'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 const Login = lazy(() => import('./pages/Login'));
 const BaseConhecimento = lazy(() => import('./pages/BaseConhecimentoPage'));
+const AtribuicaoAutomatica = lazy(() => import('./pages/AtribuicaoAutomaticaPage'));
 
 // Componente de carregamento
 import { Spinner } from '@edunexia/ui-components';
@@ -49,6 +50,7 @@ const App = () => {
             <Route path="campanhas" element={<Campanhas />} />
             <Route path="notificacoes" element={<Notificacoes />} />
             <Route path="base-conhecimento" element={<BaseConhecimento />} />
+            <Route path="atribuicao-automatica" element={<AtribuicaoAutomatica />} />
           </Route>
           
           {/* Página não encontrada */}

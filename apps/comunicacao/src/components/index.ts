@@ -13,6 +13,10 @@ export * from './crm';
 // Configurações
 export * from './configuracoes/SoundSettings';
 
+// Widget
+export * from './widget/ChatWidget';
+export * from './widget/WidgetEmbed';
+
 // Componentes individuais
 export { SearchInput } from './SearchInput';
 export { Pagination } from './Pagination';

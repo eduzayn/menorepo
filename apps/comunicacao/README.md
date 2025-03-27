@@ -16,6 +16,7 @@ Este é o módulo de comunicação integrado, que permite gerenciar conversas, m
 - Configurações personalizáveis para notificações e comportamento do aplicativo
 - Sistema de CRM com gerenciamento de leads
 - Automações e cenários de atendimento personalizáveis
+- Atribuição automática de conversas
 
 ## Pré-requisitos
 
@@ -171,6 +172,32 @@ O módulo de comunicação suporta videochamadas em tempo real entre usuários, 
 - Fallback para servidores STUN públicos
 - Troca segura de streams de mídia
 
+### Widget de Chat para Integração Externa
+
+O módulo inclui um widget de chat que pode ser facilmente incorporado em sites externos, permitindo que visitantes iniciem conversas diretamente com a sua equipe.
+
+**Recursos do Widget:**
+- Interface flutuante personalizável
+- Atendimento inicial automatizado
+- Encaminhamento para departamentos com base no conteúdo
+- Persistência de histórico de conversa
+- Compatível com qualquer site ou plataforma
+- Design responsivo para mobile e desktop
+
+**Configurações personalizáveis:**
+- Cores, títulos e mensagens
+- Posição na tela (direita ou esquerda)
+- Departamento padrão para atendimento
+- Mensagem de boas-vindas
+
+**Como utilizar:**
+1. Acesse a página de Configurações > Widget de Chat
+2. Personalize as configurações conforme necessário
+3. Copie o código de incorporação fornecido
+4. Cole o código no HTML do seu site, antes do fechamento da tag `</body>`
+
+O widget se integra perfeitamente com o sistema de atribuição automática, encaminhando conversas para os departamentos adequados com base nas palavras-chave detectadas nas mensagens.
+
 ### Sistema de CRM
 
 O módulo inclui um sistema completo de CRM (Customer Relationship Management) para gerenciamento de leads e oportunidades de negócio.
@@ -207,4 +234,26 @@ O sistema permite criar automações baseadas em regras para executar ações au
 1. Acesse a seção de Automações na página de um lead ou no menu CRM
 2. Clique em "Nova Automação"
 3. Configure o gatilho, condições e ações desejadas
-4. Ative a automação para que ela comece a funcionar 
+4. Ative a automação para que ela comece a funcionar
+
+### Atribuição Automática de Conversas
+
+O módulo possui um sistema inteligente de atribuição automática de conversas com base no conteúdo das mensagens, direcionando os atendimentos para os departamentos mais adequados.
+
+**Recursos de Atribuição Automática:**
+- Configuração de regras baseadas em palavras-chave
+- Definição de prioridades entre as regras
+- Encaminhamento automático para departamentos específicos
+- Distribuição balanceada entre os atendentes do departamento
+- Notificações e mensagens automáticas sobre transferências
+- Ferramenta de teste para simular atribuições
+- Interface amigável para gerenciamento de regras
+
+**Como configurar:**
+1. Acesse a seção de "Atribuição Automática" no menu
+2. Defina as palavras-chave que identificam cada tipo de atendimento
+3. Selecione o departamento de destino para cada regra
+4. Defina a prioridade das regras (as de maior prioridade são verificadas primeiro)
+5. Use a ferramenta de teste para verificar o funcionamento das regras
+
+As regras são aplicadas automaticamente quando um cliente envia uma mensagem, analisando o texto para identificar o departamento mais adequado. Por exemplo, mensagens contendo palavras como "comprar" ou "preço" podem ser direcionadas ao setor comercial, enquanto mensagens com "problema" ou "erro" podem ir para o suporte técnico. 

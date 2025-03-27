@@ -12,6 +12,7 @@ import {
   UnauthorizedPage,
   DetalheCampanhaPage
 } from './pages';
+import WidgetConfigPage from './pages/WidgetConfigPage';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { MainLayout } from './components/layout/MainLayout';
 
@@ -36,6 +37,16 @@ export function AppRoutes() {
         element={
           <ProtectedRoute>
             <ConfiguracoesPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/configuracoes/widget"
+        element={
+          <ProtectedRoute requiredRole="admin">
+            <MainLayout>
+              <WidgetConfigPage />
+            </MainLayout>
           </ProtectedRoute>
         }
       />

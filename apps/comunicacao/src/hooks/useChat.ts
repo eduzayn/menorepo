@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../services/supabase';
 import { useNotificationSound } from './useNotificationSound';
+import { useAtribuicaoAutomatica } from './useAtribuicaoAutomatica';
 import type { Mensagem, ComunicacaoTipoMensagem, Lead, Aluno, Interacao } from '../types/comunicacao';
 import { RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 
@@ -13,12 +14,13 @@ interface UseChatResult {
   mensagens: Mensagem[];
   loading: boolean;
   error: Error | null;
-  enviarMensagem: (conversaId: string, texto: string) => Promise<Mensagem>;
+  enviarMensagem: (conversaId: string, texto: string, metadados?: any) => Promise<Mensagem>;
   marcarComoLida: (conversaId: string) => Promise<void>;
   indicarDigitando: (conversaId: string, digitando: boolean) => Promise<void>;
   carregarMensagens: (conversaId: string) => Promise<Mensagem[]>;
   carregarParticipante: (participanteId: string, tipo: 'LEAD' | 'ALUNO') => Promise<Lead | Aluno>;
   carregarHistoricoInteracoes: (participanteId: string, tipo: 'LEAD' | 'ALUNO') => Promise<Interacao[]>;
+  atribuirConversa: (conversaId: string, departamentoId: string) => Promise<any>;
 }
 
 export function useChat({ conversaId }: UseChatOptions = {}): UseChatResult {
@@ -28,6 +30,13 @@ export function useChat({ conversaId }: UseChatOptions = {}): UseChatResult {
   const [error, setError] = useState<Error | null>(null);
   const [digitando, setDigitando] = useState(false);
   const { play } = useNotificationSound();
+  const { processarMensagem, carregarRegras, carregarDepartamentos } = useAtribuicaoAutomatica();
+
+  // Carregar regras de atribuição ao iniciar
+  useEffect(() => {
+    carregarRegras();
+    carregarDepartamentos();
+  }, [carregarRegras, carregarDepartamentos]);
 
   // Carregar mensagens
   useEffect(() => {
@@ -85,7 +94,11 @@ export function useChat({ conversaId }: UseChatOptions = {}): UseChatResult {
   }, [conversaId, user, play]);
 
   // Enviar mensagem
-  const enviarMensagem = useCallback(async (conversaId: string, texto: string): Promise<Mensagem> => {
+  const enviarMensagem = useCallback(async (
+    conversaId: string, 
+    texto: string,
+    metadados?: any
+  ): Promise<Mensagem> => {
     if (!conversaId || !user) return Promise.reject(new Error('Usuário ou conversa não definida'));
 
     try {
@@ -97,7 +110,8 @@ export function useChat({ conversaId }: UseChatOptions = {}): UseChatResult {
             conversa_id: conversaId,
             remetente_id: user.id,
             conteudo: texto,
-            tipo: 'TEXTO',
+            tipo: metadados?.tipo || 'TEXTO',
+            metadados: metadados,
             lida: false,
           },
         ])
@@ -107,6 +121,24 @@ export function useChat({ conversaId }: UseChatOptions = {}): UseChatResult {
       if (error) throw error;
 
       setMensagens((prev: Mensagem[]) => [...prev, data]);
+      
+      // Se a mensagem é do cliente (não do atendente), processar atribuição
+      const { data: conversa } = await supabase
+        .from('conversas')
+        .select('usuario_id, participante_id, participante_tipo, departamento_id')
+        .eq('id', conversaId)
+        .single();
+      
+      // Se o remetente é o participante (cliente) e não há departamento atribuído ainda
+      if (
+        conversa && 
+        data.remetente_id === conversa.participante_id && 
+        !conversa.departamento_id
+      ) {
+        // Processar atribuição automática
+        await processarMensagem(conversaId, texto);
+      }
+      
       return data;
     } catch (err) {
       setError(err instanceof Error ? err : new Error('Erro ao enviar mensagem'));
@@ -114,7 +146,7 @@ export function useChat({ conversaId }: UseChatOptions = {}): UseChatResult {
     } finally {
       setLoading(false);
     }
-  }, [user]);
+  }, [user, processarMensagem]);
 
   // Marcar mensagens como lidas
   const marcarComoLida = useCallback(async (conversaId: string): Promise<void> => {
@@ -234,6 +266,60 @@ export function useChat({ conversaId }: UseChatOptions = {}): UseChatResult {
     }
   }, [user]);
 
+  // Atribuir conversa a um departamento manualmente
+  const atribuirConversa = useCallback(async (
+    conversaId: string,
+    departamentoId: string
+  ) => {
+    if (!conversaId || !user) return Promise.reject(new Error('Usuário ou conversa não definida'));
+
+    try {
+      setLoading(true);
+      
+      // Obter informações do departamento
+      const { data: departamento, error: depError } = await supabase
+        .from('departamentos')
+        .select('nome')
+        .eq('id', departamentoId)
+        .single();
+        
+      if (depError) throw depError;
+      
+      // Atualizar a conversa com o departamento
+      const { error } = await supabase
+        .from('conversas')
+        .update({ 
+          departamento_id: departamentoId,
+          atribuido_em: new Date().toISOString(),
+          atribuido_por: user.id
+        })
+        .eq('id', conversaId);
+        
+      if (error) throw error;
+      
+      // Adicionar mensagem de sistema sobre a transferência
+      await supabase
+        .from('mensagens')
+        .insert({
+          conversa_id: conversaId,
+          remetente_id: 'system',
+          conteudo: `Esta conversa foi transferida para o departamento ${departamento.nome}.`,
+          tipo: 'SISTEMA',
+          data_envio: new Date().toISOString()
+        });
+      
+      return { 
+        sucesso: true, 
+        departamento: departamento.nome 
+      };
+    } catch (err) {
+      setError(err instanceof Error ? err : new Error('Erro ao atribuir conversa'));
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, [user]);
+
   return {
     mensagens,
     loading,
@@ -244,5 +330,6 @@ export function useChat({ conversaId }: UseChatOptions = {}): UseChatResult {
     carregarMensagens,
     carregarParticipante,
     carregarHistoricoInteracoes,
+    atribuirConversa
   };
 } 

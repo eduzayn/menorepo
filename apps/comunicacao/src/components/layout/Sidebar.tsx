@@ -9,8 +9,10 @@ import {
   BellIcon,
   ArrowLeftOnRectangleIcon,
   BookOpenIcon,
+  ArrowsRightLeftIcon,
 } from '@heroicons/react/24/outline';
 import { useAuth } from '../../hooks/useAuth';
+import { useState } from 'react';
 
 interface NavItem {
   name: string;
@@ -24,15 +26,25 @@ const navigation: NavItem[] = [
   { name: 'Leads', path: '/leads', icon: UserGroupIcon },
   { name: 'Campanhas', path: '/campanhas', icon: MegaphoneIcon },
   { name: 'Base de Conhecimento', path: '/base-conhecimento', icon: BookOpenIcon },
+  { name: 'Atribuição Automática', path: '/atribuicao-automatica', icon: ArrowsRightLeftIcon },
   { name: 'Respostas Rápidas', path: '/respostas-rapidas', icon: DocumentTextIcon },
   { name: 'Notificações', path: '/notificacoes', icon: BellIcon },
   { name: 'Configurações', path: '/configuracoes', icon: Cog6ToothIcon },
+];
+
+// Subnavegação para configurações
+const configSubnav = [
+  { name: 'Geral', path: '/configuracoes' },
+  { name: 'Perfil', path: '/configuracoes/perfil' },
+  { name: 'Notificações', path: '/configuracoes/notificacoes' },
+  { name: 'Widget de Chat', path: '/configuracoes/widget' }
 ];
 
 export default function Sidebar() {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
+  const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
 
   const handleSignOut = async () => {
     try {
@@ -41,6 +53,14 @@ export default function Sidebar() {
     } catch (error) {
       console.error('Erro ao fazer logout:', error);
     }
+  };
+
+  // Verificar se está em alguma subpágina de configurações
+  const isConfigPage = location.pathname.startsWith('/configuracoes');
+
+  // Toggle submenu
+  const toggleSubmenu = (menu: string) => {
+    setOpenSubmenu(prev => prev === menu ? null : menu);
   };
 
   return (
@@ -60,31 +80,94 @@ export default function Sidebar() {
           {navigation.map((item) => {
             const isActive = location.pathname.startsWith(item.path);
             const Icon = item.icon;
+            const isConfigItem = item.path === '/configuracoes';
+            const showSubmenu = isConfigItem && (openSubmenu === 'config' || isConfigPage);
 
             return (
-              <Link
-                key={item.name}
-                to={item.path}
-                className={`
-                  group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors
-                  ${isActive
-                    ? 'bg-primary-light text-primary-dark'
-                    : 'text-neutral-dark hover:bg-neutral-light hover:text-primary'
-                  }
-                `}
-              >
-                <Icon
-                  className={`
-                    mr-3 h-5 w-5 transition-colors
-                    ${isActive
-                      ? 'text-primary'
-                      : 'text-neutral-dark group-hover:text-primary'
-                    }
-                  `}
-                  aria-hidden="true"
-                />
-                {item.name}
-              </Link>
+              <div key={item.name}>
+                {isConfigItem ? (
+                  <div>
+                    <button
+                      onClick={() => toggleSubmenu('config')}
+                      className={`
+                        w-full group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors
+                        ${isActive
+                          ? 'bg-primary-light text-primary-dark'
+                          : 'text-neutral-dark hover:bg-neutral-light hover:text-primary'
+                        }
+                      `}
+                    >
+                      <Icon
+                        className={`
+                          mr-3 h-5 w-5 transition-colors
+                          ${isActive
+                            ? 'text-primary'
+                            : 'text-neutral-dark group-hover:text-primary'
+                          }
+                        `}
+                        aria-hidden="true"
+                      />
+                      <span className="flex-1 text-left">{item.name}</span>
+                      <svg
+                        className={`ml-2 h-4 w-4 transform transition-transform ${showSubmenu ? 'rotate-180' : ''}`}
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                    
+                    {showSubmenu && (
+                      <div className="pl-10 pr-2 mt-1 space-y-1">
+                        {configSubnav.map((subItem) => {
+                          const isSubActive = location.pathname === subItem.path;
+                          
+                          return (
+                            <Link
+                              key={subItem.name}
+                              to={subItem.path}
+                              className={`
+                                block px-3 py-2 text-sm rounded-md transition-colors
+                                ${isSubActive
+                                  ? 'bg-primary-lighter text-primary-dark font-medium'
+                                  : 'text-neutral-dark hover:bg-neutral-lighter hover:text-primary'
+                                }
+                              `}
+                            >
+                              {subItem.name}
+                            </Link>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <Link
+                    to={item.path}
+                    className={`
+                      group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors
+                      ${isActive
+                        ? 'bg-primary-light text-primary-dark'
+                        : 'text-neutral-dark hover:bg-neutral-light hover:text-primary'
+                      }
+                    `}
+                  >
+                    <Icon
+                      className={`
+                        mr-3 h-5 w-5 transition-colors
+                        ${isActive
+                          ? 'text-primary'
+                          : 'text-neutral-dark group-hover:text-primary'
+                        }
+                      `}
+                      aria-hidden="true"
+                    />
+                    {item.name}
+                  </Link>
+                )}
+              </div>
             );
           })}
         </nav>
