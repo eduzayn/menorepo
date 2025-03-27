@@ -9,7 +9,11 @@ import { IAConfig } from '../components/configuracoes/IAConfig'
 import AutomacoesConfig from '../components/configuracoes/AutomacoesConfig'
 import { UserIcon, BellIcon, Cog6ToothIcon, SparklesIcon, BoltIcon } from '@heroicons/react/24/outline'
 import { IAProvider } from '../contexts/IAContext'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
+import { ProfileConfig } from '@/components/configuracoes/ProfileConfig'
+import { AssistenteIAConfig } from '@/components/configuracoes/AssistenteIAConfig'
+import { GeralConfig } from '@/components/configuracoes/GeralConfig'
+import { CanaisConfig } from '@/components/configuracoes/CanaisConfig'
 
 const tabs = [
   {
@@ -45,30 +49,22 @@ const tabs = [
 ]
 
 export default function ConfiguracoesPage() {
-  const [activeTab, setActiveTab] = useState('perfil')
-  const location = useLocation()
+  const [searchParams] = useSearchParams()
   const navigate = useNavigate()
-  
-  // Detectar tab da URL
+  const [activeTab, setActiveTab] = useState<string>('perfil')
+
+  // Definir o tab ativo com base no parâmetro da URL
   useEffect(() => {
-    const searchParams = new URLSearchParams(location.search)
-    const tabParam = searchParams.get('tab')
-    
-    if (tabParam && tabs.some(tab => tab.id === tabParam)) {
-      setActiveTab(tabParam)
+    const tab = searchParams.get('tab')
+    if (tab) {
+      setActiveTab(tab)
     }
-  }, [location.search])
-  
-  // Atualizar URL quando mudar de tab
+  }, [searchParams])
+
+  // Atualizar a URL quando o tab mudar
   const handleTabChange = (value: string) => {
     setActiveTab(value)
-    
-    // Atualizar URL sem recarregar a página
-    const newUrl = value === 'perfil' 
-      ? '/configuracoes' 
-      : `/configuracoes?tab=${value}`
-    
-    navigate(newUrl, { replace: true })
+    navigate(`/configuracoes?tab=${value}`)
   }
 
   return (
@@ -81,33 +77,39 @@ export default function ConfiguracoesPage() {
           </p>
         </div>
 
-        <Tabs value={activeTab} onValueChange={handleTabChange}>
+        <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-4">
           <TabsList className="grid w-full grid-cols-5 lg:w-[600px]">
-            {tabs.map((tab) => (
-              <TabsTrigger
-                key={tab.id}
-                value={tab.id}
-                className="flex items-center gap-2"
-              >
-                <tab.icon className="h-4 w-4" />
-                <span className="hidden sm:inline">{tab.label}</span>
-              </TabsTrigger>
-            ))}
+            <TabsTrigger value="perfil">Perfil</TabsTrigger>
+            <TabsTrigger value="notificacoes">Notificações</TabsTrigger>
+            <TabsTrigger value="canais">Canais</TabsTrigger>
+            <TabsTrigger value="ia">Assistente IA</TabsTrigger>
+            <TabsTrigger value="automacoes">Automações</TabsTrigger>
+            <TabsTrigger value="geral">Geral</TabsTrigger>
           </TabsList>
 
-          {tabs.map((tab) => (
-            <TabsContent
-              key={tab.id}
-              value={tab.id}
-              className="mt-8 space-y-4 bg-card p-6 rounded-lg border"
-            >
-              <div className="flex items-center gap-2 mb-6">
-                <tab.icon className="h-6 w-6" />
-                <h2 className="text-2xl font-semibold">{tab.label}</h2>
-              </div>
-              <tab.component />
-            </TabsContent>
-          ))}
+          <TabsContent value="perfil">
+            <ProfileConfig />
+          </TabsContent>
+          
+          <TabsContent value="notificacoes">
+            <NotificacoesConfig />
+          </TabsContent>
+          
+          <TabsContent value="canais">
+            <CanaisConfig />
+          </TabsContent>
+          
+          <TabsContent value="ia">
+            <AssistenteIAConfig />
+          </TabsContent>
+          
+          <TabsContent value="automacoes">
+            <AutomacoesConfig />
+          </TabsContent>
+          
+          <TabsContent value="geral">
+            <GeralConfig />
+          </TabsContent>
         </Tabs>
       </div>
     </IAProvider>
