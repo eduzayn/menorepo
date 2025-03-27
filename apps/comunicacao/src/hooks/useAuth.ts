@@ -1,15 +1,8 @@
-import { useAuth as useUnifiedAuth } from '@edunexia/auth';
+/**
+ * @deprecated Este hook foi substituído pela implementação unificada de @edunexia/auth
+ * Importe diretamente: import { useAuth } from '@edunexia/auth'
+ */
 
-export function useAuth() {
-  const auth = useUnifiedAuth();
-
-  return {
-    user: auth.user,
-    loading: auth.loading,
-    signIn: auth.signIn,
-    signOut: auth.signOut,
-    signUp: auth.signUp,
-    resetPassword: auth.resetPassword,
-    updatePassword: auth.updatePassword,
-  };
-} 
+// Re-exportar do pacote compartilhado
+import { useAuth as useSharedAuth } from '@edunexia/auth';
+export const useAuth = useSharedAuth; 

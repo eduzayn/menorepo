@@ -1,6 +1,88 @@
-# API Client - Edunéxia
+# @edunexia/api-client
 
-Um cliente unificado para todas as interações com a API do Supabase na plataforma Edunéxia.
+Cliente API centralizado para comunicação com o Supabase, fortemente tipado com o schema do banco de dados da Edunéxia.
+
+## Instalação
+
+```bash
+# O pacote é instalado automaticamente através das dependências do monorepo
+```
+
+## Uso Básico
+
+```tsx
+import { ApiProvider, useSupabaseClient, useSupabaseQuery } from '@edunexia/api-client';
+
+// No arquivo principal da aplicação, usar o provider
+function App() {
+  return (
+    <ApiProvider 
+      supabaseUrl={import.meta.env.VITE_SUPABASE_URL} 
+      supabaseKey={import.meta.env.VITE_SUPABASE_ANON_KEY}
+    >
+      <Router />
+    </ApiProvider>
+  );
+}
+
+// Em componentes, usar os hooks para acessar o cliente e fazer consultas
+function MinhaListagem() {
+  const supabase = useSupabaseClient();
+  
+  // Consulta usando React Query
+  const { data, isLoading, error } = useSupabaseQuery(
+    supabase,
+    'matriculas',
+    {
+      filters: { status: 'ativa' },
+      order: { column: 'created_at', ascending: false },
+      limit: 10
+    }
+  );
+  
+  if (isLoading) return <div>Carregando...</div>;
+  if (error) return <div>Erro: {error.message}</div>;
+  
+  return (
+    <ul>
+      {data?.map(item => (
+        <li key={item.id}>{item.nome}</li>
+      ))}
+    </ul>
+  );
+}
+```
+
+## API
+
+### Componentes
+
+- `ApiProvider`: Provider que disponibiliza o cliente Supabase e React Query
+
+### Hooks
+
+- `useSupabaseClient()`: Retorna o cliente Supabase do contexto
+- `useApiContext()`: Retorna o contexto completo (cliente, URLs)
+- `useSupabaseQuery()`: Hook para consultas com React Query
+- `useSupabaseInsert()`: Hook para inserção de dados
+- `useSupabaseUpdate()`: Hook para atualização de dados
+- `useSupabaseDelete()`: Hook para exclusão de dados
+
+### Funções Utilitárias
+
+- `createSupabaseClient()`: Cria uma instância do cliente Supabase tipado
+
+## Migração dos Módulos
+
+Para migrar módulos existentes para usar este cliente API compartilhado:
+
+1. Remova arquivos locais como `supabase.ts` ou similares
+2. Importe o provider e coloque no topo da aplicação
+3. Substitua chamadas diretas ao Supabase pelos hooks do cliente
+
+## Tipagem
+
+O cliente é totalmente tipado usando o schema do banco de dados definido em `@edunexia/database-schema`.
 
 ## Características
 

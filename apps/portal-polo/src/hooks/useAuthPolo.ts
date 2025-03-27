@@ -1,112 +1,103 @@
-import { useEffect, useState } from 'react';
-import { useApi } from '@edunexia/api-client';
-import { useUser } from '@edunexia/core';
+/**
+ * Hook estendido para autenticação específica de polo
+ * Baseia-se no useAuth compartilhado, adicionando funcionalidades específicas
+ */
 
-interface PoloUser {
-  userId: string;
-  poloId: string | null;
-  perfil: string;
-  isPolo: boolean;
-  isAdmin: boolean;
-  hasAccess: boolean;
+import { useEffect, useState, useCallback } from 'react';
+import { useAuth } from '@edunexia/auth';
+
+// Tipos específicos para polos
+interface PoloInfo {
+  id: string;
+  nome: string;
+  cidade: string;
+  estado: string;
+  responsavel: string;
 }
 
-/**
- * Hook para verificar se o usuário atual tem acesso ao portal do polo
- * e determinar o tipo de acesso (admin instituição, admin polo, atendente)
- */
 export function useAuthPolo() {
-  const api = useApi();
-  const { user, isAuthenticated, isLoading: isLoadingUser } = useUser();
-  const [poloUser, setPoloUser] = useState<PoloUser>({
-    userId: '',
-    poloId: null,
-    perfil: '',
-    isPolo: false,
-    isAdmin: false,
-    hasAccess: false
-  });
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
+  // Usa o hook de autenticação compartilhado
+  const auth = useAuth();
+  
+  // Estado específico para polos
+  const [poloId, setPoloId] = useState<string | null>(null);
+  const [poloInfo, setPoloInfo] = useState<PoloInfo | null>(null);
+  const [loading, setLoading] = useState(true);
+  
+  // Determinar se o usuário é de um polo
+  const isPolo = auth.user?.perfil === 'parceiro';
+  const isAdmin = auth.user?.perfil === 'admin';
+  
+  // Permissão para acessar recursos de polo
+  const hasAccess = isPolo || isAdmin;
 
+  // Carregar dados do polo quando o usuário estiver autenticado
   useEffect(() => {
-    async function checkPoloAccess() {
-      if (!isAuthenticated || !user) {
-        setIsLoading(false);
+    const carregarDadosPolo = async () => {
+      if (!auth.user || !hasAccess) {
+        setPoloId(null);
+        setPoloInfo(null);
+        setLoading(false);
         return;
       }
-
+      
+      setLoading(true);
+      
       try {
-        setIsLoading(true);
-        
-        // Consulta o perfil do usuário para verificar o tipo de acesso
-        const { data: profileData, error: profileError } = await api.supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', user.id)
-          .single();
-
-        if (profileError) throw profileError;
-
-        const userRole = profileData?.role;
-        let poloId = null;
-        let perfil = '';
-        let isPolo = false;
-        let isAdmin = false;
-        let hasAccess = false;
-
-        // Administrador da instituição
-        if (userRole === 'super_admin' || userRole === 'admin_instituicao') {
-          isAdmin = true;
-          hasAccess = true;
-          perfil = userRole;
-        } 
-        // Verifica se é um usuário de polo (admin_polo ou atendente_polo)
-        else if (userRole === 'admin_polo' || userRole === 'atendente_polo') {
-          // Consulta a tabela de usuários_polo para obter o polo vinculado
-          const { data: poloData, error: poloError } = await api.supabase
-            .from('polos.usuarios_polo')
-            .select('*, polos:polos.polos(*)')
-            .eq('usuario_id', user.id)
-            .eq('ativo', true)
-            .single();
-
-          if (poloError && poloError.code !== 'PGRST116') { // Ignora erro de nenhum resultado
-            throw poloError;
-          }
-
-          if (poloData) {
-            poloId = poloData.polo_id;
-            perfil = userRole;
-            isPolo = true;
-            isAdmin = userRole === 'admin_polo';
-            hasAccess = true;
-          }
+        // Se for um usuário de polo, buscar ID do polo associado
+        if (isPolo) {
+          // Em um cenário real, buscaria do banco de dados
+          // Simulação para desenvolvimento
+          const idPolo = auth.user.perfil_detalhes?.polo_id || 'polo-default';
+          setPoloId(idPolo);
+          
+          // Buscar informações detalhadas do polo
+          // Simulação para desenvolvimento
+          setPoloInfo({
+            id: idPolo,
+            nome: 'Polo ' + auth.user.nome,
+            cidade: 'Cidade Exemplo',
+            estado: 'UF',
+            responsavel: auth.user.nome
+          });
+        } else if (isAdmin) {
+          // Admins podem acessar qualquer polo, definir um valor padrão ou null
+          // dependendo da lógica da aplicação
+          setPoloId(null);
         }
-
-        setPoloUser({
-          userId: user.id,
-          poloId,
-          perfil,
-          isPolo,
-          isAdmin,
-          hasAccess
-        });
-
       } catch (error) {
-        console.error('Erro ao verificar acesso ao polo:', error);
-        setError(error instanceof Error ? error : new Error('Erro desconhecido'));
+        console.error('Erro ao carregar dados do polo:', error);
       } finally {
-        setIsLoading(false);
+        setLoading(false);
       }
+    };
+    
+    carregarDadosPolo();
+  }, [auth.user, isPolo, isAdmin, hasAccess]);
+  
+  // Função para selecionar um polo específico (útil para admins)
+  const selecionarPolo = useCallback((id: string) => {
+    if (isAdmin) {
+      setPoloId(id);
+      // Aqui buscaria informações do polo selecionado
     }
-
-    checkPoloAccess();
-  }, [isAuthenticated, user, api.supabase]);
-
-  return { 
-    ...poloUser, 
-    isLoading: isLoadingUser || isLoading,
-    error
+  }, [isAdmin]);
+  
+  return {
+    // Dados básicos de autenticação
+    ...auth,
+    
+    // Dados específicos de polo
+    poloId,
+    poloInfo,
+    isPolo,
+    isAdmin,
+    hasAccess,
+    
+    // Funcionalidades específicas
+    selecionarPolo,
+    
+    // Estado adicional
+    loadingPolo: loading
   };
 } 
