@@ -1,7 +1,6 @@
-import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
-import { Tabs } from '../components/tabs';
 import { describe, it, expect, vi } from 'vitest';
+import { render, screen, fireEvent } from '../setupTests';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '../components/tabs';
 
 describe('Tabs Component', () => {
   const mockTabs = [

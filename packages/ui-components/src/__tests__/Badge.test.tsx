@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import { Badge } from '../components/badge';
-import { describe, it, expect } from 'vitest';
 
 describe('Badge Component', () => {
   it('deve renderizar o conteúdo do badge corretamente', () => {

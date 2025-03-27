@@ -1,5 +1,6 @@
-import { describe, it, expect } from 'vitest';
-import { render, screen } from '@edunexia/test-config';
+import React from 'react';
+import { render, screen } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import { Button } from '../components/button';
 
 describe('Button', () => {
@@ -36,7 +37,7 @@ describe('Button', () => {
   });
 
   it('encaminha corretamente a ref para o elemento nativo', () => {
-    const refCallback = vi.fn();
+    const refCallback = jest.fn();
     render(<Button ref={refCallback}>Botão com ref</Button>);
     expect(refCallback).toHaveBeenCalledWith(expect.any(HTMLButtonElement));
   });

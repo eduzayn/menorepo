@@ -1,7 +1,6 @@
-import React from 'react';
-import { render, screen, within } from '@testing-library/react';
-import { Table } from '../components/table';
 import { describe, it, expect } from 'vitest';
+import { render, screen } from '../setupTests';
+import { Table, TableHeader, TableBody, TableFooter, TableHead, TableRow, TableCell, TableCaption } from '../components/table';
 
 describe('Table Component', () => {
   const mockData = [
@@ -44,14 +43,14 @@ describe('Table Component', () => {
     expect(rows).toHaveLength(mockData.length + 1);
     
     // Verificar dados da primeira linha
-    const firstRowCells = within(rows[1]).getAllByRole('cell');
+    const firstRowCells = screen.getAllByRole('cell');
     expect(firstRowCells[0]).toHaveTextContent('1');
     expect(firstRowCells[1]).toHaveTextContent('João Silva');
     expect(firstRowCells[2]).toHaveTextContent('joao@example.com');
     expect(firstRowCells[3]).toHaveTextContent('Ativo');
     
     // Verificar dados da segunda linha
-    const secondRowCells = within(rows[2]).getAllByRole('cell');
+    const secondRowCells = screen.getAllByRole('cell');
     expect(secondRowCells[0]).toHaveTextContent('2');
     expect(secondRowCells[1]).toHaveTextContent('Maria Santos');
     expect(secondRowCells[2]).toHaveTextContent('maria@example.com');

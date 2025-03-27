@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { render, screen } from '@edunexia/test-config';
+import { render, screen } from '../setupTests';
 import { 
   Card, 
   CardHeader, 
