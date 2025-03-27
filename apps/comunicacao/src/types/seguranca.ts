@@ -10,6 +10,9 @@ export interface Consentimento {
   consentido: boolean;
   data_consentimento: string;
   ip_consentimento: string;
+  dispositivo_consentimento: string;
+  navegador_consentimento: string;
+  sistema_operacional_consentimento: string;
   versao_termos: string;
   dados_consentidos: string[];
   criado_at: string;
@@ -30,6 +33,9 @@ export interface LogAuditoria {
   dados_novos?: Record<string, any>;
   ip: string;
   user_agent: string;
+  dispositivo: string;
+  navegador: string;
+  sistema_operacional: string;
   criado_at: string;
 }
 
@@ -43,6 +49,8 @@ export interface ConfiguracaoSeguranca {
   ultimo_acesso: string;
   ip_ultimo_acesso: string;
   dispositivo_ultimo_acesso: string;
+  navegador_ultimo_acesso: string;
+  sistema_operacional_ultimo_acesso: string;
   criado_at: string;
   atualizado_at: string;
 }
@@ -52,6 +60,9 @@ export interface TentativaLogin {
   usuario_id: string;
   ip: string;
   user_agent: string;
+  dispositivo: string;
+  navegador: string;
+  sistema_operacional: string;
   sucesso: boolean;
   motivo_falha?: string;
   criado_at: string;
@@ -66,6 +77,8 @@ export interface BloqueioTemporario {
   motivo: string;
   data_inicio: string;
   data_fim: string;
+  ip_bloqueio: string;
+  user_agent_bloqueio: string;
   criado_at: string;
 }
 

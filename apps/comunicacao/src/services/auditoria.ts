@@ -1,5 +1,6 @@
 import { supabase } from './supabase';
 import type { Database } from '../types/database';
+import { getRequestInfo, parseUserAgent } from '../utils/request-info';
 
 export interface LogAuditoria {
   id: string;
@@ -29,11 +30,19 @@ export interface RegistrarLogParams {
 
 export const auditoriaService = {
   // Registrar novo log de auditoria
-  async registrarLog(params: RegistrarLogParams): Promise<LogAuditoria> {
+  async registrarLog(params: Omit<RegistrarLogParams, 'ip' | 'user_agent'>): Promise<LogAuditoria> {
+    const requestInfo = getRequestInfo();
+    const userAgentInfo = parseUserAgent(requestInfo.userAgent);
+
     const { data, error } = await supabase
       .from('logs_auditoria')
       .insert({
         ...params,
+        ip: requestInfo.ip,
+        user_agent: requestInfo.userAgent,
+        dispositivo: userAgentInfo.device,
+        navegador: userAgentInfo.browser,
+        sistema_operacional: userAgentInfo.os,
         criado_at: new Date().toISOString()
       })
       .select()

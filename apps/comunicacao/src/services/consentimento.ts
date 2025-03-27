@@ -1,5 +1,6 @@
 import { supabase } from './supabase';
 import type { Database } from '../types/database';
+import { getRequestInfo, parseUserAgent } from '../utils/request-info';
 
 export interface Consentimento {
   id: string;
@@ -25,11 +26,18 @@ export interface RegistrarConsentimentoParams {
 
 export const consentimentoService = {
   // Registrar novo consentimento
-  async registrarConsentimento(params: RegistrarConsentimentoParams): Promise<Consentimento> {
+  async registrarConsentimento(params: Omit<RegistrarConsentimentoParams, 'ip_consentimento'>): Promise<Consentimento> {
+    const requestInfo = getRequestInfo();
+    const userAgentInfo = parseUserAgent(requestInfo.userAgent);
+
     const { data, error } = await supabase
       .from('consentimentos')
       .insert({
         ...params,
+        ip_consentimento: requestInfo.ip,
+        dispositivo_consentimento: userAgentInfo.device,
+        navegador_consentimento: userAgentInfo.browser,
+        sistema_operacional_consentimento: userAgentInfo.os,
         data_consentimento: new Date().toISOString()
       })
       .select()

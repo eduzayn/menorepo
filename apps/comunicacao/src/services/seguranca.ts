@@ -1,6 +1,7 @@
 import { supabase } from './supabase';
 import type { Database } from '../types/database';
 import { auditoriaService } from './auditoria';
+import { getRequestInfo, parseUserAgent } from '../utils/request-info';
 
 export interface ConfiguracaoSeguranca {
   id: string;
@@ -85,17 +86,24 @@ export const segurancaService = {
   async registrarTentativaLogin(
     usuarioId: string,
     params: {
-      ip: string;
-      user_agent: string;
       sucesso: boolean;
       motivo_falha?: string;
     }
   ): Promise<TentativaLogin> {
+    const requestInfo = getRequestInfo();
+    const userAgentInfo = parseUserAgent(requestInfo.userAgent);
+
     const { data, error } = await supabase
       .from('tentativas_login')
       .insert({
         usuario_id: usuarioId,
-        ...params,
+        ip: requestInfo.ip,
+        user_agent: requestInfo.userAgent,
+        sucesso: params.sucesso,
+        motivo_falha: params.motivo_falha,
+        dispositivo: userAgentInfo.device,
+        navegador: userAgentInfo.browser,
+        sistema_operacional: userAgentInfo.os,
         criado_at: new Date().toISOString()
       })
       .select()
@@ -110,9 +118,16 @@ export const segurancaService = {
       tipo: 'ACESSO',
       entidade: 'tentativas_login',
       entidade_id: data.id,
-      dados_novos: params,
-      ip: params.ip,
-      user_agent: params.user_agent
+      dados_novos: {
+        ...params,
+        ip: requestInfo.ip,
+        user_agent: requestInfo.userAgent,
+        dispositivo: userAgentInfo.device,
+        navegador: userAgentInfo.browser,
+        sistema_operacional: userAgentInfo.os
+      },
+      ip: requestInfo.ip,
+      user_agent: requestInfo.userAgent
     });
 
     return data;
@@ -141,6 +156,7 @@ export const segurancaService = {
       duracao_minutos: number;
     }
   ): Promise<BloqueioTemporario> {
+    const requestInfo = getRequestInfo();
     const dataInicio = new Date();
     const dataFim = new Date(dataInicio.getTime() + params.duracao_minutos * 60000);
 
@@ -152,6 +168,8 @@ export const segurancaService = {
         motivo: params.motivo,
         data_inicio: dataInicio.toISOString(),
         data_fim: dataFim.toISOString(),
+        ip_bloqueio: requestInfo.ip,
+        user_agent_bloqueio: requestInfo.userAgent,
         criado_at: new Date().toISOString()
       })
       .select()
@@ -169,10 +187,12 @@ export const segurancaService = {
       dados_novos: {
         ...params,
         data_inicio: dataInicio.toISOString(),
-        data_fim: dataFim.toISOString()
+        data_fim: dataFim.toISOString(),
+        ip: requestInfo.ip,
+        user_agent: requestInfo.userAgent
       },
-      ip: '', // TODO: Implementar captura de IP
-      user_agent: '' // TODO: Implementar captura de User Agent
+      ip: requestInfo.ip,
+      user_agent: requestInfo.userAgent
     });
 
     return data;
@@ -191,7 +211,17 @@ export const segurancaService = {
   },
 
   async validarUserAgent(userAgent: string): Promise<boolean> {
-    // TODO: Implementar validação de User Agent
+    const userAgentInfo = parseUserAgent(userAgent);
+    
+    // Validações básicas de User Agent
+    if (!userAgentInfo.browser || userAgentInfo.browser === 'Unknown') {
+      return false;
+    }
+
+    if (!userAgentInfo.os || userAgentInfo.os === 'Unknown') {
+      return false;
+    }
+
     return true;
   }
 }; 
