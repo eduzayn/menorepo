@@ -2,6 +2,13 @@
   "name": "@edunexia/typescript-config",
   "version": "0.0.1",
   "private": true,
+  "scripts": {
+    "build": "echo 'No build step needed'",
+    "dev": "echo 'No dev step needed'",
+    "lint": "echo 'No lint step needed'",
+    "clean": "rm -rf .turbo && rm -rf node_modules",
+    "test": "echo 'No tests available'"
+  },
   "files": [
     "base.json",
     "react-library.json",

@@ -1,24 +1,26 @@
 {
-  "name": "@edunexia/core-types",
+  "name": "@edunexia/utils",
   "version": "0.1.0",
   "private": true,
   "main": "src/index.ts",
   "types": "src/index.ts",
+  "files": [
+    "dist/**"
+  ],
   "scripts": {
-    "build": "tsc",
-    "dev": "tsc --watch",
-    "lint": "eslint \"**/*.ts*\"",
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
     "test": "vitest run"
   },
-  "files": [
-    "src"
-  ],
   "dependencies": {},
   "devDependencies": {
-    "typescript": "^5.2.2",
     "@edunexia/eslint-config": "*",
     "@edunexia/typescript-config": "*",
-    "vitest": "^0.32.3"
+    "eslint": "^8.45.0",
+    "tsup": "^8.0.2",
+    "typescript": "^5.0.2",
+    "vitest": "^0.34.6"
   }
 } 

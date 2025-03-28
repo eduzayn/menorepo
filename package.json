@@ -11,7 +11,10 @@
     "lint": "turbo lint",
     "clean": "turbo clean",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "test": "turbo test"
+    "test": "turbo test",
+    "prune": "scripts/ts-prune.sh",
+    "setup-lint": "powershell -ExecutionPolicy Bypass -File scripts/setup-lint-format.ps1",
+    "check-lint-deps": "powershell -ExecutionPolicy Bypass -File scripts/check-lint-deps.ps1"
   },
   "packageManager": "pnpm@8.9.0",
   "engines": {

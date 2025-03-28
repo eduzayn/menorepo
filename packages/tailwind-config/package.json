@@ -3,6 +3,13 @@
   "version": "0.1.0",
   "main": "index.js",
   "private": true,
+  "scripts": {
+    "build": "echo 'No build step needed'",
+    "dev": "echo 'No dev step needed'",
+    "lint": "eslint *.js --report-unused-disable-directives --max-warnings 0",
+    "clean": "rm -rf .turbo && rm -rf node_modules",
+    "test": "echo 'No tests available'"
+  },
   "dependencies": {
     "tailwindcss": "^3.4.0",
     "postcss": "^8.4.32",

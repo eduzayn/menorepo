@@ -1,8 +1,16 @@
 {
   "name": "@edunexia/prettier-config",
   "version": "0.1.0",
+  "description": "Configuração Prettier compartilhada para todos os módulos da Edunéxia",
   "main": "index.json",
   "private": true,
+  "scripts": {
+    "build": "echo 'No build step needed'",
+    "dev": "echo 'No dev step needed'",
+    "lint": "echo 'No lint step needed'",
+    "clean": "rm -rf .turbo && rm -rf node_modules",
+    "test": "echo 'No tests available'"
+  },
   "dependencies": {
     "prettier": "^3.1.1"
   }

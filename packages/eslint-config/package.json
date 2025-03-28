@@ -1,8 +1,16 @@
 {
   "name": "@edunexia/eslint-config",
   "version": "0.0.1",
+  "description": "Configuração ESLint compartilhada para todos os módulos da Edunéxia",
   "private": true,
   "main": "index.js",
+  "scripts": {
+    "build": "echo 'No build step needed'",
+    "dev": "echo 'No dev step needed'",
+    "lint": "eslint *.js --max-warnings 0",
+    "clean": "rm -rf .turbo && rm -rf node_modules",
+    "test": "echo 'No tests available'"
+  },
   "files": [
     "index.js",
     "react.js",
@@ -17,7 +25,8 @@
     "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-jsx-a11y": "^6.8.0",
     "eslint-plugin-react": "^7.33.2",
-    "eslint-plugin-react-hooks": "^4.6.0"
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-import-resolver-typescript": "^3.6.1"
   },
   "devDependencies": {
     "eslint": "^8.56.0",
