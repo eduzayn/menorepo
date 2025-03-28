@@ -1,0 +1,50 @@
+name: Verificação da Versão do pnpm
+
+on:
+  pull_request:
+    branches: [main, dev]
+  workflow_dispatch:
+
+jobs:
+  check-pnpm-version:
+    name: Verificar versão do pnpm
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v3
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          
+      - name: Verificar versão do pnpm
+        run: |
+          EXPECTED_VERSION="8.9.0"
+          
+          if ! command -v pnpm &> /dev/null; then
+            echo "::error::pnpm não encontrado. Instale usando 'corepack enable' e/ou 'corepack prepare pnpm@$EXPECTED_VERSION --activate'."
+            exit 1
+          fi
+          
+          INSTALLED_VERSION=$(pnpm --version)
+          
+          if [ "$INSTALLED_VERSION" != "$EXPECTED_VERSION" ]; then
+            echo "::error::Versão incorreta do pnpm! Esperado: $EXPECTED_VERSION, Encontrado: $INSTALLED_VERSION"
+            echo "Consulte docs/gerenciamento-pacotes.md para instruções sobre como instalar a versão correta."
+            exit 1
+          else
+            echo "✅ Usando a versão correta do pnpm: $INSTALLED_VERSION"
+          fi
+          
+      - name: Instruções em caso de falha
+        if: failure()
+        run: |
+          echo "Falha na verificação da versão do pnpm!"
+          echo ""
+          echo "Consulte docs/gerenciamento-pacotes.md para instruções sobre como instalar a versão correta."
+          echo ""
+          echo "Em resumo:"
+          echo "1. Use corepack (recomendado): 'corepack enable && corepack prepare pnpm@8.9.0 --activate'"
+          echo "2. Ou instale manualmente: 'npm install -g pnpm@8.9.0'" 

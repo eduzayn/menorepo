@@ -1,0 +1,14 @@
+chore: padroniza pnpm como gerenciador de pacotes oficial
+
+- Adiciona documentação completa em docs/gerenciamento-pacotes.md
+- Atualiza README.md removendo referências ao Yarn
+- Adiciona scripts para verificar a versão do pnpm (check-pnpm)
+- Configura GitHub Actions para verificar a versão do pnpm nos PRs
+- Remove arquivos específicos do Yarn
+- Atualiza .gitignore para refletir o uso de pnpm
+- Adiciona verificação no preinstall para garantir o uso do pnpm
+- Configura .npmrc com parâmetros adicionais de consistência
+
+Esta alteração garante que todos os desenvolvedores usem a mesma versão do pnpm (8.9.0),
+evitando problemas de inconsistência no lock file e garantindo uma experiência de
+desenvolvimento mais uniforme. 

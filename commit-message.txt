@@ -1,0 +1,16 @@
+feat(deps): implementa detecção de dependências circulares
+
+- Adiciona madge como dependência de desenvolvimento para detecção de dependências circulares
+- Adiciona scripts no package.json para verificar dependências circulares:
+  - circular:check - verifica dependências circulares nos pacotes
+  - circular:check:apps - verifica dependências circulares nas apps
+  - circular:check:all - verifica dependências circulares em todo o projeto
+  - circular:image - gera imagem do grafo de dependências
+- Cria scripts de verificação:
+  - scripts/check-circular-deps.bat - para Windows usando batch
+  - scripts/check-circular-deps.ps1 - para Windows usando PowerShell
+- Adiciona documentação em docs/dependencias-circulares.md
+- Configura workflow do GitHub Actions em .github/workflows/check-circular-deps.yml
+- Atualiza README.md com informações sobre a detecção de dependências circulares
+
+Isso ajuda a prevenir problemas de compilação e execução causados por dependências circulares entre módulos. 

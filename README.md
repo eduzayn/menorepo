@@ -6,7 +6,7 @@ Este documento apresenta a arquitetura e estratégia de integração dos módulo
 ## O que é Monorepo com Workspaces?
 - **Monorepo** é uma abordagem onde todos os projetos (módulos) coexistem dentro de um único repositório Git.
 - **Workspaces** permitem tratar cada módulo como um pacote isolado, com suas próprias dependências e scripts, mas compartilhando configurações e bibliotecas comuns.
-- Utilizaremos o **Yarn Workspaces** como gerenciador principal, com possibilidade futura de integração com **Turborepo** para otimização de builds.
+- Utilizamos **pnpm Workspaces** como gerenciador de pacotes, com integração com **Turborepo** para otimização de builds.
 
 ## Arquitetura Técnica da Plataforma
 - **Backend**: Todos os módulos utilizam o **Supabase** como backend e banco de dados. O banco é único e compartilhado por toda a plataforma, garantindo integridade e consistência dos dados.
@@ -187,6 +187,11 @@ O cumprimento desta estrutura garante consistência e facilita a navegação ent
   - Build optimizado para produção
   - Suporte nativo para TypeScript e React
   - Configuração simplificada e extensível
+- **Detecção de dependências circulares com madge** ✅
+  - Prevenção de problemas de compilação e funcionamento em tempo de execução
+  - Verificação automatizada via scripts `circular:check` e `circular:check:all`
+  - Visualização do grafo de dependências com `circular:image`
+  - Executável via scripts `check-circular-deps.bat` ou `check-circular-deps.ps1`
 - Integração com gateway de pagamento no módulo `site-vendas` 🔄
 - Geração automática de credenciais e e-mails transacionais 🔄
 - Backend unificado no Supabase para todos os módulos usando `@supabase/supabase-js` ✅
