@@ -1,24 +1,27 @@
 {
-  "extends": "./packages/typescript-config/base.json",
+  "extends": "./tsconfig.base.json",
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@edunexia/*": ["./packages/*/src"]
+      "@edunexia/*": ["./packages/*/src"],
+      "@apps/*": ["./apps/*/src"]
     }
   },
   "exclude": ["node_modules"],
-  "include": [],
+  "include": ["**/*.ts", "**/*.tsx"],
   "references": [
     { "path": "./apps/comunicacao" },
     { "path": "./apps/core" },
-    { "path": "./apps/material-didatico" }, 
+    { "path": "./apps/material-didatico" },
     { "path": "./apps/matriculas" },
     { "path": "./apps/portal-do-aluno" },
     { "path": "./apps/portal-parceiro" },
     { "path": "./apps/portal-polo" },
     { "path": "./packages/api-client" },
-    { "path": "./packages/auth/tsconfig.json" },
-    { "path": "./packages/database-schema/tsconfig.json" },
-    { "path": "./packages/typescript-config" }
+    { "path": "./packages/auth" },
+    { "path": "./packages/core" },
+    { "path": "./packages/database-schema" },
+    { "path": "./packages/ui-components" },
+    { "path": "./packages/utils" }
   ]
 } 
