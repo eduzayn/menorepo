@@ -1,0 +1,1 @@
+module.exports = require('@edunexia/tailwind-config/postcss.config.js'); 

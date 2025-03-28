@@ -1,0 +1,9 @@
+{
+  "name": "@edunexia/prettier-config",
+  "version": "0.1.0",
+  "main": "index.json",
+  "private": true,
+  "dependencies": {
+    "prettier": "^3.1.1"
+  }
+} 

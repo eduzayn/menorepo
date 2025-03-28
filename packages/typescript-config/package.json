@@ -1,0 +1,13 @@
+{
+  "name": "@edunexia/typescript-config",
+  "version": "0.0.1",
+  "private": true,
+  "files": [
+    "base.json",
+    "react-library.json",
+    "nextjs.json",
+    "react-app.json",
+    "vite.json",
+    "vite-node.json"
+  ]
+}
