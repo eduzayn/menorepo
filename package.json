@@ -14,7 +14,16 @@
     "test": "turbo test",
     "prune": "scripts/ts-prune.sh",
     "setup-lint": "powershell -ExecutionPolicy Bypass -File scripts/setup-lint-format.ps1",
-    "check-lint-deps": "powershell -ExecutionPolicy Bypass -File scripts/check-lint-deps.ps1"
+    "check-lint-deps": "powershell -ExecutionPolicy Bypass -File scripts/check-lint-deps.ps1",
+    "git:fix": "scripts/git-fix.bat",
+    "git:status": "scripts/git-status.bat",
+    "git:commit": "scripts/git-commit.bat",
+    "git:push": "scripts/git-push.bat",
+    "git:repair-all": "scripts/git-repair-all.bat",
+    "git:fix-hooks": "scripts/fix-git-hooks.bat",
+    "git:fix-auth": "scripts/fix-git-auth.bat",
+    "git:fix-permissions": "scripts/git-fix-permissions.bat",
+    "git:create-attributes": "scripts/create-gitattributes.bat"
   },
   "packageManager": "pnpm@8.9.0",
   "engines": {
