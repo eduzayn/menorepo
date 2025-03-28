@@ -1,1 +1,0 @@
-// Funções utilitárias específicas do módulo de comunicação 

@@ -1,6 +1,0 @@
-export * from './DashboardCard'
-export * from './DashboardFilter'
-export * from './StatsCard'
-export * from './ChartMatriculasPorStatus'
-export * from './ChartMatriculasPorPeriodo'
-export * from './ChartCursosPopulares' 

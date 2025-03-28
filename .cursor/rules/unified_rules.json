@@ -1,0 +1,53 @@
+{
+  "rules": [
+    {
+      "name": "Modularidade",
+      "pattern": "import\\s+[^\\s]+\\s+from\\s+'apps/",
+      "language": ["javascript", "typescript", "tsx", "jsx"],
+      "message": "Coloque funcionalidades compartilhadas em packages/ e não em apps/"
+    },
+    {
+      "name": "Tipagem em TypeScript",
+      "pattern": ":\\s*any\\b",
+      "language": ["typescript", "tsx"],
+      "message": "Evite usar 'any', prefira tipos explícitos"
+    },
+    {
+      "name": "Documentação JSDoc",
+      "pattern": "function\\s+[a-zA-Z0-9_]+\\s*\\([^\\)]*\\)\\s*{",
+      "language": ["javascript", "typescript"],
+      "exclude": "/\\*\\*[\\s\\S]*?\\*/\\s*function",
+      "message": "Funções complexas precisam de documentação JSDoc"
+    },
+    {
+      "name": "Reutilização de componentes",
+      "pattern": "export\\s+(?:default\\s+)?(?:function|const)\\s+([A-Z][a-zA-Z0-9]+)",
+      "language": ["jsx", "tsx"],
+      "message": "Verifique se não há componente similar em ui-components antes de criar um novo"
+    },
+    {
+      "name": "Usar português em comentários",
+      "pattern": "//.*[a-zA-Z]",
+      "language": ["javascript", "typescript", "tsx", "jsx"],
+      "message": "Use português em comentários"
+    },
+    {
+      "name": "Padrão de nomeação kebab-case para arquivos",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*\\.[a-zA-Z0-9]+$",
+      "scope": "filename",
+      "message": "Use kebab-case para nomes de arquivos"
+    },
+    {
+      "name": "Padrão PascalCase para componentes React",
+      "pattern": "^[A-Z][a-zA-Z0-9]*\\.(jsx|tsx)$",
+      "scope": "filename",
+      "message": "Use PascalCase para arquivos de componentes React"
+    },
+    {
+      "name": "Commits semânticos",
+      "pattern": "^(feat|fix|docs|style|refactor|perf|test|chore)(\\([a-z-]+\\))?: .+",
+      "scope": "git_commit",
+      "message": "Use commits semânticos: tipo(escopo): descrição"
+    }
+  ]
+} 

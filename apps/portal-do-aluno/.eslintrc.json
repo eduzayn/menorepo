@@ -1,3 +1,0 @@
-{
-  "extends": ["@edunexia/eslint-config/nextjs.json"]
-} 
