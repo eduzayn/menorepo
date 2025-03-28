@@ -7,7 +7,8 @@
     "dev": "echo 'No dev step needed'",
     "lint": "echo 'No lint step needed'",
     "clean": "rm -rf .turbo && rm -rf node_modules",
-    "test": "echo 'No tests available'"
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "files": [
     "base.json",
@@ -16,5 +17,8 @@
     "react-app.json",
     "vite.json",
     "vite-node.json"
-  ]
+  ],
+  "devDependencies": {
+    "vitest": "^0.34.6"
+  }
 }

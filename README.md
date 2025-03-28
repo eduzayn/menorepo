@@ -256,3 +256,32 @@ Esta separação clara permite:
 4. Melhor performance de build
 
 > **Importante**: Qualquer código que não dependa de React ou UI deve ser movido para `packages/core`. Componentes, hooks e contextos devem permanecer em `apps/core`.
+
+## Testes Automatizados
+
+Este monorepo utiliza Vitest e Jest para testes automatizados em todos os pacotes. Para garantir a qualidade do código, todos os pacotes devem incluir testes adequados.
+
+### Executando testes
+
+```bash
+# Executar testes em todos os pacotes
+pnpm test
+
+# Executar testes em um pacote específico
+pnpm --filter @edunexia/[nome-do-pacote] test
+
+# Executar testes com watch mode
+pnpm --filter @edunexia/[nome-do-pacote] test:watch
+```
+
+### Cobertura de testes
+
+Os relatórios de cobertura são gerados automaticamente durante a execução do CI e enviados para o Codecov.
+
+### Configuração de testes
+
+Cada pacote contém sua própria configuração de testes, mas seguimos convenções comuns:
+
+- Testes unitários em `__tests__/*.test.{ts,tsx,js,jsx}`
+- Configuração via `vite.config.js` ou `jest.config.js`
+- Cobertura de código adequada, especialmente para funções críticas
