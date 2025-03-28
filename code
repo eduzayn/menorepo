@@ -1,0 +1,5 @@
+[33m8006340[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m chore: reorganizar estrutura do monorepo, consolidar configurações Tailwind e esclarecer divisão entre packages/core e apps/core
+[33m76ef284[m feat: consolidar configurações e esclarecer divisão entre packages/core e apps/core
+[33m2a615a9[m feat(ui-components): atualizar Badge para suportar todas as variantes do sistema e configurar testes
+[33m7cbde79[m test(packages): adiciona testes para componentes e utilitários compartilhados
+[33meb4f37b[m test(comunicacao): implementa testes unitários, de componentes e E2E para o módulo de comunicação

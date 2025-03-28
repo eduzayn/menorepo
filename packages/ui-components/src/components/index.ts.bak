@@ -15,8 +15,6 @@ export * from './layout';
 
 // Feedback
 export * from './badge';
-export * from './alert';
-export * from './toast';
 
 // Exibição de dados
 export * from './table';
