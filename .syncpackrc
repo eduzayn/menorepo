@@ -1,0 +1,53 @@
+{
+  "dependencyTypes": ["prod", "dev", "peer"],
+  "source": ["package.json", "packages/*/package.json", "apps/*/package.json"],
+  "sortAz": [
+    "dependencies",
+    "devDependencies",
+    "peerDependencies",
+    "optionalDependencies"
+  ],
+  "versionGroups": [
+    {
+      "label": "Usar versão consistente de React",
+      "packages": ["**"],
+      "dependencies": ["react", "react-dom", "@types/react", "@types/react-dom"],
+      "policy": "same"
+    },
+    {
+      "label": "Versão consistente para Radix UI",
+      "packages": ["**"],
+      "dependencies": ["@radix-ui/*"],
+      "policy": "same"
+    },
+    {
+      "label": "Versão consistente para pacotes TanStack",
+      "packages": ["**"],
+      "dependencies": ["@tanstack/*"],
+      "policy": "same"
+    },
+    {
+      "label": "Permitir workspace:* para pacotes locais em devDependencies",
+      "packages": ["**"],
+      "dependencies": ["@edunexia/*"],
+      "dependencyTypes": ["dev"],
+      "policy": "ignore"
+    },
+    {
+      "label": "Permitir ranges de compatibilidade em peerDependencies",
+      "packages": ["**"],
+      "dependencies": ["*"],
+      "dependencyTypes": ["peer"],
+      "policy": "ignore"
+    }
+  ],
+  "semverGroups": [
+    {
+      "label": "Permitir semver range caret (^) para todas as dependências",
+      "packages": ["**"],
+      "dependencyTypes": ["prod", "dev"],
+      "dependencies": ["*"],
+      "range": "^"
+    }
+  ]
+} 

@@ -1,0 +1,40 @@
+name: Verificação de Versões
+
+on:
+  pull_request:
+    branches: [main, dev]
+    paths:
+      - '**package.json'
+      - 'pnpm-lock.yaml'
+  workflow_dispatch:
+
+jobs:
+  version-check:
+    name: Verificar consistência de versões
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v3
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          
+      - name: Setup PNPM
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8.9.0
+          
+      - name: Instalar syncpack
+        run: pnpm add -g syncpack
+        
+      - name: Verificar inconsistências de versão
+        run: syncpack lint --types prod,dev
+        
+      - name: Sugerir correções
+        if: failure()
+        run: |
+          echo "::warning::Inconsistências de versão encontradas! Execute 'pnpm syncpack:fix-mismatches' localmente para resolver."
+          syncpack list --types prod,dev --filter=mismatches 

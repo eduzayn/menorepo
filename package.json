@@ -15,6 +15,12 @@
     "prune": "scripts/ts-prune.sh",
     "setup-lint": "powershell -ExecutionPolicy Bypass -File scripts/setup-lint-format.ps1",
     "check-lint-deps": "powershell -ExecutionPolicy Bypass -File scripts/check-lint-deps.ps1",
+    "syncpack:list": "syncpack list",
+    "syncpack:lint": "syncpack lint",
+    "syncpack:fix-mismatches": "syncpack fix-mismatches",
+    "syncpack:update": "syncpack update",
+    "version:check": "syncpack lint",
+    "version:fix": "syncpack fix-mismatches",
     "git:fix": "scripts/git-fix.bat",
     "git:status": "scripts/git-status.bat",
     "git:commit": "scripts/git-commit.bat",
@@ -33,7 +39,8 @@
     "turbo": "^1.11.3",
     "eslint": "^8.45.0",
     "typescript": "^5.0.2",
-    "prettier": "^3.0.0"
+    "prettier": "^3.0.0",
+    "syncpack": "^11.2.1"
   },
   "overridesInfo": "Os overrides a seguir são usados para forçar versões específicas de dependências em todo o monorepo para resolver conflitos e vulnerabilidades",
   "overrides": {
@@ -59,6 +66,10 @@
     "// Dependências de manipulação de arquivos com conflitos": "",
     "glob": "^8.1.0",
     "inflight": "^1.0.6",
-    "rimraf": "^5.0.0"
+    "rimraf": "^5.0.0",
+    
+    "// React e React DOM devem ser sempre consistentes": "",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   }
 }
