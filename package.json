@@ -23,18 +23,30 @@
     "typescript": "^5.0.2",
     "prettier": "^3.0.0"
   },
+  "overridesInfo": "Os overrides a seguir são usados para forçar versões específicas de dependências em todo o monorepo para resolver conflitos e vulnerabilidades",
   "overrides": {
-    "@humanwhocodes/config-array": "^0.15.0",
-    "@humanwhocodes/object-schema": "^2.2.0",
-    "abab": "^2.0.8",
-    "domexception": "^5.0.0",
-    "glob": "^8.1.0",
-    "inflight": "^1.0.6",
-    "rimraf": "^5.0.0",
+    "// Pacotes com vulnerabilidades de segurança críticas (GHSA-4r6h-8v6p-xvw6, GHSA-5pgg-2g8v-p4x9, GHSA-w532-jxjh-hjhj, GHSA-vhxf-7vqr-mrjg)": "",
     "xlsx": "^0.18.5",
     "jspdf": "^3.0.1",
     "dompurify": "^3.0.8",
+    
+    "// Pacotes com vulnerabilidades de segurança moderadas (GHSA-67mh-4wv8-2f99)": "",
     "esbuild": "^0.25.0",
-    "tsup": "^8.0.2"
+    
+    "// Pacotes com vulnerabilidades de segurança baixas (GHSA-3mv9-4h5g-vhg3)": "",
+    "tsup": "^8.0.2",
+    
+    "// Dependências do ESLint com problemas de compatibilidade": "",
+    "@humanwhocodes/config-array": "^0.15.0",
+    "@humanwhocodes/object-schema": "^2.2.0",
+    
+    "// Dependências com conflitos de resolução para web APIs": "",
+    "abab": "^2.0.8",
+    "domexception": "^5.0.0",
+    
+    "// Dependências de manipulação de arquivos com conflitos": "",
+    "glob": "^8.1.0",
+    "inflight": "^1.0.6",
+    "rimraf": "^5.0.0"
   }
 }
