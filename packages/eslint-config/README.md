@@ -7,7 +7,7 @@ Configurações padronizadas de ESLint para o monorepo Edunéxia.
 
 ```bash
 # No diretório do seu aplicativo ou pacote
-yarn add -D eslint @edunexia/eslint-config
+pnpm add -D eslint @edunexia/eslint-config
 ```
 
 ## Uso

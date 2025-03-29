@@ -119,8 +119,8 @@ export function useMinhaFeature() {
 ## Desenvolvimento
 
 1. Clone o repositório
-2. Instale as dependências com `yarn`
-3. Execute o módulo com `yarn workspace @edunexia/nome-do-modulo dev`
+2. Instale as dependências com `pnpm`
+3. Execute o módulo com `pnpm --filter @edunexia/nome-do-modulo dev`
 
 ### Ferramentas de Build
 
@@ -134,12 +134,12 @@ Este módulo utiliza **Vite** como ferramenta de build padrão, proporcionando:
 
 Para compilar o módulo para produção:
 ```bash
-yarn workspace @edunexia/nome-do-modulo build
+pnpm --filter @edunexia/nome-do-modulo build
 ```
 
 Para visualizar a versão de produção localmente:
 ```bash
-yarn workspace @edunexia/nome-do-modulo preview
+pnpm --filter @edunexia/nome-do-modulo preview
 ```
 
 ## Testes
@@ -147,7 +147,7 @@ yarn workspace @edunexia/nome-do-modulo preview
 Execute os testes com:
 
 ```bash
-yarn workspace @edunexia/nome-do-modulo test
+pnpm --filter @edunexia/nome-do-modulo test
 ```
 
 ## Padrões a Seguir

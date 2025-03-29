@@ -19,7 +19,7 @@ Bem-vindo ao repositório da **Edunéxia**! Este documento tem como objetivo ori
 edunexia-monorepo/
 ├── apps/                  # Módulos independentes
 ├── packages/              # Bibliotecas compartilhadas
-├── package.json           # Workspaces do Yarn
+├── package.json           # Workspaces do PNPM
 ├── tsconfig.json          # TypeScript global
 └── README.md              # Documentação geral
 ```
@@ -28,7 +28,7 @@ edunexia-monorepo/
 
 ## ⚙️ Tecnologias e Ferramentas
 
-- **Monorepo:** Yarn Workspaces
+- **Monorepo:** PNPM Workspaces
 - **Frontend:** React + TypeScript (Vite)
 - **Backend:** Supabase
 - **Deploy:** Vercel

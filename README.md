@@ -39,10 +39,10 @@ edunexia-monorepo/
 │   ├── workflows/             # Fluxos de trabalho e processos
 │   └── guidelines/            # Diretrizes e melhores práticas
 ├── .gitignore
-├── package.json               # Define os workspaces do Yarn
-├── tsconfig.json              # Configuração TypeScript compartilhada
+├── package.json               # Define os workspaces do PNPM
+├── tsconfig.json              # TypeScript global
 ├── CHANGELOG.md               # Registro de alterações significativas
-└── README.md                  # Este documento
+└── README.md                  # Documentação geral
 ```
 
 ## Estado Atual do Desenvolvimento
@@ -174,14 +174,14 @@ O cumprimento desta estrutura garante consistência e facilita a navegação ent
 - **Verificação ortográfica**: Para documentação em português, utilize o script `scripts/fix-spelling.bat` para garantir que o verificador ortográfico esteja configurado corretamente. Mais detalhes em `docs/configuracao-ortografia.md`.
 
 ## Estratégia de Integração
-1. Criação da estrutura base do monorepo com Yarn Workspaces. ✅
+1. Criação da estrutura base do monorepo com PNPM Workspaces. ✅
 2. Desenvolvimento de cada módulo como um workspace em `apps/`. ✅
 3. Criação de bibliotecas reutilizáveis em `packages/` (ex: autenticação, design system, API). ✅
 4. Configuração de SSO (Single Sign-On) e compartilhamento de sessões. 🔄
 5. Padronização de ferramentas de desenvolvimento: ESLint, Prettier, Husky, Vite, etc. ✅
 
 ## Considerações Técnicas
-- Gerenciamento de pacotes via `Yarn Workspaces` ✅
+- Gerenciamento de pacotes via `PNPM Workspaces` ✅
 - Integração contínua com CI/CD baseada em ramificações por módulo 🔄
 - Autenticação JWT com SSO centralizado (em `packages/auth`) ✅
 - Compartilhamento de componentes em `ui-components` ✅

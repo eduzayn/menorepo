@@ -17,7 +17,7 @@
 > A estrutura visual segue o padrão moderno de CRMs omnichannel, com menu lateral, painel principal de conversas e painel de detalhes do contato.
 
 > **🗂️ Organização do Código:**
-> Este módulo integra o monorepo da plataforma Edunéxia, que utiliza Yarn Workspaces. Isso garante compartilhamento de bibliotecas, padronização de estrutura e integração escalável entre os módulos.
+> Este módulo integra o monorepo da plataforma Edunéxia, que utiliza PNPM Workspaces. Isso garante compartilhamento de bibliotecas, padronização de estrutura e integração escalável entre os módulos.
 
 O Módulo de Comunicação centraliza todas as interações entre instituição, leads, alunos e parceiros. Atua como hub de relacionamento com suporte a IA, mensagens, campanhas e CRM visual.
 
@@ -26,7 +26,7 @@ O Módulo de Comunicação centraliza todas as interações entre instituição,
 - **Supabase** (Banco de dados e autenticação)
 - **TailwindCSS** (Estilização)
 - **Vite** (Dev server e build)
-- **Yarn Workspaces** (Monorepo e compartilhamento de pacotes)
+- **PNPM Workspaces** (Monorepo e compartilhamento de pacotes)
 
 ## 📁 Estrutura do Projeto
 ```bash
@@ -72,10 +72,10 @@ apps/comunicacao/
 
 ## 🧪 Comandos de Desenvolvimento
 ```bash
-yarn dev           # Executa localmente
-yarn build         # Build de produção
-yarn lint          # Verifica padrões de código
-yarn test          # (Futuro) Testes automatizados
+pnpm dev           # Executa localmente
+pnpm build         # Build de produção
+pnpm lint          # Verifica padrões de código
+pnpm test          # (Futuro) Testes automatizados
 ```
 
 ## 🚧 Roadmap Técnico

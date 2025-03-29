@@ -22,7 +22,7 @@ Este é o módulo de comunicação integrado, que permite gerenciar conversas, m
 ## Pré-requisitos
 
 - Node.js 18+
-- Yarn ou pnpm (utilizado para gerenciamento de workspaces)
+- PNPM (utilizado para gerenciamento de workspaces)
 - Conta no Supabase
 
 ## Instalação

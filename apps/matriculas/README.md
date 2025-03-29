@@ -27,21 +27,21 @@ Sistema de gerenciamento de matrículas desenvolvido com React, TypeScript e int
 1. Clone o repositório do monorepo
 2. Instale as dependências na raiz:
 ```bash
-yarn install
+pnpm install
 ```
 
 3. Inicie o servidor de desenvolvimento:
 ```bash
-yarn workspace @edunexia/matriculas dev
+pnpm --filter @edunexia/matriculas dev
 ```
 
 4. Acesse [http://localhost:3000](http://localhost:3000)
 
 ## Scripts
 
-- `yarn workspace @edunexia/matriculas dev` - Inicia o servidor de desenvolvimento
-- `yarn workspace @edunexia/matriculas build` - Gera a build de produção
-- `yarn workspace @edunexia/matriculas lint` - Executa o linter
+- `pnpm --filter @edunexia/matriculas dev` - Inicia o servidor de desenvolvimento
+- `pnpm --filter @edunexia/matriculas build` - Gera a build de produção
+- `pnpm --filter @edunexia/matriculas lint` - Executa o linter
 
 ## Estrutura de Arquivos
 
@@ -176,14 +176,14 @@ Este módulo faz parte do monorepo Edunéxia e integra-se com:
 > Este módulo está totalmente conectado aos demais módulos da plataforma, como Comunicação, Portal do Aluno, Financeiro e Contabilidade. Ele será fundamental para garantir que o aluno esteja registrado corretamente no sistema, com permissões, acesso e status financeiro atualizados.
 
 > **🗂️ Organização do Código:**
-> O módulo integra o monorepo da plataforma Edunéxia, utilizando Yarn Workspaces, compartilhando bibliotecas de autenticação, UI, chamadas à API e utilitários globais.
+> O módulo integra o monorepo da plataforma Edunéxia, utilizando PNPM Workspaces, compartilhando bibliotecas de autenticação, UI, chamadas à API e utilitários globais.
 
 ## ⚙️ Tecnologias Utilizadas
 - **React + TypeScript** (Frontend)
 - **@supabase/supabase-js** (Backend, banco de dados e autenticação)
 - **TailwindCSS** (Estilização)
 - **Vite** (Dev server e build)
-- **Yarn Workspaces** (Monorepo e pacotes compartilhados)
+- **PNPM Workspaces** (Monorepo e pacotes compartilhados)
 
 ## 🎨 Layout e Design
 

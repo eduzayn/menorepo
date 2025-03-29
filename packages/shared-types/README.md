@@ -23,7 +23,7 @@ src/
 Instale o pacote como dependência:
 
 ```bash
-yarn add @edunexia/shared-types
+pnpm add @edunexia/shared-types
 ```
 
 Importe os tipos necessários:
@@ -49,12 +49,12 @@ Para contribuir com novos tipos:
 1. Adicione os novos tipos nos arquivos apropriados ou crie um novo arquivo
 2. Exporte-os no arquivo `index.ts`
 3. Documente os tipos com JSDoc
-4. Execute `yarn build` para gerar as declarações
+4. Execute `pnpm build` para gerar as declarações
 
 ## Scripts
 
-- `yarn build`: Compilar a biblioteca
-- `yarn dev`: Compilar em modo watch
-- `yarn lint`: Executar eslint
-- `yarn test`: Executar testes
-- `yarn clean`: Limpar diretório dist 
+- `pnpm build`: Compilar a biblioteca
+- `pnpm dev`: Compilar em modo watch
+- `pnpm lint`: Executar eslint
+- `pnpm test`: Executar testes
+- `pnpm clean`: Limpar diretório dist 

@@ -13,7 +13,7 @@
 - *React + TypeScript* (Frontend)
 - *Supabase* (Banco e Auth)
 - *TailwindCSS* (Design system)
-- *Yarn Workspaces* (Monorepo)
+- *PNPM Workspaces* (Monorepo)
 
 ##  Principais Funcionalidades
 

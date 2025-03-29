@@ -22,7 +22,7 @@ Este módulo está totalmente integrado com os demais módulos da plataforma Edu
 - **Estilização**: TailwindCSS + UI Components Edunéxia
 - **Gerenciamento de Estado**: React Query
 - **Formulários**: React Hook Form + Zod
-- **Monorepo**: Yarn Workspaces
+- **Monorepo**: PNPM Workspaces
 - **Gateways de Pagamento**: Integração com Littex e InfinitePay
 
 ## 🌟 Funcionalidades Principais
@@ -117,7 +117,6 @@ Este módulo está totalmente integrado com os demais módulos da plataforma Edu
 apps/financeiro-empresarial/
 ├── src/
 │   ├── pages/                # Páginas e rotas do módulo
-│   ├── components/           # Componentes específicos do módulo
 │   │   ├── dashboard/        # Componentes do dashboard
 │   │   ├── cobrancas/        # Componentes de cobranças
 │   │   ├── relatorios/       # Componentes de relatórios

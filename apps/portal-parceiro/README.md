@@ -10,7 +10,7 @@
 - React + TypeScript
 - Supabase (Auth e banco)
 - TailwindCSS
-- Yarn Workspaces (Monorepo)
+- PNPM Workspaces (Monorepo)
 - Heroicons
 
 ## Interfaces do Sistema

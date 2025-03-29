@@ -9,7 +9,7 @@
 - *React + TypeScript* (Frontend)
 - *TailwindCSS* (Design moderno)
 - *Supabase* (Banco, storage, autenticação)
-- *Yarn Workspaces* (Monorepo)
+- *PNPM Workspaces* (Monorepo)
 - *Vite* (Build tool)
 - *IA (OpenAI ou Claude)* para geração assistida de conteúdo
 - *Shadcn UI* (Componentes base)
