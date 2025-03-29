@@ -123,32 +123,65 @@ Este documento registra o progresso da migração dos componentes locais para a 
    - Detectado em: `apps/comunicacao/src/pages/AtribuicaoAutomaticaPage.tsx`
    - Status: Implementado e em uso
 
+2. **ChatMessage**
+   - Localização anterior: `apps/comunicacao/src/components/chat/ChatMessage.tsx`
+   - Implementação: `packages/ui-components/src/components/chat/ChatMessage.tsx`
+   - Melhorias:
+     - API simplificada e mais flexível
+     - Suporte para diferentes tipos de conteúdo (texto, imagem, arquivo)
+     - Documentação detalhada
+     - Adaptação para usar componentes base da biblioteca
+
 ### 🔄 Componentes Pendentes
 
-1. **Message**
+1. **MainLayout** (equivalente ao DashboardLayout)
 2. **NotificationCard**
-3. **DashboardLayout**
 
 ## Módulo Material Didático
 
-### 🔄 Componentes Pendentes
+### ✅ Componentes Migrados
 
 1. **StatsCard**
+   - Localização anterior: `apps/material-didatico/src/components/dashboard/StatsCard.tsx`
+   - Implementação: `packages/ui-components/src/components/data-display/StatsCard.tsx`
+   - Melhorias:
+     - Documentação detalhada criada
+     - Suporte para estados de carregamento
+     - API flexível com mais opções de personalização
+
 2. **DisciplineCard**
+   - Localização anterior: `apps/material-didatico/src/components/disciplinas/DisciplineCard.tsx`
+   - Implementação: `packages/ui-components/src/components/data-display/DisciplineCard.tsx`
+   - Melhorias:
+     - Suporte para drag-and-drop
+     - Melhor tipagem TypeScript
+     - Documentação detalhada
+
 3. **CourseCard**
+   - Localização anterior: `apps/material-didatico/src/components/cursos/CourseCard.tsx`
+   - Implementação: `packages/ui-components/src/components/data-display/CourseCard.tsx`
+   - Melhorias:
+     - API mais flexível com props opcionais
+     - Documentação detalhada
+     - Tipagem TypeScript rigorosa
+
+### 🔄 Componentes Pendentes
+
+Nenhum componente pendente - todos os componentes principais foram migrados.
 
 ## Resumo Geral
 
-- **Componentes Migrados**: 10
+- **Componentes Migrados**: 14
 - **Componentes Não Migrados (com justificativa)**: 1
-- **Componentes Pendentes**: 6
-- **Progresso Total**: ~62%
+- **Componentes Pendentes**: 3
+- **Progresso Total**: ~82%
 
 ## Próximos Passos
 
-1. Iniciar migração do DashboardLayout no Portal do Aluno
-2. Continuar migração no módulo Material Didático
-3. Iniciar migração dos componentes específicos do módulo Comunicação
+1. Implementar MainLayout/DashboardLayout unificado para todos os módulos
+2. Criar o componente NotificationCard para o módulo de Comunicação
+3. Atualizar as importações nos módulos para usar os componentes centralizados
+4. Executar testes integrados para garantir compatibilidade
 
 ## Problemas Encontrados
 
