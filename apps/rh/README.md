@@ -1,103 +1,108 @@
-# Módulo de Recursos Humanos (RH) - Edunéxia
+# Módulo de RH - Edunéxia
 
-Este módulo faz parte da plataforma Edunéxia e gerencia todos os processos relacionados à área de Recursos Humanos.
+Este módulo implementa as funcionalidades de Recursos Humanos da plataforma Edunéxia, permitindo a gestão completa do ciclo de vida dos colaboradores, recrutamento e seleção, e avaliações de desempenho.
 
-## Visão Geral
+## Funcionalidades Principais
 
-O módulo de RH permite gerenciar o ciclo completo de recursos humanos de uma instituição educacional, incluindo:
-
-- Recrutamento e seleção
-- Gestão de colaboradores
-- Avaliação de desempenho
-- Dashboard de indicadores
-- Perfil profissional
-- Integração com redes sociais para contratação
+- **Gestão de Colaboradores**: Cadastro, edição, visualização e desativação de funcionários
+- **Recrutamento e Seleção**: Gerenciamento de vagas, candidatos e processo seletivo
+- **Avaliações de Desempenho**: Configuração e acompanhamento de avaliações de colaboradores
+- **Dashboard de RH**: Visualização de métricas e KPIs relevantes para o departamento
 
 ## Estrutura do Módulo
 
 ```
 apps/rh/
 ├── src/
-│   ├── components/         # Componentes reutilizáveis
-│   │   ├── candidatos/     # Gestão de candidatos
-│   │   ├── colaboradores/  # Gestão de colaboradores
-│   │   ├── recrutamento/   # Processo seletivo
-│   │   ├── dashboard/      # Indicadores e métricas
-│   │   ├── perfil/         # Perfil do colaborador
-│   │   └── avaliacao/      # Avaliação de desempenho
-│   ├── contexts/           # Contextos para estados compartilhados
-│   ├── hooks/              # Hooks personalizados
-│   ├── pages/              # Páginas principais
-│   ├── services/           # Serviços e integrações
-│   ├── utils/              # Funções utilitárias
-│   └── types/              # Tipagens específicas do módulo
-├── package.json            # Dependências do módulo
-├── tsconfig.json           # Configuração TypeScript
-└── README.md               # Esta documentação
+│   ├── components/           # Componentes específicos do módulo
+│   │   └── layout/           # Componentes de layout específicos
+│   │
+│   ├── pages/                # Páginas do módulo
+│   │   ├── ColaboradoresPage.tsx        # Lista de colaboradores
+│   │   ├── NovoColaboradorPage.tsx      # Cadastro de colaborador
+│   │   ├── DetalhesColaboradorPage.tsx  # Detalhes do colaborador
+│   │   ├── VagasPage.tsx                # Lista de vagas
+│   │   ├── NovaVagaPage.tsx             # Cadastro de vaga
+│   │   ├── DetalhesVagaPage.tsx         # Detalhes da vaga
+│   │   ├── CandidatosPage.tsx           # Lista de candidatos
+│   │   ├── NovoCandidatoPage.tsx        # Cadastro de candidato
+│   │   ├── DetalhesCandidatoPage.tsx    # Detalhes do candidato
+│   │   ├── AvaliacoesPage.tsx           # Lista de avaliações
+│   │   ├── NovaAvaliacaoPage.tsx        # Cadastro de avaliação
+│   │   ├── DetalhesAvaliacaoPage.tsx    # Detalhes da avaliação
+│   │   ├── ConfiguracoesPage.tsx        # Configurações do módulo
+│   │   ├── SocialMediaPage.tsx          # Integração com redes sociais
+│   │   └── index.ts                     # Exportações
+│   │
+│   ├── services/             # Serviços específicos do módulo
+│   │   ├── colaboradores-service.ts     # Serviço de colaboradores
+│   │   ├── vagas-service.ts             # Serviço de vagas
+│   │   ├── candidatos-service.ts        # Serviço de candidatos
+│   │   ├── avaliacoes-service.ts        # Serviço de avaliações
+│   │   └── index.ts                     # Exportações
+│   │
+│   ├── App.tsx               # Componente principal
+│   ├── main.tsx              # Ponto de entrada
+│   └── routes.tsx            # Definição de rotas do módulo
+│
+├── package.json
+└── README.md                 # Esta documentação
 ```
 
-## Responsabilidades
+## Tecnologias Utilizadas
 
-- **Gestão de recrutamento**: Publicação de vagas, triagem de currículos, agendamento de entrevistas
-- **Gestão de colaboradores**: Cadastro, histórico, documentação e informações contratuais
-- **Avaliação de desempenho**: Ciclos de avaliação, metas, feedback e planos de desenvolvimento
-- **Dashboard de RH**: Indicadores de turnover, headcount, tempo médio de contratação
-- **Integração com redes sociais**: LinkedIn, Facebook, Twitter e GitHub para recrutamento
+- **React + TypeScript**: Para construção da interface
+- **Vite**: Como bundler e ferramenta de desenvolvimento
+- **React Query**: Para gerenciamento de estado e requisições
+- **Supabase**: Como backend e banco de dados
+- **@edunexia/ui-components**: Para componentes visuais compartilhados
+- **@edunexia/auth**: Para autenticação e autorização
+- **@edunexia/shared-types**: Para tipos compartilhados entre módulos
 
-## Fluxos Principais
+## Integração com Outros Módulos
 
-1. **Recrutamento**:
-   - Criação da vaga
-   - Publicação em redes sociais e portais
-   - Recebimento e triagem de candidaturas
-   - Processo seletivo (entrevistas, testes)
-   - Contratação e onboarding
+- **Autenticação**: Utiliza o pacote `@edunexia/auth` para autenticação e controle de acesso
+- **UI**: Utiliza o pacote `@edunexia/ui-components` para manter consistência visual
+- **Tipos**: Utiliza o pacote `@edunexia/shared-types` para tipos compartilhados
 
-2. **Gestão de Colaboradores**:
-   - Cadastro completo
-   - Gestão de documentos
-   - Histórico profissional
-   - Férias e licenças
-   - Desligamento
+## Como Utilizar
 
-3. **Avaliação de Desempenho**:
-   - Definição de metas
-   - Avaliação 360°
-   - Feedback contínuo
-   - Plano de desenvolvimento
+### Instalação
 
-## Integração com outros Módulos
+Este módulo faz parte do monorepo Edunéxia e deve ser executado dentro desse contexto.
 
-- **Portal do Aluno**: Para professores que também são colaboradores
-- **Financeiro**: Para folha de pagamento e benefícios
-- **Comunicação**: Para comunicados internos aos colaboradores
-- **Core**: Para autenticação e permissões
-
-## Funcionalidades de Redes Sociais
-
-- Publicação automática de vagas no LinkedIn, Facebook e Twitter
-- Login social para candidatos
-- Importação de dados profissionais do LinkedIn
-- Integração com GitHub para vagas técnicas
-- Compartilhamento de conquistas dos colaboradores
-
-## Como Usar
-
-1. Instale as dependências:
 ```bash
+# Na raiz do monorepo
 pnpm install
 ```
 
-2. Execute o ambiente de desenvolvimento:
+### Desenvolvimento
+
 ```bash
-pnpm dev
+# Iniciar o servidor de desenvolvimento
+pnpm --filter @edunexia/rh dev
+
+# Construir para produção
+pnpm --filter @edunexia/rh build
 ```
 
-3. Para construir o módulo:
-```bash
-pnpm build
+### Configuração
+
+1. Crie um arquivo `.env.local` na raiz do módulo com as seguintes variáveis:
+
+```
+VITE_SUPABASE_URL=sua_url_do_supabase
+VITE_SUPABASE_ANON_KEY=sua_chave_anon_do_supabase
 ```
 
-## Desenvolvimento
+## Features Futuras
 
-Para contribuir com este módulo, siga as diretrizes gerais de contribuição do projeto Edunéxia e as especificações técnicas deste README. 
+- Integração com sistema de folha de pagamento
+- Gestão de benefícios e vale-transporte
+- Controle de férias e licenças
+- Emissão de documentos para colaboradores
+- Módulo de treinamento e desenvolvimento
+
+## Contribuição
+
+Para contribuir com este módulo, siga as diretrizes de contribuição do monorepo principal. 

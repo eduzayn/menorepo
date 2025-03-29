@@ -55,6 +55,7 @@ Os seguintes módulos estão atualmente em desenvolvimento ativo:
 - ✅ **comunicacao** - Mensageria, notificações e CRM
 - ✅ **matriculas** - Processo de inscrição e matrícula
 - ✅ **site-edunexia** - Site institucional, blog e vendas self-service
+- ✅ **rh** - Gestão de recursos humanos, recrutamento e avaliações de desempenho
 
 ### Pacotes Compartilhados Implementados
 - ✅ **ui-components** - Sistema de design unificado
@@ -206,12 +207,13 @@ O cumprimento desta estrutura garante consistência e facilita a navegação ent
 - Finalizar a implementação das funcionalidades básicas dos módulos prioritários
 - Integrar completamente o sistema de autenticação centralizada
 - Implementar pipeline de CI/CD para todos os módulos
-- Desenvolvimento do módulo de RH
+- Continuar o desenvolvimento do módulo de RH e suas integrações
 
 ### Médio Prazo (3-6 meses)
 - Desenvolver módulos secundários (Contabilidade)
 - Finalizar a integração do site-edunexia com o sistema de pagamentos
 - Iniciar testes de integração entre todos os módulos
+- Expandir as funcionalidades do módulo de RH com folha de pagamento e benefícios
 
 ### Longo Prazo (6-12 meses)
 - Completar a implementação de todos os módulos
