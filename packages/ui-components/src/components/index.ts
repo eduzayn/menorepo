@@ -21,4 +21,8 @@ export * from './toast';
 // Exibição de dados
 export * from './table';
 export * from './tabs';
-export * from './separator'; 
+export * from './separator';
+
+export * from './data-display';
+export * from './forms';
+export * from './feedback'; 

@@ -15,7 +15,16 @@ import {
   CRMPage,
   GruposPage,
   NotificacoesPage,
-  AnalyticsPage
+  AnalyticsPage,
+  ConhecimentoPage,
+  DashboardPage,
+  SettingsPage,
+  AlunoDashboardPage,
+  ChatPage,
+  AtendimentosPage,
+  PerfilPage,
+  EstatisticasPage,
+  NotificacaoExemploPage
 } from './pages';
 import { MainLayout } from './components/layout/MainLayout';
 
@@ -131,6 +140,14 @@ export default function AppRoutes() {
       <Route path={`${PREFIX}/notificacoes`} element={
         <ProtectedRoute>
           <NotificacoesPage />
+        </ProtectedRoute>
+      } />
+      
+      <Route path={`${PREFIX}/notificacoes/exemplo`} element={
+        <ProtectedRoute>
+          <MainLayout>
+            <NotificacaoExemploPage />
+          </MainLayout>
         </ProtectedRoute>
       } />
       

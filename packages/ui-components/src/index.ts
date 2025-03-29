@@ -35,6 +35,10 @@ export type { InputProps } from './components/forms/Input';
 export { default as Select } from './components/forms/Select';
 export type { SelectProps, SelectOption } from './components/forms/Select';
 
+// Feedback
+export { default as NotificationCard } from './components/feedback/NotificationCard';
+export type { NotificationCardProps } from './components/feedback/NotificationCard';
+
 // Templates
 export { default as DashboardPageTemplate } from './templates/DashboardPage';
 export type { DashboardPageTemplateProps } from './templates/DashboardPage';

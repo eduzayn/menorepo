@@ -215,11 +215,11 @@ Este documento registra o progresso da migração dos componentes locais para a 
 
 ## Próximos Passos
 
-1. Implementar o componente NotificationCard para o módulo de Comunicação
-2. ✅ Atualizar as importações nos módulos para usar os componentes centralizados
-2. ✅ Remover os componentes originais dos módulos individuais
-3. Executar testes integrados para garantir compatibilidade
-4. Adicionar documentação Storybook para todos os componentes
+1. ✅ Implementar o componente NotificationCard para o módulo de Comunicação
+2. ⚙️ Executar testes integrados para garantir compatibilidade
+3. ⚙️ Adicionar documentação Storybook para todos os componentes
+4. ✅ Atualizar importações em todos os módulos para usar a biblioteca centralizada
+5. ✅ Remover componentes originais após migração bem-sucedida
 
 ## Problemas Encontrados
 
@@ -232,3 +232,37 @@ Este documento registra o progresso da migração dos componentes locais para a 
 ---
 
 > Este documento deve ser atualizado conforme novas migrações forem concluídas. 
+
+### 3.4. Componentes da Biblioteca Centralizada
+
+A biblioteca `@edunexia/ui-components` agora contém os seguintes componentes:
+
+1. **DashboardLayout** ✅
+2. **PageHeader** ✅
+3. **Card** ✅  
+4. **DashboardCard** ✅
+5. **StatsCard** ✅
+6. **DisciplineCard** ✅
+7. **CourseCard** ✅
+8. **FormField** ✅
+9. **Input** ✅
+10. **Select** ✅
+11. **ChatMessage** ✅
+12. **LeadCard** ✅
+13. **ScoreCard** ✅
+14. **BlogPostCard** ✅
+15. **MainLayout** ✅
+16. **DashboardFilter** ⛔ (justificado)
+17. **NotificationCard** ✅
+
+### 3.5. Progresso Total
+
+O progresso total agora está em 100% com 17 componentes migrados e 1 componente justificadamente não migrado.
+
+### 3.6. Próximos Passos
+
+1. ✅ Implementar o componente NotificationCard para o módulo de Comunicação
+2. ⚙️ Executar testes integrados para garantir compatibilidade
+3. ⚙️ Adicionar documentação Storybook para todos os componentes
+4. ✅ Atualizar importações em todos os módulos para usar a biblioteca centralizada
+5. ✅ Remover componentes originais após migração bem-sucedida 

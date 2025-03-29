@@ -5,54 +5,68 @@ on:
     branches: [main, dev]
   pull_request:
     branches: [main, dev]
+  workflow_dispatch:
 
 jobs:
   check-circular-deps:
     name: Verificar Dependências Circulares
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout código
         uses: actions/checkout@v3
-      
+
       - name: Configurar Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version: 23.10.0
           cache: 'pnpm'
-      
-      - name: Instalar pnpm
+
+      - name: Setup PNPM
         uses: pnpm/action-setup@v2
         with:
           version: 8.9.0
           run_install: false
-      
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v3
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
       - name: Instalar dependências
         run: pnpm install --frozen-lockfile
-      
+
       - name: Instalar Graphviz
         run: |
           sudo apt-get update
           sudo apt-get install -y graphviz
-      
+
       - name: Verificar dependências circulares nos pacotes
         run: pnpm circular:check
         continue-on-error: true
-      
+
       - name: Verificar dependências circulares nas apps
         run: pnpm circular:check:apps
         continue-on-error: true
-      
+
       - name: Gerar imagem do grafo de dependências
         run: pnpm circular:image
-      
+
       - name: Arquivar grafo de dependências
         uses: actions/upload-artifact@v3
         with:
           name: dependency-graph
           path: dependency-graph.png
           if-no-files-found: warn
-      
+
       # Falha o workflow apenas se encontrar dependências circulares
       - name: Verificação final de dependências circulares
         run: |
@@ -60,6 +74,6 @@ jobs:
           if pnpm circular:check:all; then
             echo "Nenhuma dependência circular encontrada."
           else
-            echo "::error::Dependências circulares encontradas! Consulte docs/dependencias-circulares.md para orientações sobre como resolvê-las."
+            echo "::error::Dependências circulares encontradas! Consulte docs/dependencies-circulares.md para orientações sobre como resolvê-las."
             exit 1
-          fi 
+          fi
