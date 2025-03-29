@@ -47,6 +47,15 @@ Este documento registra o progresso da migração dos componentes locais para a 
      - Implementação do hook useUser para fornecer informações de usuário
      - Mantida a navegação específica do módulo através do sidebar personalizado
 
+5. **Card e componentes relacionados**
+   - Já existia uma implementação básica na biblioteca, mas foi aprimorada
+   - Implementação: `packages/ui-components/src/components/card/card.tsx`
+   - Melhorias:
+     - Adicionados tipos explícitos para cada componente
+     - Documentação completa adicionada
+     - Testes abrangentes implementados
+     - Exportação adequada no arquivo principal da biblioteca
+
 ### ❌ Componentes Não Migrados
 
 1. **DashboardFilter**
@@ -56,19 +65,29 @@ Este documento registra o progresso da migração dos componentes locais para a 
 
 ### 📊 Estatísticas de Progresso
 
-- **Componentes Migrados**: 4
+- **Componentes Migrados**: 5
 - **Componentes Não Migrados (com justificativa)**: 1
-- **Total de Componentes Identificados**: 5
+- **Total de Componentes Identificados**: 6
 - **Progresso**: 100% (considerando decisões de "não migrar" como concluídas)
 
 ## Módulo Portal do Aluno
 
+### ✅ Componentes Migrados
+
+1. **Card e componentes relacionados**
+   - Localização anterior: `apps/portal-do-aluno/src/components/ui/card/index.tsx`
+   - Implementação: `packages/ui-components/src/components/card/card.tsx`
+   - Status: Implementado na biblioteca, pendente de migração nos módulos
+   - Benefícios:
+     - Consistência visual em todos os módulos
+     - Manutenção centralizada
+     - API flexível e bem documentada
+
 ### 🔄 Componentes Pendentes
 
-1. **Card**
-2. **PageHeader**
-3. **FormField**
-4. **DashboardLayout**
+1. **PageHeader**
+2. **FormField**
+3. **DashboardLayout**
 
 ## Módulo Comunicação
 
@@ -81,15 +100,15 @@ Este documento registra o progresso da migração dos componentes locais para a 
 
 ## Resumo Geral
 
-- **Componentes Migrados**: 4
+- **Componentes Migrados**: 6
 - **Componentes Não Migrados (com justificativa)**: 1
-- **Componentes Pendentes**: 8
-- **Progresso Total**: ~38%
+- **Componentes Pendentes**: 6
+- **Progresso Total**: ~46%
 
 ## Próximos Passos
 
-1. Implementar Card padronizado em @edunexia/ui-components
-2. Iniciar migração no portal-do-aluno
+1. Migrar uso do Card no módulo portal-do-aluno
+2. Iniciar migração do PageHeader
 3. Expandir cobertura de testes
 4. Documentar diretrizes de decisão para migração vs. manutenção local de componentes
 

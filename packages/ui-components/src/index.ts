@@ -32,3 +32,13 @@ export type { DashboardPageTemplateProps } from './templates/DashboardPage';
 
 export { default as SettingsPageTemplate } from './templates/SettingsPage';
 export type { SettingsPageTemplateProps, SettingsTabProps } from './templates/SettingsPage';
+
+// Card Components
+export { 
+  Card, 
+  CardHeader, 
+  CardFooter, 
+  CardTitle, 
+  CardDescription, 
+  CardContent 
+} from './components/card';

@@ -1,9 +1,31 @@
 import * as React from "react";
 import { cn } from "../../utils";
 
+/**
+ * Componente Card básico para exibição de conteúdo agrupado
+ * Suporta header, content, footer e outros elementos aninhados
+ * 
+ * @example
+ * ```tsx
+ * <Card>
+ *   <CardHeader>
+ *     <CardTitle>Título do Card</CardTitle>
+ *     <CardDescription>Descrição opcional do Card</CardDescription>
+ *   </CardHeader>
+ *   <CardContent>
+ *     Conteúdo principal do Card
+ *   </CardContent>
+ *   <CardFooter>
+ *     <Button>Ação</Button>
+ *   </CardFooter>
+ * </Card>
+ * ```
+ */
+export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {}
+
 const Card = React.forwardRef<
   HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
+  CardProps
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
@@ -16,9 +38,15 @@ const Card = React.forwardRef<
 ));
 Card.displayName = "Card";
 
+/**
+ * Componente para o cabeçalho do Card
+ * Geralmente contém CardTitle e CardDescription
+ */
+export interface CardHeaderProps extends React.HTMLAttributes<HTMLDivElement> {}
+
 const CardHeader = React.forwardRef<
   HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
+  CardHeaderProps
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
@@ -28,9 +56,14 @@ const CardHeader = React.forwardRef<
 ));
 CardHeader.displayName = "CardHeader";
 
+/**
+ * Componente para o título do Card
+ */
+export interface CardTitleProps extends React.HTMLAttributes<HTMLHeadingElement> {}
+
 const CardTitle = React.forwardRef<
   HTMLParagraphElement,
-  React.HTMLAttributes<HTMLHeadingElement>
+  CardTitleProps
 >(({ className, ...props }, ref) => (
   <h3
     ref={ref}
@@ -43,9 +76,14 @@ const CardTitle = React.forwardRef<
 ));
 CardTitle.displayName = "CardTitle";
 
+/**
+ * Componente para a descrição do Card
+ */
+export interface CardDescriptionProps extends React.HTMLAttributes<HTMLParagraphElement> {}
+
 const CardDescription = React.forwardRef<
   HTMLParagraphElement,
-  React.HTMLAttributes<HTMLParagraphElement>
+  CardDescriptionProps
 >(({ className, ...props }, ref) => (
   <p
     ref={ref}
@@ -55,17 +93,28 @@ const CardDescription = React.forwardRef<
 ));
 CardDescription.displayName = "CardDescription";
 
+/**
+ * Componente para o conteúdo principal do Card
+ */
+export interface CardContentProps extends React.HTMLAttributes<HTMLDivElement> {}
+
 const CardContent = React.forwardRef<
   HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
+  CardContentProps
 >(({ className, ...props }, ref) => (
   <div ref={ref} className={cn("p-6 pt-0", className)} {...props} />
 ));
 CardContent.displayName = "CardContent";
 
+/**
+ * Componente para o rodapé do Card
+ * Geralmente contém botões ou ações
+ */
+export interface CardFooterProps extends React.HTMLAttributes<HTMLDivElement> {}
+
 const CardFooter = React.forwardRef<
   HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
+  CardFooterProps
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}

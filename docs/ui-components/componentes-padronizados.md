@@ -7,7 +7,7 @@ Este documento descreve os componentes padronizados disponíveis no pacote `@edu
 O pacote `@edunexia/ui-components` já está disponível como dependência no monorepo. Para utilizá-lo, basta importar os componentes necessários em seu código:
 
 ```tsx
-import { StatsCard, DashboardCard, DashboardLayout, FormField, Input, Select } from '@edunexia/ui-components';
+import { StatsCard, DashboardCard, DashboardLayout, FormField, Input, Select, Card, CardHeader, CardContent } from '@edunexia/ui-components';
 ```
 
 ## Componentes Disponíveis
@@ -69,6 +69,42 @@ Card versátil para exibição de informações em dashboards, com suporte para 
 | `to` | `string` (opcional) | URL para navegação ao clicar no card |
 | `onClick` | `() => void` (opcional) | Função chamada ao clicar no card |
 | `children` | `ReactNode` (opcional) | Conteúdo personalizado a ser exibido dentro do card |
+
+#### Card e Componentes Relacionados
+
+Sistema de cards flexível e composível para exibição de conteúdo organizado.
+
+```tsx
+<Card>
+  <CardHeader>
+    <CardTitle>Título do Card</CardTitle>
+    <CardDescription>Descrição opcional</CardDescription>
+  </CardHeader>
+  <CardContent>
+    <p>Conteúdo principal do card</p>
+  </CardContent>
+  <CardFooter>
+    <Button>Ação</Button>
+  </CardFooter>
+</Card>
+```
+
+**Componentes Disponíveis:**
+
+| Componente | Descrição |
+|------------|-----------|
+| `Card` | Container principal do card |
+| `CardHeader` | Cabeçalho do card, geralmente contém título e descrição |
+| `CardTitle` | Título do card |
+| `CardDescription` | Descrição ou subtítulo do card |
+| `CardContent` | Conteúdo principal do card |
+| `CardFooter` | Rodapé do card, geralmente contém ações ou botões |
+
+**Props Comuns:**
+
+Todos os componentes aceitam:
+- `className`: Classes CSS adicionais
+- Props HTML padrão do elemento base (div, h3, p, etc.)
 
 ### Templates de Página
 
@@ -166,136 +202,4 @@ Layout padronizado para páginas de dashboard, incluindo cabeçalho, barra later
 
 | Prop | Tipo | Descrição |
 |------|------|-----------|
-| `title` | `string` (opcional) | Título do dashboard |
-| `user` | `{ name?: string, email?: string, avatar?: string }` (opcional) | Informações do usuário logado |
-| `onLogout` | `() => void` (opcional) | Função chamada ao clicar no botão de sair |
-| `sidebar` | `ReactNode` (opcional) | Componente personalizado para a barra lateral |
-| `headerContent` | `ReactNode` (opcional) | Conteúdo personalizado para o cabeçalho |
-| `footer` | `ReactNode` (opcional) | Rodapé personalizado |
-| `children` | `ReactNode` | Conteúdo principal do layout |
-
-### Componentes de Formulário
-
-#### FormField
-
-Container padronizado para campos de formulário, com suporte para rótulo e mensagens de erro.
-
-```tsx
-<FormField
-  name="email"
-  label="E-mail"
-  required
-  error={errors.email?.message}
-  helpText="Utilize seu e-mail institucional"
->
-  <Input name="email" placeholder="exemplo@email.com" />
-</FormField>
-```
-
-**Props:**
-
-| Prop | Tipo | Descrição |
-|------|------|-----------|
-| `name` | `string` | Nome do campo |
-| `label` | `string` | Rótulo do campo |
-| `error` | `string` (opcional) | Mensagem de erro |
-| `helpText` | `string` (opcional) | Texto de ajuda ou descrição |
-| `required` | `boolean` (opcional) | Indica se o campo é obrigatório |
-| `disabled` | `boolean` (opcional) | Indica se o campo está desabilitado |
-| `children` | `ReactNode` | Componente de input (Input, Select, etc.) |
-| `className` | `string` (opcional) | Classes CSS adicionais |
-
-#### Input
-
-Campo de entrada de texto padronizado.
-
-```tsx
-<Input
-  name="nome"
-  placeholder="Nome completo"
-  variant="outlined"
-  size="md"
-  leftIcon={<UserIcon />}
-/>
-```
-
-**Props:**
-
-| Prop | Tipo | Descrição |
-|------|------|-----------|
-| `size` | `'sm' \| 'md' \| 'lg'` (opcional) | Tamanho do campo |
-| `variant` | `'default' \| 'outlined' \| 'filled'` (opcional) | Variante de estilo |
-| `hasError` | `boolean` (opcional) | Indica se o campo tem erro |
-| `leftIcon` | `ReactNode` (opcional) | Ícone à esquerda do campo |
-| `rightIcon` | `ReactNode` (opcional) | Ícone à direita do campo |
-| `className` | `string` (opcional) | Classes CSS adicionais |
-| ... | Todas as props nativas de `<input>` | - |
-
-#### Select
-
-Campo de seleção padronizado.
-
-```tsx
-<Select
-  name="estado"
-  placeholder="Selecione um estado"
-  options={[
-    { value: 'sp', label: 'São Paulo' },
-    { value: 'rj', label: 'Rio de Janeiro' },
-    { value: 'mg', label: 'Minas Gerais' }
-  ]}
-/>
-```
-
-**Props:**
-
-| Prop | Tipo | Descrição |
-|------|------|-----------|
-| `options` | `Array<{ value: string, label: string, disabled?: boolean }>` | Opções do select |
-| `size` | `'sm' \| 'md' \| 'lg'` (opcional) | Tamanho do campo |
-| `variant` | `'default' \| 'outlined' \| 'filled'` (opcional) | Variante de estilo |
-| `hasError` | `boolean` (opcional) | Indica se o campo tem erro |
-| `placeholder` | `string` (opcional) | Texto para opção vazia |
-| `rightIcon` | `ReactNode` (opcional) | Ícone à direita do campo |
-| `className` | `string` (opcional) | Classes CSS adicionais |
-| ... | Todas as props nativas de `<select>` | - |
-
-## Boas Práticas
-
-### Quando usar componentes padronizados
-
-- Utilize os componentes padronizados para garantir consistência visual e comportamental em todos os módulos da plataforma
-- Priorize o uso desses componentes em vez de criar implementações locais duplicadas
-- Se precisar de personalizações leves, use as props disponíveis (como `className`, `variant`, etc.)
-
-### Como estender funcionalidades
-
-Se os componentes padronizados não atenderem todas as suas necessidades:
-
-1. Verifique se a funcionalidade pode ser implementada usando as props existentes
-2. Considere compor os componentes para criar uma variação específica
-3. Entre em contato com a equipe de UI antes de criar implementações personalizadas
-
-### Testes
-
-Todos os componentes padronizados incluem testes de unidade. Ao implementar novos componentes:
-
-1. Siga os padrões de teste existentes
-2. Cubra todos os casos de uso e variações importantes
-3. Execute os testes com `pnpm test` antes de enviar seu PR
-
-## Contribuindo com novos componentes
-
-Para contribuir com novos componentes padronizados:
-
-1. Identifique componentes duplicados em diferentes módulos
-2. Analise as APIs e comportamentos existentes
-3. Extraia uma versão comum que atenda a maioria dos casos de uso
-4. Implemente o componente em `packages/ui-components`
-5. Adicione testes abrangentes
-6. Documente o componente neste arquivo
-7. Envie um PR para revisão
-
----
-
-> **Lembrete:** Atualize este documento sempre que adicionar, modificar ou remover componentes padronizados. 
+| `title` | `

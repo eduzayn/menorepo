@@ -30,6 +30,61 @@ describe('Card Components', () => {
       const cardElement = screen.getByTestId('card-test');
       expect(cardElement).toHaveClass('test-custom-class');
     });
+
+    test('renders basic card correctly', () => {
+      render(<Card data-testid="card">Card Content</Card>);
+      const card = screen.getByTestId('card');
+      expect(card).toBeInTheDocument();
+      expect(card).toHaveClass('rounded-lg border shadow-sm');
+      expect(card).toHaveTextContent('Card Content');
+    });
+
+    test('renders card with header, title and content', () => {
+      render(
+        <Card>
+          <CardHeader>
+            <CardTitle>Card Title</CardTitle>
+            <CardDescription>Card Description</CardDescription>
+          </CardHeader>
+          <CardContent>Card Content</CardContent>
+        </Card>
+      );
+      
+      expect(screen.getByText('Card Title')).toBeInTheDocument();
+      expect(screen.getByText('Card Description')).toBeInTheDocument();
+      expect(screen.getByText('Card Content')).toBeInTheDocument();
+    });
+
+    test('renders card with footer', () => {
+      render(
+        <Card>
+          <CardContent>Card Content</CardContent>
+          <CardFooter>Footer Content</CardFooter>
+        </Card>
+      );
+      
+      expect(screen.getByText('Card Content')).toBeInTheDocument();
+      expect(screen.getByText('Footer Content')).toBeInTheDocument();
+    });
+
+    test('applies custom classes correctly', () => {
+      render(
+        <Card className="custom-card">
+          <CardHeader className="custom-header">
+            <CardTitle className="custom-title">Title</CardTitle>
+          </CardHeader>
+          <CardContent className="custom-content">Content</CardContent>
+          <CardFooter className="custom-footer">Footer</CardFooter>
+        </Card>
+      );
+      
+      const card = screen.getByText('Title').closest('div.custom-card');
+      expect(card).toHaveClass('custom-card');
+      
+      expect(screen.getByText('Title')).toHaveClass('custom-title');
+      expect(screen.getByText('Content')).toHaveClass('custom-content');
+      expect(screen.getByText('Footer')).toHaveClass('custom-footer');
+    });
   });
 
   // Testes para CardHeader
