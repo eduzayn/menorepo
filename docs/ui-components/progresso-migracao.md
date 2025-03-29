@@ -66,6 +66,7 @@ Este documento registra o progresso da migração dos componentes locais para a 
        - Suporte a campos obrigatórios
        - Exibição de textos de ajuda
        - Estados de desabilitado
+     - Documentação detalhada criada 
 
 ### ❌ Componentes Não Migrados
 
@@ -115,12 +116,18 @@ Este documento registra o progresso da migração dos componentes locais para a 
 
 ## Módulo Comunicação
 
+### ✅ Componentes Migrados
+
+1. **FormField**
+   - Já sendo utilizado a partir da biblioteca centralizada
+   - Detectado em: `apps/comunicacao/src/pages/AtribuicaoAutomaticaPage.tsx`
+   - Status: Implementado e em uso
+
 ### 🔄 Componentes Pendentes
 
 1. **Message**
 2. **NotificationCard**
-3. **FormField** - Verificar uso e providenciar migração
-4. **DashboardLayout**
+3. **DashboardLayout**
 
 ## Módulo Material Didático
 
@@ -132,17 +139,16 @@ Este documento registra o progresso da migração dos componentes locais para a 
 
 ## Resumo Geral
 
-- **Componentes Migrados**: 9
+- **Componentes Migrados**: 10
 - **Componentes Não Migrados (com justificativa)**: 1
-- **Componentes Pendentes**: 7
-- **Progresso Total**: ~53%
+- **Componentes Pendentes**: 6
+- **Progresso Total**: ~62%
 
 ## Próximos Passos
 
-1. Verificar e atualizar referências de FormField nos módulos
-2. Iniciar migração do DashboardLayout no Portal do Aluno
-3. Continuar migração no módulo Material Didático
-4. Iniciar migração dos componentes específicos do módulo Comunicação
+1. Iniciar migração do DashboardLayout no Portal do Aluno
+2. Continuar migração no módulo Material Didático
+3. Iniciar migração dos componentes específicos do módulo Comunicação
 
 ## Problemas Encontrados
 

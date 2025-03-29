@@ -1,4 +1,4 @@
-# Guia de Decisão para Migração de Componentes
+CEITO AS SUAS # Guia de Decisão para Migração de Componentes
 
 Este documento fornece diretrizes para ajudar desenvolvedores a decidir quais componentes devem ser migrados para a biblioteca centralizada `@edunexia/ui-components` e quais devem permanecer como componentes locais em seus respectivos módulos.
 
