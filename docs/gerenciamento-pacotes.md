@@ -30,7 +30,7 @@ Esta versão está definida em:
 A versão padrão do Node.js para este projeto é:
 
 ```
-node@18.16.0
+node@23.10.0
 ```
 
 Esta versão está definida em:
@@ -42,10 +42,10 @@ Esta versão está definida em:
 
 Ao especificar a versão do Node.js em arquivos de configuração, sempre use o formato completo X.Y.Z:
 
-✅ **Correto**: `18.16.0`  
-❌ **Incorreto**: `18` ou `>=18`
+✅ **Correto**: `23.10.0`  
+❌ **Incorreto**: `23` ou `>=23`
 
-O PNPM requer o formato completo X.Y.Z para baixar a versão correta do Node.js. Usar apenas o número principal da versão (como "18") causará erros.
+O PNPM requer o formato completo X.Y.Z para baixar a versão correta do Node.js. Usar apenas o número principal da versão (como "23") causará erros.
 
 ## Instalação do pnpm
 
