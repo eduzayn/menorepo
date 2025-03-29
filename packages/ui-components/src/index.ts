@@ -22,6 +22,9 @@ export type { DashboardLayoutProps } from './components/layout/DashboardLayout';
 export { default as PageHeader } from './components/layout/PageHeader';
 export type { PageHeaderProps } from './components/layout/PageHeader';
 
+export { default as MainLayout } from './components/layout/MainLayout';
+export type { MainLayoutProps, NavigationItem } from './components/layout/MainLayout';
+
 // Forms
 export { default as FormField } from './components/forms/FormField';
 export type { FormFieldProps } from './components/forms/FormField';

@@ -7,7 +7,7 @@ Este documento registra o progresso da migração dos componentes locais para a 
 ### ✅ Componentes Migrados
 
 1. **StatsCard**
-   - Localização anterior: `apps/matriculas/src/components/dashboard/StatsCard.tsx`
+   - Localização anterior: `apps/matriculas/src/components/dashboard/StatsCard.tsx` (removido)
    - Arquivos atualizados: 
      - `apps/matriculas/src/pages/dashboard/Dashboard.tsx`
      - `apps/matriculas/src/pages/dashboard/RelatorioFinanceiro.tsx`
@@ -87,7 +87,7 @@ Este documento registra o progresso da migração dos componentes locais para a 
 ### ✅ Componentes Migrados
 
 1. **Card e componentes relacionados**
-   - Localização anterior: `apps/portal-do-aluno/src/components/ui/card/index.tsx`
+   - Localização anterior: `apps/portal-do-aluno/src/components/ui/card/index.tsx` (removido)
    - Implementação: `packages/ui-components/src/components/card/card.tsx`
    - Benefícios:
      - Consistência visual em todos os módulos
@@ -95,7 +95,7 @@ Este documento registra o progresso da migração dos componentes locais para a 
      - API flexível e bem documentada
 
 2. **PageHeader**
-   - Localização anterior: (baseado no core) `apps/core/src/components/shared/page-header.tsx`
+   - Localização anterior: (baseado no core) `apps/core/src/components/shared/page-header.tsx` (removido)
    - Implementação: `packages/ui-components/src/components/layout/PageHeader.tsx`
    - Melhorias:
      - API expandida: adicionados `backIcon` e `onBackClick`
@@ -145,7 +145,7 @@ Este documento registra o progresso da migração dos componentes locais para a 
      - Adaptação para usar componentes base da biblioteca
 
 3. **MainLayout**
-   - Localização anterior: `apps/comunicacao/src/components/layout/MainLayout.tsx`
+   - Localização anterior: `apps/comunicacao/src/components/layout/MainLayout.tsx` (removido)
    - Implementação: `packages/ui-components/src/components/layout/MainLayout.tsx`
    - Melhorias:
      - API unificada compatível com todos os módulos
@@ -185,7 +185,7 @@ Este documento registra o progresso da migração dos componentes locais para a 
      - Documentação detalhada
 
 3. **CourseCard**
-   - Localização anterior: `apps/material-didatico/src/components/cursos/CourseCard.tsx`
+   - Localização anterior: `apps/material-didatico/src/components/cursos/CourseCard.tsx` (removido)
    - Implementação: `packages/ui-components/src/components/data-display/CourseCard.tsx`
    - Melhorias:
      - API mais flexível com props opcionais
@@ -216,7 +216,8 @@ Este documento registra o progresso da migração dos componentes locais para a 
 ## Próximos Passos
 
 1. Implementar o componente NotificationCard para o módulo de Comunicação
-2. Atualizar as importações nos módulos para usar os componentes centralizados
+2. ✅ Atualizar as importações nos módulos para usar os componentes centralizados
+2. ✅ Remover os componentes originais dos módulos individuais
 3. Executar testes integrados para garantir compatibilidade
 4. Adicionar documentação Storybook para todos os componentes
 
@@ -226,6 +227,7 @@ Este documento registra o progresso da migração dos componentes locais para a 
 2. **Tipagem**: A tipagem do React.cloneElement no FormField precisa ser ajustada para resolver os avisos do TypeScript.
 3. **Adaptação de API**: Algumas adaptações são necessárias nas APIs dos componentes, como visto na migração do StatsCard (iconBgColor → className, change → trend).
 4. **Componentes Específicos**: Alguns componentes são muito acoplados ao contexto de um módulo específico, dificultando a padronização sem sacrificar funcionalidades.
+5. **Resíduos de Código**: Durante a verificação final, detectamos que nem todos os componentes originais haviam sido removidos após a migração, o que foi corrigido.
 
 ---
 
