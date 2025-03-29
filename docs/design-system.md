@@ -1,3 +1,4 @@
+<!-- cSpell:disable -->
 # Design System - Edunéxia
 
 ## Visão Geral

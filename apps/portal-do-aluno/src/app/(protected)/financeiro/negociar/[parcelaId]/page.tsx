@@ -31,6 +31,7 @@ import {
 import { Parcela, RegrasNegociacao, PropostaNegociacao, MetodoPagamento } from '@/types/financeiro'
 import { formatCurrency, formatDate } from '@/utils/formatters'
 import { toast } from 'react-hot-toast'
+import Link from 'next/link'
 
 export default function NegociarParcelaPage() {
   const router = useRouter()
@@ -366,7 +367,7 @@ export default function NegociarParcelaPage() {
               onCheckedChange={setAceitouTermos}
             />
             <Label htmlFor="termos" className="text-sm cursor-pointer">
-              Concordo com os <a href="#" className="text-blue-600 hover:underline">termos e condições</a> da negociação.
+              Concordo com os <Link href="/financeiro/termos-negociacao" className="text-blue-600 hover:underline">termos e condições</Link> da negociação.
             </Label>
           </div>
         </CardContent>

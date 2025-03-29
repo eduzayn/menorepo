@@ -1,3 +1,4 @@
+<!-- cSpell:disable -->
 # Configuração do TypeScript no Monorepo Edunéxia
 
 ## Visão Geral

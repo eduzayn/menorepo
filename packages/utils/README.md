@@ -1,3 +1,4 @@
+<!-- cSpell:disable -->
 # @edunexia/utils
 
 Biblioteca de utilitários compartilhados para todos os módulos da plataforma Edunéxia.

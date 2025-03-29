@@ -1,3 +1,4 @@
+<!-- cSpell:disable -->
 # @edunexia/shared-types
 
 Biblioteca de tipos TypeScript compartilhados para o ecossistema Edunéxia.

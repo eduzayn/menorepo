@@ -1,3 +1,4 @@
+<!-- cSpell:disable -->
 # Integração Lytex - Gateway de Pagamentos
 
 ## Visão Geral

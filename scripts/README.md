@@ -1,3 +1,4 @@
+<!-- cSpell:disable -->
 # Scripts de Utilidade
 
 Este diretório contém scripts de utilidade para automatizar tarefas comuns no desenvolvimento.

@@ -1,3 +1,4 @@
+<!-- cSpell:disable -->
 # Estratégia de Testes - Módulo Comunicação
 
 Este documento descreve a abordagem de testes adotada no módulo de Comunicação da Edunéxia.

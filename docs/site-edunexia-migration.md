@@ -1,3 +1,4 @@
+<!-- cSpell:disable -->
 # Migration para o Módulo Site Edunéxia
 
 Este documento fornece instruções sobre como aplicar a migração do banco de dados para o módulo site-edunexia.

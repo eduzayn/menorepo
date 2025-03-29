@@ -1,3 +1,4 @@
+<!-- cSpell:disable -->
 # Instruções para Commit e Push das Alterações
 
 ## Arquivos Modificados

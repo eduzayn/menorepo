@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { ExclamationCircleIcon } from '@heroicons/react/24/outline';
 
@@ -103,9 +103,9 @@ const Login: React.FC = () => {
           </div>
 
           <div className="text-sm">
-            <a href="#" className="font-medium text-indigo-600 hover:text-indigo-500">
+            <Link to="/forgot-password" className="font-medium text-indigo-600 hover:text-indigo-500">
               Esqueceu a senha?
-            </a>
+            </Link>
           </div>
         </div>
 

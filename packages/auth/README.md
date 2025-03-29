@@ -1,3 +1,4 @@
+<!-- cSpell:disable -->
 # @edunexia/auth
 
 Pacote de autenticação unificado para todos os módulos da plataforma Edunéxia. Gerencia sessão de usuários, permissões e perfis.

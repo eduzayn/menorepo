@@ -1,3 +1,4 @@
+<!-- cSpell:disable -->
 # @edunexia/api-client
 
 Cliente API centralizado para comunicação com o Supabase, fortemente tipado com o schema do banco de dados da Edunéxia.

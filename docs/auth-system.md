@@ -1,3 +1,4 @@
+<!-- cSpell:disable -->
 # Sistema de Autenticação da Plataforma Edunéxia
 
 ## Visão Geral

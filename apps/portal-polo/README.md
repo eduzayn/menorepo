@@ -1,3 +1,4 @@
+<!-- cSpell:disable -->
 # README TÉCNICO - Módulo Portal do Polo da Plataforma Edunéxia
 
 ## Visão Geral##

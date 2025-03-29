@@ -1,3 +1,4 @@
+<!-- cSpell:disable -->
 # Resumo: Resolução de Problemas de TypeScript no Monorepo
 
 ## Problema Identificado

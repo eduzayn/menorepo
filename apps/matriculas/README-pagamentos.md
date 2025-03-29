@@ -1,3 +1,4 @@
+<!-- cSpell:disable -->
 # Módulo de Pagamentos - Edunéxia Matrículas
 
 Este módulo integra a plataforma Edunéxia com gateways de pagamento para processar matrículas e mensalidades.

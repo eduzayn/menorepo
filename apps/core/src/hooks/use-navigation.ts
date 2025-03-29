@@ -15,7 +15,7 @@ export type AppModule =
   | 'portal-polo'
   | 'rh'
   | 'contabilidade'
-  | 'site-vendas';
+  | 'site-edunexia';
 
 /**
  * Interface para representar a estrutura de navegação entre módulos
@@ -136,8 +136,8 @@ const MODULE_CONFIGS: Record<AppModule, ModuleNavigation> = {
       { path: '/fiscal', label: 'Obrigações Fiscais', icon: 'file-contract', roles: ['admin'] }
     ]
   },
-  'site-vendas': {
-    name: 'Site de Vendas',
+  'site-edunexia': {
+    name: 'Site Institucional',
     baseRoute: '/site',
     routes: [
       { path: '', label: 'Configurações', icon: 'cog', roles: ['admin'] },

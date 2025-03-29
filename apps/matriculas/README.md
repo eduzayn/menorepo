@@ -1,3 +1,4 @@
+<!-- cSpell:disable -->
 # Módulo de Matrículas
 
 Sistema de gerenciamento de matrículas desenvolvido com React, TypeScript e integrado ao monorepo da Edunéxia.
@@ -430,7 +431,7 @@ A gestão será feita via painel próprio em:
 | `matriculas_logs`       | Histórico de ações (criação, atualização, etc.)|
 
 ## 📄 Documentação Complementar
-> Este módulo faz parte do monorepo da Edunéxia. Consulte o [README Técnico Principal](../../README.md) e o [Modelo de Banco de Dados](../../modelo-banco-edunexia.md) para mais informações.
+> Este módulo faz parte do monorepo da Edunéxia. Consulte o [README Técnico Principal](../../README.md) para mais informações.
 
 ---
 

@@ -1,3 +1,4 @@
+<!-- cSpell:disable -->
 # @edunexia/core-types
 
 Este pacote contém tipos, interfaces e utilitários fundamentais compartilhados por todos os módulos e pacotes do ecossistema Edunéxia.

@@ -1,3 +1,4 @@
+<!-- cSpell:disable -->
 # TypeScript Config
 
 Este pacote contém configurações TypeScript reutilizáveis e padronizadas para todos os projetos e módulos do monorepo Edunexia.

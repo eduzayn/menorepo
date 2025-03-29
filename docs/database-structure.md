@@ -1,3 +1,4 @@
+<!-- cSpell:disable -->
 # 📚 Documento Técnico: Estrutura de Banco de Dados e Storage da Plataforma Edunéxia
 
 ## 🧭 Visão Geral

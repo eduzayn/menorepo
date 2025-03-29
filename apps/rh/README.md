@@ -1,3 +1,4 @@
+<!-- cSpell:disable -->
 # Módulo de RH - Edunéxia
 
 Este módulo implementa as funcionalidades de Recursos Humanos da plataforma Edunéxia, permitindo a gestão completa do ciclo de vida dos colaboradores, recrutamento e seleção, e avaliações de desempenho.

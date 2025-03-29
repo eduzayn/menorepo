@@ -1,3 +1,4 @@
+<!-- cSpell:disable -->
 # ✨ Guia de Contribuição para o Projeto Edunéxia
 
 Bem-vindo ao repositório da **Edunéxia**! Este documento tem como objetivo orientar os colaboradores sobre boas práticas, padrões e diretrizes técnicas para contribuir com o projeto de forma eficaz e consistente.
@@ -96,7 +97,7 @@ git commit -m "chore: atualiza dependências do projeto"
 - `apps/portal-do-aluno`
 - `apps/comunicacao`
 - `apps/material-didatico`
-- `apps/site-vendas`
+- `apps/site-edunexia`
 - `packages/auth`
 - `packages/ui-components`
 

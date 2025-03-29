@@ -1,3 +1,4 @@
+<!-- cSpell:disable -->
 # Integração WhatsApp para Edunéxia
 
 Este módulo implementa a integração do WhatsApp para o sistema de comunicação da Edunéxia, suportando dois modos de operação:

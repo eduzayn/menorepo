@@ -1,3 +1,4 @@
+<!-- cSpell:disable -->
 # Controle de Versões no Monorepo Edunéxia
 
 Este documento descreve as práticas de controle de versões de dependências no monorepo da Edunéxia, visando garantir consistência e prevenir problemas de compatibilidade.

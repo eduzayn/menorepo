@@ -1,3 +1,4 @@
+<!-- cSpell:disable -->
 # Configurações Compartilhadas do Monorepo Edunéxia
 
 Este pacote contém configurações padronizadas para ESLint, Prettier e Tailwind CSS que podem ser utilizadas por todos os módulos do monorepo Edunéxia.

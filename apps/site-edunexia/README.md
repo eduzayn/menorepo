@@ -1,3 +1,4 @@
+<!-- cSpell:disable -->
 # Módulo Site Edunéxia
 
 Módulo responsável pelo site institucional e blog da plataforma Edunéxia. Este módulo inclui gerenciamento de páginas, blog, leads e outras funcionalidades para o site público e administrativo.

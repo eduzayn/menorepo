@@ -1,3 +1,4 @@
+<!-- cSpell:disable -->
 # Edunéxia - Módulo Template
 
 Este é um template para a criação de novos módulos na plataforma Edunéxia. Use esta estrutura de arquivos e diretrizes para garantir consistência com o resto da plataforma.

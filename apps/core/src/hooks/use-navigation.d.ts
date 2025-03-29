@@ -1,7 +1,7 @@
 /**
  * Tipo dos módulos disponíveis no sistema
  */
-export type AppModule = 'dashboard' | 'material-didatico' | 'matriculas' | 'portal-do-aluno' | 'comunicacao' | 'financeiro-empresarial' | 'portal-parceiro' | 'portal-polo' | 'rh' | 'contabilidade' | 'site-vendas';
+export type AppModule = 'dashboard' | 'material-didatico' | 'matriculas' | 'portal-do-aluno' | 'comunicacao' | 'financeiro-empresarial' | 'portal-parceiro' | 'portal-polo' | 'rh' | 'contabilidade' | 'site-edunexia';
 /**
  * Interface para representar a estrutura de navegação entre módulos
  */

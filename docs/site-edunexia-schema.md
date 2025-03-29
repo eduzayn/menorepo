@@ -1,3 +1,4 @@
+<!-- cSpell:disable -->
 # Esquema de Banco de Dados: Site Edunéxia
 
 Este documento descreve o esquema de banco de dados para o módulo `site-edunexia`, responsável por gerenciar o site institucional e blog da plataforma Edunéxia.

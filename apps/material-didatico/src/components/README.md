@@ -1,3 +1,4 @@
+<!-- cSpell:disable -->
 # Estrutura de Componentes - Material Didático
 
 ## Visão Geral

@@ -1,3 +1,4 @@
+<!-- cSpell:disable -->
 # Gerenciamento de Pacotes no Monorepo Edunéxia
 
 Este documento estabelece as diretrizes oficiais para o gerenciamento de pacotes no monorepo da Edunéxia.

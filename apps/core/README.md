@@ -1,3 +1,4 @@
+<!-- cSpell:disable -->
 # Edunéxia - Core
 
 Este módulo contém componentes, hooks e utilitários compartilhados entre todos os outros módulos da plataforma Edunéxia.

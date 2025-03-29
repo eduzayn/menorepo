@@ -1,3 +1,4 @@
+<!-- cSpell:disable -->
 # Guia de Implantação Manual da Edge Function no Supabase
 
 Este documento descreve como implantar manualmente a Edge Function do webhook Lytex usando o painel do Supabase, sem a necessidade de CLI ou Docker.

@@ -1,3 +1,4 @@
+<!-- cSpell:disable -->
 # Gerenciamento de Dependências Circulares no Monorepo
 
 Este documento explica como detectar, prevenir e resolver dependências circulares no monorepo da Edunéxia.

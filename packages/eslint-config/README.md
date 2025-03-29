@@ -1,3 +1,4 @@
+<!-- cSpell:disable -->
 # ESLint Config
 
 Configurações padronizadas de ESLint para o monorepo Edunéxia.

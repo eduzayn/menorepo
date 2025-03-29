@@ -1,3 +1,4 @@
+<!-- cSpell:disable -->
 # README TÉCNICO - Módulo de Comunicação da Plataforma Edunéxia
 
 ## 📌 Visão Geral

@@ -1,3 +1,4 @@
+<!-- cSpell:disable -->
 # README TÉCNICO - Módulo Portal do Parceiro da Plataforma Edunéxia
 
 ## Visão Geral

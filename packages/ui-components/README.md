@@ -1,3 +1,4 @@
+<!-- cSpell:disable -->
 # @edunexia/ui-components
 
 Biblioteca de componentes UI reutilizáveis para a plataforma Edunéxia.

@@ -93,8 +93,8 @@ const MODULE_CONFIGS = {
             { path: '/fiscal', label: 'Obrigações Fiscais', icon: 'file-contract', roles: ['admin'] }
         ]
     },
-    'site-vendas': {
-        name: 'Site de Vendas',
+    'site-edunexia': {
+        name: 'Site Institucional',
         baseRoute: '/site',
         routes: [
             { path: '', label: 'Configurações', icon: 'cog', roles: ['admin'] },

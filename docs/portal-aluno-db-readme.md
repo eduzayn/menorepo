@@ -1,3 +1,4 @@
+<!-- cSpell:disable -->
 # Documentação Técnica: Banco de Dados do Portal do Aluno
 
 Este documento explica a estrutura do banco de dados implementada para o módulo Portal do Aluno da plataforma Edunéxia.

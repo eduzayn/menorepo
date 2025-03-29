@@ -1,3 +1,4 @@
+<!-- cSpell:disable -->
 # @edunexia/database-schema
 
 Definições de esquema e tipos do banco de dados para a plataforma Edunéxia.

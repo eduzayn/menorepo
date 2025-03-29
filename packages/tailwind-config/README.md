@@ -1,3 +1,4 @@
+<!-- cSpell:disable -->
 # @edunexia/tailwind-config
 
 Configuração compartilhada do Tailwind CSS para o monorepo da Edunéxia.

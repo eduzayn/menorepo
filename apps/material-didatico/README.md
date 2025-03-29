@@ -1,3 +1,4 @@
+<!-- cSpell:disable -->
 # README TÉCNICO - Módulo de Produção de Conteúdo (Portal do Professor) - Plataforma Edunéxia
 
 ## 📁 Visão Geral

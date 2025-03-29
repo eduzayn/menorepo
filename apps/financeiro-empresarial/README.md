@@ -1,3 +1,4 @@
+<!-- cSpell:disable -->
 # 💹 Módulo Financeiro Empresarial - Edunéxia
 
 > **Responsável pela gestão completa das finanças institucionais dentro da plataforma Edunéxia.**

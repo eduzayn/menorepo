@@ -1,0 +1,1 @@
+{  "extends": "../../packages/typescript-config/vite.json",  "compilerOptions": {    "baseUrl": ".",    "jsx": "react-jsx",    "paths": {      "@/*": ["./src/*"]    }  },  "include": ["src", "vite.config.ts"],  "exclude": ["node_modules", "dist"]}

@@ -1,3 +1,4 @@
+<!-- cSpell:disable -->
 # Módulo de Comunicação
 
 Este é o módulo de comunicação integrado, que permite gerenciar conversas, mensagens e interações com usuários através de diferentes canais.

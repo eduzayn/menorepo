@@ -1,3 +1,4 @@
+<!-- cSpell:disable -->
 # README TÉCNICO - Integração Modular com Monorepo na Plataforma Edunéxia
 
 ## Visão Geral
@@ -170,6 +171,7 @@ O cumprimento desta estrutura garante consistência e facilita a navegação ent
 - Reuse componentes do **ui-components** sempre que possível
 - Utilize o cliente **api-client** para todas as chamadas ao backend
 - Implemente testes para todos os novos componentes e lógica de negócio
+- **Verificação ortográfica**: Para documentação em português, utilize o script `scripts/fix-spelling.bat` para garantir que o verificador ortográfico esteja configurado corretamente. Mais detalhes em `docs/configuracao-ortografia.md`.
 
 ## Estratégia de Integração
 1. Criação da estrutura base do monorepo com Yarn Workspaces. ✅

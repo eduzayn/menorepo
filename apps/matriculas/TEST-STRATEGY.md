@@ -1,3 +1,4 @@
+<!-- cSpell:disable -->
 # Estratégia de Testes - Módulo Matrículas
 
 Este documento descreve a abordagem de testes adotada no módulo de Matrículas da Edunéxia.

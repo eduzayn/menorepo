@@ -1,3 +1,4 @@
+<!-- cSpell:disable -->
 # Resolução de Problemas de TypeScript no Monorepo
 
 Este documento fornece instruções para diagnosticar e resolver problemas comuns de TypeScript no monorepo Edunéxia.

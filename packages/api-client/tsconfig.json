@@ -3,15 +3,13 @@
   "compilerOptions": {
     "composite": true,
     "baseUrl": ".",
-    "jsx": "react-jsx",
     "paths": {
       "@/*": [
         "./src/*"
       ]
     },
     "outDir": "./dist",
-    "rootDir": "./src",
-    "skipLibCheck": true
+    "rootDir": "./src"
   },
   "include": [
     "src"

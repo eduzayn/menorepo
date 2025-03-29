@@ -1,3 +1,4 @@
+<!-- cSpell:disable -->
 # Rotas do Sistema de Autenticação
 
 ## Visão Geral

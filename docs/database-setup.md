@@ -1,3 +1,4 @@
+<!-- cSpell:disable -->
 # Configuração do Banco de Dados - Edunéxia
 
 Este documento descreve o processo de configuração do banco de dados para a plataforma Edunéxia, incluindo a estrutura de tabelas, políticas de segurança e instruções de instalação.

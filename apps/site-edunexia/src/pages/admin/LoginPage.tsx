@@ -115,9 +115,9 @@ const LoginPage: React.FC = () => {
               </div>
 
               <div className="text-sm">
-                <a href="#" className="font-medium text-blue-600 hover:text-blue-500">
+                <Link to="/admin/recuperar-senha" className="font-medium text-blue-600 hover:text-blue-500">
                   Esqueceu a senha?
-                </a>
+                </Link>
               </div>
             </div>
 
