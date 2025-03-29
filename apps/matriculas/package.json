@@ -13,9 +13,9 @@
   "dependencies": {
     "@edunexia/api-client": "workspace:*",
     "@edunexia/auth": "workspace:*",
-    "@edunexia/core": "workspace:*",
-    "@edunexia/core-types": "*",
-    "@edunexia/ui-components": "*",
+    "@edunexia/ui-components": "workspace:*",
+    "@edunexia/utils": "workspace:*",
+    "@edunexia/navigation": "workspace:*",
     "@hookform/resolvers": "^3.3.4",
     "@tanstack/react-query": "^5.24.1",
     "@tanstack/react-query-devtools": "^5.24.1",

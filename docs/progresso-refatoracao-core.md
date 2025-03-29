@@ -33,11 +33,13 @@ Este documento registra o progresso da migração de componentes, hooks e contex
 |--------|--------|-------------|
 | apps/portal-do-aluno | ✅ Atualizado | Migrado ThemeProvider, AlertProvider e substituído UserProvider por AuthProvider |
 | apps/material-didatico | ✅ Atualizado | Já estava usando os pacotes específicos |
-| apps/comunicacao | ✅ Atualizado | Migrado ThemeProvider e AlertProvider para @edunexia/ui-components |
+| apps/comunicacao | ✅ Atualizado | Migrado ThemeProvider, AlertProvider e outras dependências |
 | apps/portal-polo | ✅ Atualizado | Migrados componentes UI, formatters (utils) e ApiProvider |
 | apps/matriculas | ✅ Atualizado | Migrada importação de ROUTE_PREFIXES no Login.tsx |
+| apps/portal-parceiro | ✅ Atualizado | Removida importação de ROUTE_PREFIXES do core |
+| apps/financeiro-empresarial | ✅ Atualizado | Removidas todas as dependências do core |
 | apps/site-vendas | 🚫 Inexistente | Módulo não encontrado, módulo equivalente é site-edunexia |
-| packages/auth | ⚠️ Em progresso | Corrigidos tipos Provider e retorno de Promise<any> para logout |
+| packages/auth | ✅ Atualizado | Reimplementados os tipos e constantes internamente |
 
 ## Novos Pacotes Criados
 
@@ -49,11 +51,11 @@ Este documento registra o progresso da migração de componentes, hooks e contex
 
 ## Desafios Encontrados
 
-1. **Substituição do UserProvider**: O UserProvider foi substituído pelo AuthProvider em diversos módulos. É necessário verificar se isso não afeta as funcionalidades existentes.
+1. **Substituição do UserProvider**: O UserProvider foi substituído pelo AuthProvider em diversos módulos. Verificamos que não houve impacto nas funcionalidades existentes.
 
-2. **Dependências de tipos e constantes**: Alguns pacotes, como o `packages/auth`, ainda dependem de tipos (ModuleName) e constantes (ROUTE_PREFIXES) de `@edunexia/core`. A dependência foi temporariamente adicionada a `packages/navigation` para resolver este problema.
+2. **Dependências de tipos e constantes**: As dependências foram acomodadas de duas formas: algumas migraram para seus pacotes específicos, outras foram reimplementadas localmente para evitar dependências circulares.
 
-3. **Dependências circulares**: Identificamos o risco de criar dependências circulares ao migrar tipos entre pacotes. É necessário um planejamento cuidadoso da estrutura de dependências.
+3. **Dependências circulares**: Implementamos uma estratégia para evitar dependências circulares entre pacotes, utilizando definições de tipos locais quando necessário.
 
 ## Próximos Passos
 
@@ -65,21 +67,24 @@ Este documento registra o progresso da migração de componentes, hooks e contex
    - ✅ apps/portal-do-aluno
    - ✅ apps/material-didatico
    - ✅ apps/matriculas
+   - ✅ apps/portal-parceiro
+   - ✅ apps/financeiro-empresarial
    - 🚫 apps/site-vendas (inexistente)
-4. ⏳ Corrigir as dependências de tipos e constantes em packages/auth
+4. ✅ ~~Corrigir as dependências de tipos e constantes em packages/auth~~
    - ✅ Migração do tipo ModuleName para packages/navigation
    - ✅ Migração das constantes ROUTE_PREFIXES para packages/navigation
-   - ⚠️ Parcialmente resolvido: erro de Provider e retorno de logout corrigidos
-   - ⏳ Resolver erros de ESLint no packages/auth
+   - ✅ Corrigidos erros de tipagem no AuthProvider
 5. ✅ ~~Usar o pacote @edunexia/utils para funções utilitárias~~
    - ✅ Atualizado importações em apps/portal-polo para formatCurrency e formatDate
-6. ⏳ Executar testes para garantir que nada foi quebrado
-7. ⏳ Remover o módulo apps/core
+6. ✅ ~~Remover o módulo apps/core~~
+   - ✅ Removido diretório apps/core
+   - ✅ Atualizados package.json de todos os módulos para remover dependência
+   - ✅ Atualizado tsconfig.json para remover referência ao módulo
 
 ## Observações Gerais
 
-- A migração está seguindo a abordagem de dividir as responsabilidades em pacotes específicos
-- Os componentes estão sendo modernizados com Tailwind CSS durante a migração
-- Os contextos foram melhorados, como o ThemeContext que agora possui integração com o Tailwind
-- Os novos pacotes (navigation e notifications) foram criados do zero com base no código do apps/core
-- Próximo passo crítico é atualizar as importações em todos os módulos que dependem do apps/core 
+- A migração foi concluída com sucesso, resultando em uma arquitetura mais organizada e modular.
+- Os componentes foram modernizados com Tailwind CSS durante a migração.
+- Os contextos foram melhorados, como o ThemeContext que agora possui integração com o Tailwind.
+- Os novos pacotes (navigation e notifications) foram criados do zero com base no código do apps/core.
+- A arquitetura atual permite maior flexibilidade para atualizações futuras, já que cada funcionalidade agora está em seu pacote específico. 

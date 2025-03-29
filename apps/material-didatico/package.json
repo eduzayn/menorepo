@@ -12,12 +12,12 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@edunexia/ui-components": "workspace:*",
-    "@edunexia/auth": "workspace:*",
-    "@edunexia/core": "workspace:*",
-    "@edunexia/core-types": "workspace:*",
-    "@edunexia/database-schema": "workspace:*",
     "@edunexia/api-client": "workspace:*",
+    "@edunexia/auth": "workspace:*",
+    "@edunexia/core-types": "workspace:*",
+    "@edunexia/ui-components": "workspace:*",
+    "@edunexia/utils": "workspace:*",
+    "@edunexia/database-schema": "workspace:*",
     "@supabase/supabase-js": "^2.39.3",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
