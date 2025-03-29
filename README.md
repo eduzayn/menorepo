@@ -202,6 +202,17 @@ O cumprimento desta estrutura garante consistência e facilita a navegação ent
 - Deploy do frontend via Vercel com integrações automáticas 🔄
 - Tipos e schemas centralizados em `database-schema` ✅
 - Cliente de API unificado em `api-client` para padronização de chamadas ao backend ✅
+- **Funções utilitárias centralizadas em `packages/utils`** ✅
+  - Funções de formatação, validação e utilitários gerais
+  - Importação padronizada via `import { ... } from '@edunexia/utils'`
+  - Documentação detalhada em `/docs/centralizacao-utils.md`
+  - Diretrizes de divisão de responsabilidades em `/docs/arquitetura/divisao-responsabilidades.md`
+  - Script de migração para identificar e corrigir duplicações
+- **Padronização de importações em todo o monorepo** ✅
+  - Regras definidas para importação de diferentes tipos de recursos
+  - Verificação automatizada com `pnpm lint:imports`
+  - Documentação detalhada em `/docs/padronizacao-imports.md`
+  - Previne duplicações e inconsistências entre módulos
 
 ## Próximos Passos
 

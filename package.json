@@ -37,7 +37,8 @@
     "git:fix-hooks": "scripts/fix-git-hooks.bat",
     "git:fix-auth": "scripts/fix-git-auth.bat",
     "git:fix-permissions": "scripts/git-fix-permissions.bat",
-    "git:create-attributes": "scripts/create-gitattributes.bat"
+    "git:create-attributes": "scripts/create-gitattributes.bat",
+    "lint:imports": "node scripts/lint-imports.js"
   },
   "packageManager": "pnpm@8.9.0",
   "engines": {

@@ -1,9 +1,222 @@
 import { type ClassValue, clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 
-// Função para combinar classes do Tailwind
+/**
+ * Funções utilitárias gerais
+ * 
+ * Este arquivo contém funções utilitárias gerais usadas na plataforma Edunéxia
+ */
+
+/**
+ * Combina classes CSS, otimizando classes do Tailwind
+ * @param inputs Classes CSS a serem combinadas
+ * @returns Classes CSS combinadas e otimizadas
+ */
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
+}
+
+/**
+ * Gera um ID único
+ * @returns ID único baseado em timestamp e valores aleatórios
+ */
+export function generateId(): string {
+  return Math.random().toString(36).substring(2) + Date.now().toString(36);
+}
+
+/**
+ * Atrasa a execução por um determinado tempo
+ * @param ms Tempo em milissegundos
+ * @returns Promise que será resolvida após o tempo especificado
+ */
+export function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/**
+ * Cria um slug a partir de um texto
+ * @param text Texto para criar o slug
+ * @returns Slug normalizado (sem acentos, espaços ou caracteres especiais)
+ */
+export function slugify(text: string): string {
+  return text
+    .toString()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, '-')
+    .replace(/[^\w-]+/g, '')
+    .replace(/--+/g, '-')
+    .replace(/^-+/, '')
+    .replace(/-+$/, '');
+}
+
+/**
+ * Obtem apenas as chaves do objeto que tenham valores não nulos
+ * @param obj Objeto a ser filtrado
+ * @returns Novo objeto apenas com valores não nulos
+ */
+export function removeNullValues<T extends Record<string, any>>(obj: T): Partial<T> {
+  return Object.entries(obj).reduce((acc, [key, value]) => {
+    if (value !== null && value !== undefined) {
+      acc[key as keyof T] = value;
+    }
+    return acc;
+  }, {} as Partial<T>);
+}
+
+/**
+ * Agrupa um array de objetos por uma propriedade
+ * @param array Array a ser agrupado
+ * @param key Propriedade a ser usada para agrupamento
+ * @returns Objeto com arrays agrupados por propriedade
+ */
+export function groupBy<T>(array: T[], key: keyof T): Record<string, T[]> {
+  return array.reduce((result, item) => {
+    const groupKey = String(item[key]);
+    if (!result[groupKey]) {
+      result[groupKey] = [];
+    }
+    result[groupKey].push(item);
+    return result;
+  }, {} as Record<string, T[]>);
+}
+
+/**
+ * Ordena um array de objetos por uma propriedade
+ * @param array Array a ser ordenado
+ * @param key Propriedade para ordenação
+ * @param direction Direção da ordenação (asc ou desc)
+ * @returns Array ordenado
+ */
+export function sortBy<T>(
+  array: T[], 
+  key: keyof T, 
+  direction: 'asc' | 'desc' = 'asc'
+): T[] {
+  return [...array].sort((a, b) => {
+    const valueA = a[key];
+    const valueB = b[key];
+    
+    if (valueA === valueB) return 0;
+    
+    if (typeof valueA === 'string' && typeof valueB === 'string') {
+      return direction === 'asc' 
+        ? valueA.localeCompare(valueB) 
+        : valueB.localeCompare(valueA);
+    }
+    
+    if (valueA < valueB) return direction === 'asc' ? -1 : 1;
+    return direction === 'asc' ? 1 : -1;
+  });
+}
+
+/**
+ * Faz o deep merge de dois objetos
+ * @param target Objeto alvo
+ * @param source Objeto fonte
+ * @returns Novo objeto com o merge dos dois
+ */
+export function deepMerge<T extends Record<string, any>>(
+  target: T, 
+  source: Partial<T>
+): T {
+  const result = { ...target };
+  
+  for (const key in source) {
+    if (!Object.prototype.hasOwnProperty.call(source, key)) continue;
+    
+    const value = source[key];
+    
+    if (value === null || value === undefined) continue;
+    
+    if (
+      typeof value === 'object' && 
+      !Array.isArray(value) && 
+      typeof result[key] === 'object' && 
+      !Array.isArray(result[key])
+    ) {
+      result[key] = deepMerge(result[key] as any, value as any) as any;
+    } else {
+      result[key] = value as any;
+    }
+  }
+  
+  return result;
+}
+
+/**
+ * Limita a execução de uma função dentro de um período de tempo
+ * @param func Função a ser executada
+ * @param limit Limite de tempo em ms
+ * @returns Função com debounce
+ */
+export function debounce<T extends (...args: any[]) => any>(
+  func: T, 
+  limit: number
+): (...args: Parameters<T>) => void {
+  let timeout: NodeJS.Timeout;
+  
+  return function(this: any, ...args: Parameters<T>): void {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func.apply(this, args), limit);
+  };
+}
+
+/**
+ * Limita a taxa de execução de uma função
+ * @param func Função a ser executada
+ * @param limit Limite de tempo em ms
+ * @returns Função com throttle
+ */
+export function throttle<T extends (...args: any[]) => any>(
+  func: T, 
+  limit: number
+): (...args: Parameters<T>) => void {
+  let inThrottle: boolean = false;
+  
+  return function(this: any, ...args: Parameters<T>): void {
+    if (!inThrottle) {
+      func.apply(this, args);
+      inThrottle = true;
+      setTimeout(() => inThrottle = false, limit);
+    }
+  };
+}
+
+/**
+ * Aleatoriza a ordem dos elementos de um array
+ * @param array Array a ser embaralhado
+ * @returns Novo array com elementos em ordem aleatória
+ */
+export function shuffle<T>(array: T[]): T[] {
+  const result = [...array];
+  
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  
+  return result;
+}
+
+/**
+ * Retorna apenas valores únicos de um array
+ * @param array Array com possíveis valores duplicados
+ * @returns Novo array com valores únicos
+ */
+export function uniqueArray<T>(array: T[]): T[] {
+  return [...new Set(array)];
+}
+
+/**
+ * Retira acentos de um texto
+ * @param text Texto com acentos
+ * @returns Texto sem acentos
+ */
+export function removeAccents(text: string): string {
+  return text.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 }
 
 // Formatação de datas
@@ -61,11 +274,6 @@ export function formatFileSize(bytes: number): string {
 export function truncateText(text: string, maxLength: number): string {
   if (text.length <= maxLength) return text
   return `${text.slice(0, maxLength)}...`
-}
-
-// Geração de ID único
-export function generateId(): string {
-  return Math.random().toString(36).substring(2) + Date.now().toString(36)
 }
 
 // Validação de URL

@@ -9,7 +9,7 @@
       ]
     },
     "outDir": "./dist",
-    "rootDir": "./src"
+    "rootDir": "."
   },
   "include": [
     "index.ts",

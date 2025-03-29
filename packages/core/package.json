@@ -16,7 +16,8 @@
   ],
   "dependencies": {
     "@edunexia/api-client": "workspace:*",
-    "@edunexia/database-schema": "workspace:*"
+    "@edunexia/database-schema": "workspace:*",
+    "@edunexia/utils": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.2.2",

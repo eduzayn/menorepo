@@ -11,15 +11,18 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@edunexia/api-client": "workspace:*",
+    "@edunexia/auth": "workspace:*",
+    "@edunexia/database-schema": "workspace:*",
+    "@edunexia/ui-components": "workspace:*",
+    "@edunexia/utils": "workspace:*",
     "@edunexia/core-types": "*",
-    "@edunexia/ui-components": "*",
     "@tanstack/react-query": "^5.4.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.18.0"
   },
   "devDependencies": {
-    "@edunexia/api-client": "^0.0.1",
     "@edunexia/eslint-config": "workspace:^",
     "@types/node": "^20.6.3",
     "@types/react": "^18.2.15",

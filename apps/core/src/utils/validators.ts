@@ -1,4 +1,20 @@
 /**
+ * ATENÇÃO: ARQUIVO DEPRECIADO
+ * 
+ * Conforme a arquitetura do projeto:
+ * - Funções de validação não dependentes de UI devem estar em packages/utils
+ * - Este arquivo em apps/core está mantido apenas para compatibilidade
+ * 
+ * Para TODAS as funções de validação, importe diretamente de '@edunexia/utils':
+ * import { isValidEmail, isValidCPF, ... } from '@edunexia/utils';
+ * 
+ * Este arquivo será removido em versões futuras.
+ */
+
+// Re-exporta todas as funções do pacote centralizado
+export * from '@edunexia/utils';
+
+/**
  * Verifica se o email é válido
  * @param email Email a ser validado
  * @returns Boolean indicando se é válido
