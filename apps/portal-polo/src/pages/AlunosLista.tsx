@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { usePoloContext } from '../contexts';
 import { usePoloData } from '../hooks';
-import { formatDate } from '@edunexia/core';
+import { formatDate } from '@edunexia/utils';
 
 /**
  * Página de Listagem de Alunos do Polo

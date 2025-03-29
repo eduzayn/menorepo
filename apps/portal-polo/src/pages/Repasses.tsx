@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { usePoloContext } from '../contexts';
 import { usePoloData } from '../hooks';
-import { formatCurrency, formatDate } from '@edunexia/core';
+import { formatCurrency, formatDate } from '@edunexia/utils';
 import { Download, Filter, FileText } from 'lucide-react';
 
 type PeriodoFiltro = 'todos' | 'mes_atual' | 'mes_anterior' | '3_meses' | '6_meses';

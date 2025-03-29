@@ -34,7 +34,7 @@ Este documento registra o progresso da migração de componentes, hooks e contex
 | apps/portal-do-aluno | ✅ Atualizado | Migrado ThemeProvider, AlertProvider e substituído UserProvider por AuthProvider |
 | apps/material-didatico | ✅ Atualizado | Já estava usando os pacotes específicos |
 | apps/comunicacao | ✅ Atualizado | Migrado ThemeProvider e AlertProvider para @edunexia/ui-components |
-| apps/portal-polo | ✅ Atualizado | Migrado ThemeProvider, AlertProvider e ApiProvider |
+| apps/portal-polo | ✅ Atualizado | Migrados componentes UI, formatters (utils) e ApiProvider |
 | apps/matriculas | ✅ Atualizado | Migrada importação de ROUTE_PREFIXES no Login.tsx |
 | apps/site-vendas | 🚫 Inexistente | Módulo não encontrado, módulo equivalente é site-edunexia |
 | packages/auth | ⚠️ Em progresso | Corrigidos tipos Provider e retorno de Promise<any> para logout |
@@ -45,6 +45,7 @@ Este documento registra o progresso da migração de componentes, hooks e contex
 |--------|-----------|-------------|
 | packages/navigation | Gerenciamento de navegação | Contém useNavigation e estruturas de rotas |
 | packages/notifications | Sistema de notificações | Contém useNotifications e componentes relacionados |
+| packages/utils | Funções utilitárias | Já existia no monorepo, contém formatCurrency, formatDate, etc. |
 
 ## Desafios Encontrados
 
@@ -70,9 +71,8 @@ Este documento registra o progresso da migração de componentes, hooks e contex
    - ✅ Migração das constantes ROUTE_PREFIXES para packages/navigation
    - ⚠️ Parcialmente resolvido: erro de Provider e retorno de logout corrigidos
    - ⏳ Resolver erros de ESLint no packages/auth
-5. ⏳ Criar pacote @edunexia/utils para funções utilitárias
-   - ⏳ Migrar formatCurrency, formatDate, etc.
-   - ⏳ Atualizar importações em apps/portal-polo
+5. ✅ ~~Usar o pacote @edunexia/utils para funções utilitárias~~
+   - ✅ Atualizado importações em apps/portal-polo para formatCurrency e formatDate
 6. ⏳ Executar testes para garantir que nada foi quebrado
 7. ⏳ Remover o módulo apps/core
 

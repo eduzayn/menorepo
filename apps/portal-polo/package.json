@@ -16,6 +16,7 @@
     "@edunexia/core": "*",
     "@edunexia/core-types": "*",
     "@edunexia/ui-components": "*",
+    "@edunexia/utils": "*",
     "@tanstack/react-query": "^5.4.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
