@@ -14,8 +14,8 @@
   "dependencies": {
     "@edunexia/api-client": "workspace:*",
     "@edunexia/auth": "workspace:*",
-    "@edunexia/core": "workspace:*",
-    "@edunexia/ui-components": "*",
+    "@edunexia/ui-components": "workspace:*",
+    "@edunexia/utils": "workspace:*",
     "@edunexia/database-schema": "*",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

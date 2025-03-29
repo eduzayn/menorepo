@@ -7,13 +7,15 @@
 // Exportar tipos
 export * from './types';
 
-// Exportar componentes e hooks de autenticação
+// Exportar componentes de autenticação
 export { 
   AuthProvider,
-  useAuth,
   type AuthContextType,
   type AuthProviderProps
 } from './components/AuthProvider';
+
+// Exportar o hook useAuth do AuthProvider
+export { useAuth } from './components/AuthProvider';
 
 // Exportar componentes de proteção de rotas
 export * from './components';

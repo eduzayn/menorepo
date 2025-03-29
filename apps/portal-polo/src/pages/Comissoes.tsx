@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { usePoloContext } from '../contexts';
 import { usePoloData } from '../hooks';
-import { formatCurrency, formatDate } from '@edunexia/core';
+import { formatCurrency, formatDate } from '@edunexia/utils';
 
 /**
  * Página de Comissões do Polo

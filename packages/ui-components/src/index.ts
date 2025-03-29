@@ -39,6 +39,12 @@ export type { SelectProps, SelectOption } from './components/forms/Select';
 export { default as NotificationCard } from './components/feedback/NotificationCard';
 export type { NotificationCardProps } from './components/feedback/NotificationCard';
 
+export { default as Alert } from './components/feedback/Alert';
+export type { AlertProps, AlertType } from './components/feedback/Alert';
+
+export { default as Loader } from './components/feedback/Loader';
+export type { LoaderProps } from './components/feedback/Loader';
+
 // Templates
 export { default as DashboardPageTemplate } from './templates/DashboardPage';
 export type { DashboardPageTemplateProps } from './templates/DashboardPage';
@@ -59,3 +65,17 @@ export {
 // Chat
 export { default as ChatMessage } from './components/chat/ChatMessage';
 export type { ChatMessageProps } from './components/chat/ChatMessage';
+
+// Contextos
+export {
+  ThemeProvider,
+  useTheme,
+  type Theme,
+  type ThemeContextType,
+  type ThemeProviderProps,
+  AlertProvider,
+  useAlerts,
+  type AlertItem,
+  type AlertContextType,
+  type AlertProviderProps
+} from './contexts';

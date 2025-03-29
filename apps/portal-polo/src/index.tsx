@@ -2,7 +2,9 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ApiProvider, UserProvider, ThemeProvider, AlertProvider } from '@edunexia/core';
+import { ApiProvider } from '@edunexia/api-client';
+import { AuthProvider } from '@edunexia/auth';
+import { ThemeProvider, AlertProvider } from '@edunexia/ui-components';
 import { PoloProvider } from './contexts';
 import { AppRoutes } from './routes';
 import './index.css';
@@ -30,13 +32,13 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
       <ApiProvider options={apiOptions}>
         <QueryClientProvider client={queryClient}>
           <ThemeProvider defaultTheme="system">
-            <UserProvider>
+            <AuthProvider>
               <AlertProvider position="top-right">
                 <PoloProvider>
                   <AppRoutes />
                 </PoloProvider>
               </AlertProvider>
-            </UserProvider>
+            </AuthProvider>
           </ThemeProvider>
         </QueryClientProvider>
       </ApiProvider>

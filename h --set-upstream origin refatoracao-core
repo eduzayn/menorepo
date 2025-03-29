@@ -1,0 +1,5 @@
+[33mcommit b88ef19a8d83110fe84089a8fa85112cbf0d7fdc[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mrefatoracao-core[m[33m)[m
+Author: Edunexia Developer <dev@edunexia.com>
+Date:   Sat Mar 29 14:40:53 2025 -0300
+
+    feat: migra componentes do core para pacotes específicos e atualiza documentação

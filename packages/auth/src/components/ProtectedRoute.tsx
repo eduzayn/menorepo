@@ -1,6 +1,7 @@
-import React from 'react';
-import { RouteGuard } from './RouteGuard';
 import type { UserRole } from '@edunexia/core';
+import React from 'react';
+
+import { RouteGuard } from './RouteGuard';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;

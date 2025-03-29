@@ -1,6 +1,6 @@
 import React from 'react';
 import { usePoloContext } from '../contexts';
-import { formatCurrency } from '@edunexia/core';
+import { formatCurrency } from '@edunexia/utils';
 
 /**
  * Página de Dashboard do Polo

@@ -1,7 +1,6 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext';
-import { ROUTE_PREFIXES } from '@edunexia/core';
 
 // Layouts
 import DashboardLayout from './components/layouts/DashboardLayout';
@@ -15,7 +14,7 @@ import Dashboard from './pages/dashboard/Dashboard';
 import NotFound from './pages/NotFound';
 
 // Prefixo para todas as rotas deste módulo
-const PREFIX = ROUTE_PREFIXES.PORTAL_PARCEIRO;
+const PREFIX = '/parceiro';
 
 // Componente para rotas protegidas
 interface ProtectedRouteProps {

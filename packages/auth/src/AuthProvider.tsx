@@ -1,7 +1,19 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
 import { SupabaseClient, User } from '@supabase/supabase-js';
+import React, { createContext, useContext, useEffect, useState } from 'react';
+
 import { createSupabaseClient } from './supabase-client';
-import { ROUTE_PREFIXES, ModuleName } from '@edunexia/core';
+// Usar tipos internos enquanto não resolvemos a dependência circular
+type ModuleName = 'MATRICULAS' | 'PORTAL_ALUNO' | 'COMUNICACAO' | 'FINANCEIRO' | 'PORTAL_PARCEIRO';
+
+// Constantes para rotas
+const ROUTE_PREFIXES = {
+  MATRICULAS: '/matriculas',
+  PORTAL_ALUNO: '/aluno',
+  COMUNICACAO: '/comunicacao',
+  FINANCEIRO: '/financeiro',
+  PORTAL_PARCEIRO: '/parceiro',
+  AUTH: '/auth'
+};
 
 export interface AuthContextType {
   user: User | null;
@@ -11,13 +23,13 @@ export interface AuthContextType {
   hasRole: (role: string | string[]) => boolean;
   hasPermission: (permission: string | string[]) => boolean;
   loginWithEmailAndPassword: (email: string, password: string) => Promise<any>;
-  loginWithOAuth: (provider: 'google' | 'microsoft' | 'facebook') => Promise<any>;
-  logout: () => Promise<void>;
+  loginWithOAuth: (provider: string) => Promise<any>;
+  logout: () => Promise<any>;
   getCurrentUser: () => Promise<User | null>;
   forgotPassword: (email: string) => Promise<any>;
   resetPassword: (password: string) => Promise<any>;
-  loginPath: string; // Adicionado para suportar rotas modulares
-  moduleName: ModuleName; // Adicionado para identificação do módulo
+  loginPath: string;
+  moduleName: ModuleName;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -25,13 +37,13 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export interface AuthProviderProps {
   children: React.ReactNode;
   supabaseClient?: SupabaseClient;
-  moduleName?: ModuleName; // Nome do módulo que está usando o AuthProvider
+  moduleName?: ModuleName;
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({
   children,
   supabaseClient,
-  moduleName = 'MATRICULAS'  // Módulo padrão caso não seja especificado
+  moduleName = 'MATRICULAS'
 }) => {
   const client = supabaseClient || createSupabaseClient();
   const [user, setUser] = useState<User | null>(null);
@@ -115,9 +127,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
     return client.auth.signInWithPassword({ email, password });
   };
 
-  // Login com OAuth (Google, Microsoft, etc.)
-  const loginWithOAuth = async (provider: 'google' | 'microsoft' | 'facebook') => {
-    return client.auth.signInWithOAuth({ provider });
+  // Login com OAuth
+  const loginWithOAuth = async (provider: string) => {
+    return client.auth.signInWithOAuth({ provider: provider as any });
   };
 
   // Logout
@@ -154,8 +166,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
     getCurrentUser,
     forgotPassword,
     resetPassword,
-    loginPath, // Adicionado para permitir navegação para a página de login
-    moduleName // Identificador do módulo atual
+    loginPath,
+    moduleName
   };
 
   return (
@@ -165,7 +177,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
   );
 };
 
-export const useAuth = () => {
+export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
   if (context === undefined) {
     throw new Error('useAuth must be used within an AuthProvider');

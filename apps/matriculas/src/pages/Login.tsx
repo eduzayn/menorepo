@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '@edunexia/auth'
-import { ROUTE_PREFIXES } from '@edunexia/core'
+import { ROUTE_PREFIXES } from '@edunexia/navigation'
 
 export function Login() {
   const [email, setEmail] = useState('')
