@@ -8,9 +8,12 @@
 // Data Display
 export { default as StatsCard } from './components/data-display/StatsCard';
 export type { StatsCardProps } from './components/data-display/StatsCard';
-
 export { DashboardCard } from './components/data-display/DashboardCard';
 export type { DashboardCardProps } from './components/data-display/DashboardCard';
+export { default as CourseCard } from './components/data-display/CourseCard';
+export type { CourseCardProps } from './components/data-display/CourseCard';
+export { default as DisciplineCard } from './components/data-display/DisciplineCard';
+export type { DisciplineCardProps } from './components/data-display/DisciplineCard';
 
 // Layout
 export { default as DashboardLayout } from './components/layout/DashboardLayout';
@@ -45,3 +48,7 @@ export {
   CardDescription, 
   CardContent 
 } from './components/card';
+
+// Chat
+export { default as ChatMessage } from './components/chat/ChatMessage';
+export type { ChatMessageProps } from './components/chat/ChatMessage';
