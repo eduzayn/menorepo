@@ -56,6 +56,17 @@ Este documento registra o progresso da migração dos componentes locais para a 
      - Testes abrangentes implementados
      - Exportação adequada no arquivo principal da biblioteca
 
+6. **FormField**
+   - Já existia uma implementação na biblioteca
+   - Implementação: `packages/ui-components/src/components/forms/FormField.tsx`
+   - Melhorias:
+     - Adicionados testes unitários completos
+     - Validação de funcionalidades essenciais como: 
+       - Renderização de mensagens de erro
+       - Suporte a campos obrigatórios
+       - Exibição de textos de ajuda
+       - Estados de desabilitado
+
 ### ❌ Componentes Não Migrados
 
 1. **DashboardFilter**
@@ -65,9 +76,9 @@ Este documento registra o progresso da migração dos componentes locais para a 
 
 ### 📊 Estatísticas de Progresso
 
-- **Componentes Migrados**: 5
+- **Componentes Migrados**: 6
 - **Componentes Não Migrados (com justificativa)**: 1
-- **Total de Componentes Identificados**: 6
+- **Total de Componentes Identificados**: 7
 - **Progresso**: 100% (considerando decisões de "não migrar" como concluídas)
 
 ## Módulo Portal do Aluno
@@ -91,10 +102,16 @@ Este documento registra o progresso da migração dos componentes locais para a 
      - Tipagem melhorada
      - Testes unitários adicionados
 
+3. **FormField**
+   - Já sendo utilizado a partir da biblioteca centralizada
+   - Referência: `packages/ui-components/src/components/forms/FormField.tsx`
+   - Melhorias agora disponíveis:
+     - Testes unitários completos
+     - Documentação aprimorada
+
 ### 🔄 Componentes Pendentes
 
-1. **FormField**
-2. **DashboardLayout**
+1. **DashboardLayout**
 
 ## Módulo Comunicação
 
@@ -102,7 +119,7 @@ Este documento registra o progresso da migração dos componentes locais para a 
 
 1. **Message**
 2. **NotificationCard**
-3. **FormField**
+3. **FormField** - Verificar uso e providenciar migração
 4. **DashboardLayout**
 
 ## Módulo Material Didático
@@ -115,17 +132,17 @@ Este documento registra o progresso da migração dos componentes locais para a 
 
 ## Resumo Geral
 
-- **Componentes Migrados**: 7
+- **Componentes Migrados**: 9
 - **Componentes Não Migrados (com justificativa)**: 1
-- **Componentes Pendentes**: 8
-- **Progresso Total**: ~47%
+- **Componentes Pendentes**: 7
+- **Progresso Total**: ~53%
 
 ## Próximos Passos
 
-1. Verificar e atualizar referências do PageHeader nos módulos
-2. Iniciar migração do FormField
-3. Expandir cobertura de testes
-4. Continuar migração no módulo Material Didático
+1. Verificar e atualizar referências de FormField nos módulos
+2. Iniciar migração do DashboardLayout no Portal do Aluno
+3. Continuar migração no módulo Material Didático
+4. Iniciar migração dos componentes específicos do módulo Comunicação
 
 ## Problemas Encontrados
 
