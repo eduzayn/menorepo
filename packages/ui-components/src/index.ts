@@ -65,3 +65,17 @@ export {
 // Chat
 export { default as ChatMessage } from './components/chat/ChatMessage';
 export type { ChatMessageProps } from './components/chat/ChatMessage';
+
+// Contextos
+export {
+  ThemeProvider,
+  useTheme,
+  type Theme,
+  type ThemeContextType,
+  type ThemeProviderProps,
+  AlertProvider,
+  useAlerts,
+  type AlertItem,
+  type AlertContextType,
+  type AlertProviderProps
+} from './contexts';

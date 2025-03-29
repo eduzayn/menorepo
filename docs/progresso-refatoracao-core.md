@@ -16,16 +16,16 @@ Este documento registra o progresso da migração de componentes, hooks e contex
 | Hook | Status | Destino | Observações |
 |------|--------|---------|-------------|
 | useAuth | ✅ Migrado | packages/auth | Já existia uma implementação em packages/auth |
-| useNavigation | ⏳ Pendente | packages/navigation | Deve ser migrado para um novo pacote específico |
-| useNotifications | ⏳ Pendente | packages/notifications | Deve ser migrado para um novo pacote específico |
+| useNavigation | ✅ Migrado | packages/navigation | Migrado para um novo pacote específico com melhorias |
+| useNotifications | ✅ Migrado | packages/notifications | Migrado para um novo pacote específico com contexto |
 
 ## Contextos
 
 | Contexto | Status | Destino | Observações |
 |----------|--------|---------|-------------|
 | UserContext | ✅ Migrado | packages/auth | Substituído pelo AuthProvider já existente |
-| AlertContext | ⏳ Pendente | packages/ui-components | Deve ser adaptado para usar o Alert migrado |
-| ThemeContext | ⏳ Pendente | packages/ui-components | Necessário para customização de tema |
+| AlertContext | ✅ Migrado | packages/ui-components | Migrado usando o componente Alert atualizado |
+| ThemeContext | ✅ Migrado | packages/ui-components | Migrado com suporte a Tailwind e melhorias |
 
 ## Atualizações de Importações
 
@@ -37,16 +37,25 @@ Este documento registra o progresso da migração de componentes, hooks e contex
 | apps/matriculas | ⏳ Pendente | Verificar todas as importações de @edunexia/core |
 | apps/site-vendas | ⏳ Pendente | Verificar todas as importações de @edunexia/core |
 
+## Novos Pacotes Criados
+
+| Pacote | Descrição | Observações |
+|--------|-----------|-------------|
+| packages/navigation | Gerenciamento de navegação | Contém useNavigation e estruturas de rotas |
+| packages/notifications | Sistema de notificações | Contém useNotifications e componentes relacionados |
+
 ## Próximos Passos
 
-1. Migrar os contextos AlertContext e ThemeContext para ui-components
-2. Criar pacotes específicos para navigation e notifications 
-3. Atualizar todas as importações nos módulos da aplicação
-4. Executar testes para garantir que nada foi quebrado
-5. Remover o módulo apps/core
+1. ✅ ~~Migrar os contextos AlertContext e ThemeContext para ui-components~~
+2. ✅ ~~Criar pacotes específicos para navigation e notifications~~
+3. ⏳ Atualizar todas as importações nos módulos da aplicação
+4. ⏳ Executar testes para garantir que nada foi quebrado
+5. ⏳ Remover o módulo apps/core
 
 ## Observações Gerais
 
 - A migração está seguindo a abordagem de dividir as responsabilidades em pacotes específicos
 - Os componentes estão sendo modernizados com Tailwind CSS durante a migração
-- Alguns hooks e contextos podem requerer adaptações para funcionar com as novas implementações 
+- Os contextos foram melhorados, como o ThemeContext que agora possui integração com o Tailwind
+- Os novos pacotes (navigation e notifications) foram criados do zero com base no código do apps/core
+- Próximo passo crítico é atualizar as importações em todos os módulos que dependem do apps/core 
