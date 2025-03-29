@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { SupabaseClient, User } from '@supabase/supabase-js';
 import { createSupabaseClient } from './supabase-client';
-import { ROUTE_PREFIXES, ModuleName } from '@edunexia/core';
+import { ROUTE_PREFIXES, ModuleName } from '@edunexia/navigation';
 
 export interface AuthContextType {
   user: User | null;
@@ -17,7 +17,7 @@ export interface AuthContextType {
   forgotPassword: (email: string) => Promise<any>;
   resetPassword: (password: string) => Promise<any>;
   loginPath: string; // Adicionado para suportar rotas modulares
-  moduleName: ModuleName; // Adicionado para identificação do módulo
+  moduleName: ModuleName; // Atualizado para usar ModuleName
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -25,13 +25,13 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export interface AuthProviderProps {
   children: React.ReactNode;
   supabaseClient?: SupabaseClient;
-  moduleName?: ModuleName; // Nome do módulo que está usando o AuthProvider
+  moduleName?: ModuleName; // Atualizado para usar ModuleName
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({
   children,
   supabaseClient,
-  moduleName = 'MATRICULAS'  // Módulo padrão caso não seja especificado
+  moduleName = 'matriculas'  // Módulo padrão caso não seja especificado
 }) => {
   const client = supabaseClient || createSupabaseClient();
   const [user, setUser] = useState<User | null>(null);

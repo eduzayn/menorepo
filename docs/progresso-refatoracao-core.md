@@ -33,9 +33,11 @@ Este documento registra o progresso da migração de componentes, hooks e contex
 |--------|--------|-------------|
 | apps/portal-do-aluno | ⏳ Pendente | Verificar todas as importações de @edunexia/core |
 | apps/material-didatico | ⏳ Pendente | Verificar todas as importações de @edunexia/core |
-| apps/comunicacao | ⏳ Pendente | Verificar todas as importações de @edunexia/core |
+| apps/comunicacao | ✅ Atualizado | Migrado ThemeProvider e AlertProvider para @edunexia/ui-components |
+| apps/portal-polo | ✅ Atualizado | Migrado ThemeProvider, AlertProvider e ApiProvider |
 | apps/matriculas | ⏳ Pendente | Verificar todas as importações de @edunexia/core |
 | apps/site-vendas | ⏳ Pendente | Verificar todas as importações de @edunexia/core |
+| packages/auth | ⚠️ Bloqueado | Dependência de ROUTE_PREFIXES e ModuleName de @edunexia/core |
 
 ## Novos Pacotes Criados
 
@@ -44,13 +46,28 @@ Este documento registra o progresso da migração de componentes, hooks e contex
 | packages/navigation | Gerenciamento de navegação | Contém useNavigation e estruturas de rotas |
 | packages/notifications | Sistema de notificações | Contém useNotifications e componentes relacionados |
 
+## Desafios Encontrados
+
+1. **Substituição do UserProvider**: O UserProvider foi substituído pelo AuthProvider em diversos módulos. É necessário verificar se isso não afeta as funcionalidades existentes.
+
+2. **Dependências de tipos e constantes**: Alguns pacotes, como o `packages/auth`, ainda dependem de tipos (ModuleName) e constantes (ROUTE_PREFIXES) de `@edunexia/core`. É necessário migrar esses tipos e constantes para seus respectivos pacotes.
+
+3. **Dependências circulares**: Identificamos o risco de criar dependências circulares ao migrar tipos entre pacotes. É necessário um planejamento cuidadoso da estrutura de dependências.
+
 ## Próximos Passos
 
 1. ✅ ~~Migrar os contextos AlertContext e ThemeContext para ui-components~~
 2. ✅ ~~Criar pacotes específicos para navigation e notifications~~
 3. ⏳ Atualizar todas as importações nos módulos da aplicação
-4. ⏳ Executar testes para garantir que nada foi quebrado
-5. ⏳ Remover o módulo apps/core
+   - ✅ apps/comunicacao
+   - ✅ apps/portal-polo
+   - ⏳ apps/portal-do-aluno
+   - ⏳ apps/material-didatico
+   - ⏳ apps/matriculas
+   - ⏳ apps/site-vendas
+4. ⏳ Corrigir as dependências de tipos e constantes em packages/auth
+5. ⏳ Executar testes para garantir que nada foi quebrado
+6. ⏳ Remover o módulo apps/core
 
 ## Observações Gerais
 

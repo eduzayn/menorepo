@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@edunexia/api-client": "workspace:*",
-    "@edunexia/core": "workspace:*",
+    "@edunexia/navigation": "workspace:*",
     "@edunexia/database-schema": "workspace:*",
     "@tanstack/react-query": "^5.4.3",
     "@supabase/supabase-js": "^2.39.3",

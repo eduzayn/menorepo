@@ -5,12 +5,11 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ApiProvider } from '@edunexia/api-client'
 import { AuthProvider } from '@edunexia/auth'
 
-// Provedores de contexto do Core
+// Provedores de contexto dos pacotes específicos
 import { 
-  UserProvider, 
   ThemeProvider, 
   AlertProvider 
-} from '@edunexia/core'
+} from '@edunexia/ui-components'
 
 // Componente principal da aplicação
 import App from './App'
@@ -47,14 +46,11 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
           <QueryClientProvider client={queryClient}>
             {/* Configuração de tema */}
             <ThemeProvider defaultTheme="system">
-              {/* Autenticação e usuário */}
-              <UserProvider>
-                {/* Sistema de alertas */}
-                <AlertProvider position="top-right">
-                  {/* Aplicação */}
-                  <App />
-                </AlertProvider>
-              </UserProvider>
+              {/* Sistema de alertas */}
+              <AlertProvider position="top-right">
+                {/* Aplicação */}
+                <App />
+              </AlertProvider>
             </ThemeProvider>
           </QueryClientProvider>
         </BrowserRouter>

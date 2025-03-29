@@ -154,6 +154,12 @@ export const ROUTE_PREFIXES = {
   COMUNICACAO: '/comunicacao',
   MATERIAL_DIDATICO: '/material-didatico',
   FINANCEIRO: '/financeiro',
+  PORTAL_PARCEIRO: '/parceiro',
+  PORTAL_POLO: '/polo',
+  RH: '/rh',
+  CONTABILIDADE: '/contabilidade',
+  SITE_ADMIN: '/site-admin',
+  CORE_ADMIN: '/admin',
   
   // Feature routes
   AUTH: '/auth',

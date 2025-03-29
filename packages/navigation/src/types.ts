@@ -19,6 +19,23 @@ export type AppModule =
   | 'site-edunexia';
 
 /**
+ * Tipo legado para nomes de módulos em maiúsculas (compatibilidade com o pacote auth)
+ * @deprecated Use AppModule no lugar. Será removido em versões futuras.
+ */
+export type ModuleName = 
+  | 'MATRICULAS'
+  | 'PORTAL_ALUNO' 
+  | 'COMUNICACAO'
+  | 'FINANCEIRO'
+  | 'PORTAL_PARCEIRO'
+  | 'PORTAL_POLO'
+  | 'RH'
+  | 'CONTABILIDADE'
+  | 'MATERIAL_DIDATICO'
+  | 'SITE_ADMIN'
+  | 'CORE_ADMIN';
+
+/**
  * Interface para representar a estrutura de navegação entre módulos
  */
 export interface ModuleNavigation {
