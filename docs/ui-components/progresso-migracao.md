@@ -110,9 +110,21 @@ Este documento registra o progresso da migração dos componentes locais para a 
      - Testes unitários completos
      - Documentação aprimorada
 
-### 🔄 Componentes Pendentes
+4. **MainLayout**
+   - Localização anterior: (baseado nas diversas implementações de dashboard layout)
+   - Implementação: `packages/ui-components/src/components/layout/MainLayout.tsx`
+   - Melhorias:
+     - Layout unificado para todos os módulos
+     - Suporte para painel de detalhes lateral
+     - Navegação flexível baseada em configuração
+     - Filtro automático de itens por perfil do usuário
+     - Responsividade completa
 
-1. **DashboardLayout**
+### 📊 Estatísticas de Progresso
+
+- **Componentes Migrados**: 4
+- **Total de Componentes Identificados**: 4
+- **Progresso**: 100%
 
 ## Módulo Comunicação
 
@@ -132,10 +144,25 @@ Este documento registra o progresso da migração dos componentes locais para a 
      - Documentação detalhada
      - Adaptação para usar componentes base da biblioteca
 
+3. **MainLayout**
+   - Localização anterior: `apps/comunicacao/src/components/layout/MainLayout.tsx`
+   - Implementação: `packages/ui-components/src/components/layout/MainLayout.tsx`
+   - Melhorias:
+     - API unificada compatível com todos os módulos
+     - Suporte para painel de detalhes
+     - Filtro de itens de navegação por perfil
+     - Documentação detalhada criada
+
 ### 🔄 Componentes Pendentes
 
-1. **MainLayout** (equivalente ao DashboardLayout)
-2. **NotificationCard**
+1. **NotificationCard**
+
+### 📊 Estatísticas de Progresso
+
+- **Componentes Migrados**: 3
+- **Componentes Pendentes**: 1
+- **Total de Componentes Identificados**: 4
+- **Progresso**: 75%
 
 ## Módulo Material Didático
 
@@ -165,23 +192,33 @@ Este documento registra o progresso da migração dos componentes locais para a 
      - Documentação detalhada
      - Tipagem TypeScript rigorosa
 
-### 🔄 Componentes Pendentes
+4. **MainLayout**
+   - Agora utiliza o componente centralizado
+   - Implementação: `packages/ui-components/src/components/layout/MainLayout.tsx`
+   - Benefícios:
+     - Consistência visual entre módulos
+     - Manutenção simplificada
+     - Adaptabilidade a diferentes contextos
 
-Nenhum componente pendente - todos os componentes principais foram migrados.
+### 📊 Estatísticas de Progresso
+
+- **Componentes Migrados**: 4
+- **Total de Componentes Identificados**: 4
+- **Progresso**: 100%
 
 ## Resumo Geral
 
-- **Componentes Migrados**: 14
+- **Componentes Migrados**: 17
 - **Componentes Não Migrados (com justificativa)**: 1
-- **Componentes Pendentes**: 3
-- **Progresso Total**: ~82%
+- **Componentes Pendentes**: 1
+- **Progresso Total**: ~95%
 
 ## Próximos Passos
 
-1. Implementar MainLayout/DashboardLayout unificado para todos os módulos
-2. Criar o componente NotificationCard para o módulo de Comunicação
-3. Atualizar as importações nos módulos para usar os componentes centralizados
-4. Executar testes integrados para garantir compatibilidade
+1. Implementar o componente NotificationCard para o módulo de Comunicação
+2. Atualizar as importações nos módulos para usar os componentes centralizados
+3. Executar testes integrados para garantir compatibilidade
+4. Adicionar documentação Storybook para todos os componentes
 
 ## Problemas Encontrados
 
