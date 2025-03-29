@@ -1,5 +1,4 @@
-import { SuggestionModel, SuggestionRequest, SuggestionResponse } from './suggestion-model';
-import { AISuggestion } from '../suggestion-engine';
+import { SuggestionModel, SuggestionRequest, SuggestionResponse, AISuggestion } from './types';
 
 interface DefaultSuggestionModelOptions {
   temperature?: number;
