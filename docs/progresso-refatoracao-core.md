@@ -37,7 +37,7 @@ Este documento registra o progresso da migração de componentes, hooks e contex
 | apps/portal-polo | ✅ Atualizado | Migrado ThemeProvider, AlertProvider e ApiProvider |
 | apps/matriculas | ⏳ Pendente | Verificar todas as importações de @edunexia/core |
 | apps/site-vendas | ⏳ Pendente | Verificar todas as importações de @edunexia/core |
-| packages/auth | ⚠️ Bloqueado | Dependência de ROUTE_PREFIXES e ModuleName de @edunexia/core |
+| packages/auth | ⚠️ Em progresso | Adicionado ModuleName em packages/navigation para compatibilidade |
 
 ## Novos Pacotes Criados
 
@@ -50,7 +50,7 @@ Este documento registra o progresso da migração de componentes, hooks e contex
 
 1. **Substituição do UserProvider**: O UserProvider foi substituído pelo AuthProvider em diversos módulos. É necessário verificar se isso não afeta as funcionalidades existentes.
 
-2. **Dependências de tipos e constantes**: Alguns pacotes, como o `packages/auth`, ainda dependem de tipos (ModuleName) e constantes (ROUTE_PREFIXES) de `@edunexia/core`. É necessário migrar esses tipos e constantes para seus respectivos pacotes.
+2. **Dependências de tipos e constantes**: Alguns pacotes, como o `packages/auth`, ainda dependem de tipos (ModuleName) e constantes (ROUTE_PREFIXES) de `@edunexia/core`. A dependência foi temporariamente adicionada a `packages/navigation` para resolver este problema.
 
 3. **Dependências circulares**: Identificamos o risco de criar dependências circulares ao migrar tipos entre pacotes. É necessário um planejamento cuidadoso da estrutura de dependências.
 
@@ -66,6 +66,9 @@ Este documento registra o progresso da migração de componentes, hooks e contex
    - ⏳ apps/matriculas
    - ⏳ apps/site-vendas
 4. ⏳ Corrigir as dependências de tipos e constantes em packages/auth
+   - ✅ Migração do tipo ModuleName para packages/navigation
+   - ✅ Migração das constantes ROUTE_PREFIXES para packages/navigation
+   - ⏳ Resolver erros de tipagem no packages/auth
 5. ⏳ Executar testes para garantir que nada foi quebrado
 6. ⏳ Remover o módulo apps/core
 
