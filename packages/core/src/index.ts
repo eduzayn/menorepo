@@ -1,4 +1,10 @@
 // Exportações de tipos
+/**
+ * @todo Centralizar esta definição
+ * Há múltiplas definições de UserRole no monorepo que precisam ser unificadas.
+ * A versão principal deveria estar em @edunexia/shared-types.
+ * Esta definição está mantida para compatibilidade temporária.
+ */
 export type UserRole = 
   | 'super_admin'
   | 'admin_instituicao'
