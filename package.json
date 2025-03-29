@@ -14,6 +14,7 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "test": "turbo test",
     "prune": "scripts/ts-prune.sh",
+    "update-tsconfig": "node scripts/update-tsconfig.js",
     "setup-lint": "powershell -ExecutionPolicy Bypass -File scripts/setup-lint-format.ps1",
     "check-lint-deps": "powershell -ExecutionPolicy Bypass -File scripts/check-lint-deps.ps1",
     "check-pnpm": "powershell -ExecutionPolicy Bypass -File scripts/check-pnpm-version.ps1",

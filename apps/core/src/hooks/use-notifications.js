@@ -1,12 +1,3 @@
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 import { useState, useEffect, useCallback } from 'react';
 import { useApi } from '@edunexia/api-client';
 import { useAlerts } from '../contexts/alert-context';
@@ -23,7 +14,7 @@ export function useNotifications() {
     /**
      * Busca todas as notificações do usuário
      */
-    const fetchNotifications = useCallback(() => __awaiter(this, void 0, void 0, function* () {
+    const fetchNotifications = useCallback(async () => {
         setLoading(true);
         setError(null);
         try {
@@ -62,12 +53,12 @@ export function useNotifications() {
         finally {
             setLoading(false);
         }
-    }), [client]);
+    }, [client]);
     /**
      * Marca uma notificação como lida
      * @param id ID da notificação
      */
-    const markAsRead = useCallback((id) => __awaiter(this, void 0, void 0, function* () {
+    const markAsRead = useCallback(async (id) => {
         try {
             // Simula API - substituir por chamada real quando disponível
             // const { error } = await client.from('notifications')
@@ -75,35 +66,36 @@ export function useNotifications() {
             //   .eq('id', id);
             // Atualiza estado local
             setNotifications(prev => prev.map(notification => notification.id === id
-                ? Object.assign(Object.assign({}, notification), { read: true }) : notification));
+                ? { ...notification, read: true }
+                : notification));
             setUnreadCount(prev => Math.max(0, prev - 1));
         }
         catch (err) {
             console.error('Erro ao marcar notificação como lida:', err);
         }
-    }), [client]);
+    }, [client]);
     /**
      * Marca todas as notificações como lidas
      */
-    const markAllAsRead = useCallback(() => __awaiter(this, void 0, void 0, function* () {
+    const markAllAsRead = useCallback(async () => {
         try {
             // Simula API - substituir por chamada real quando disponível
             // const { error } = await client.from('notifications')
             //   .update({ read: true })
             //   .eq('read', false);
             // Atualiza estado local
-            setNotifications(prev => prev.map(notification => (Object.assign(Object.assign({}, notification), { read: true }))));
+            setNotifications(prev => prev.map(notification => ({ ...notification, read: true })));
             setUnreadCount(0);
         }
         catch (err) {
             console.error('Erro ao marcar todas notificações como lidas:', err);
         }
-    }), [client]);
+    }, [client]);
     /**
      * Deleta uma notificação
      * @param id ID da notificação
      */
-    const deleteNotification = useCallback((id) => __awaiter(this, void 0, void 0, function* () {
+    const deleteNotification = useCallback(async (id) => {
         try {
             // Simula API - substituir por chamada real quando disponível
             // const { error } = await client.from('notifications')
@@ -119,7 +111,7 @@ export function useNotifications() {
         catch (err) {
             console.error('Erro ao deletar notificação:', err);
         }
-    }), [client, notifications]);
+    }, [client, notifications]);
     /**
      * Mostra uma notificação como alerta
      * @param notification Notificação a ser exibida

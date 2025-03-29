@@ -1,3 +1,4 @@
+export * from '@edunexia/core-types';
 export * from './components';
 export * from './contexts';
 export * from './hooks';

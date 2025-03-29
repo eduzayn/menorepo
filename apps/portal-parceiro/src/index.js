@@ -1,0 +1,10 @@
+import { jsx as _jsx } from "react/jsx-runtime";
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { BrowserRouter } from 'react-router-dom';
+import AppRoutes from './routes';
+import { AuthProvider } from './contexts/AuthContext';
+import '@edunexia/ui-components/dist/styles.css';
+import './styles/global.css';
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(_jsx(React.StrictMode, { children: _jsx(BrowserRouter, { children: _jsx(AuthProvider, { children: _jsx(AppRoutes, {}) }) }) }));

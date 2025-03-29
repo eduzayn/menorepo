@@ -1,3 +1,5 @@
+// Importar e reexportar o core-types
+export * from '@edunexia/core-types';
 // Exportações de componentes
 export * from './components';
 // Exportações de contextos

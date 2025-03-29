@@ -1,0 +1,39 @@
+import { ReactNode } from 'react';
+import Header from './Header';
+import Footer from './Footer';
+import ErrorBoundary from './ErrorBoundary';
+
+interface LayoutProps {
+  children: ReactNode;
+}
+
+/**
+ * Layout padrão da aplicação com Header e Footer
+ * Pode ser usado de duas formas:
+ * 1. Com children: <Layout><SeuComponente /></Layout>
+ * 2. Como wrapper de rotas com Outlet: <Route element={<Layout />}>...</Route>
+ */
+export default function Layout({ children }: LayoutProps) {
+  return (
+    <ErrorBoundary fallback={
+      <div className="min-h-screen flex flex-col items-center justify-center text-center p-4">
+        <h2 className="text-2xl font-bold mb-4">Não foi possível carregar esta seção do site</h2>
+        <p className="mb-6">Por favor, atualize a página ou tente novamente mais tarde</p>
+        <button 
+          onClick={() => window.location.reload()} 
+          className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700"
+        >
+          Recarregar página
+        </button>
+      </div>
+    }>
+      <div className="flex min-h-screen flex-col">
+        <Header />
+        <main className="flex-1">
+          {children}
+        </main>
+        <Footer />
+      </div>
+    </ErrorBoundary>
+  );
+} 

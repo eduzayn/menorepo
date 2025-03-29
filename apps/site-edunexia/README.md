@@ -1,160 +1,184 @@
-# README TÉCNICO - Site Institucional da Plataforma Edunéxia
-## Visão Geral
+# Módulo Site Edunéxia
 
-> ** Objetivo:** Este é o site institucional da Edunéxia, projetado para apresentar a plataforma, suas funcionalidades e planos, permitindo que clientes em potencial conheçam a solução, escolham os módulos desejados e contratem a plataforma diretamente pelo site via autoatendimento.
->
+Módulo responsável pelo site institucional e blog da plataforma Edunéxia. Este módulo inclui gerenciamento de páginas, blog, leads e outras funcionalidades para o site público e administrativo.
 
-> ** Inspiração de Layout:** O design é inspirado na estrutura do site da Conta Azul ([https://ca.contaazul.com/](https://ca.contaazul.com/)), com seções bem definidas, responsivas e chamadas para ação claras.
->
+## Tecnologias
 
-## ⚙ Tecnologias Utilizadas
-- React + TypeScript (Frontend)
-- Vite (Build Tool)
-- TailwindCSS (Estilização)
-- Supabase (Backend, Autenticação e CMS Headless)
-- Yarn Workspaces (Monorepo)
-- Vercel (Deploy e hospedagem)
+- React 18+
+- TypeScript
+- React Query
+- TailwindCSS
+- Vite
+- Supabase
 
-##  Integrações com o Monorepo
-- **Componentes compartilhados:** Uso do pacote `@edunexia/ui-components`
-- **Autenticação unificada:** Uso do módulo `@edunexia/auth`
-- **Tipos compartilhados:** Uso do pacote `@edunexia/core-types`
-- **Cliente de API comum:** Uso do módulo `@edunexia/api-client`
-- **Supabase compartilhado:** Uso do mesmo backend do ecossistema
-- **Geração de credenciais:** Após cadastro, cria instância no Supabase
-- **Checkout automatizado:** Integração com gateways (Litex, InfinitePay)
-- **Acesso imediato à plataforma:** Cria usuário com permissão de `admin_instituicao` no monorepo
-- **14 dias de teste gratuito:** Controlado via flag no Supabase + cron job
+## Funcionalidades
 
-##  Etapas de Desenvolvimento
-### Etapa 1: Estruturação Inicial
-- Criar estrutura base do projeto (Vite + TailwindCSS + TypeScript)
-- Configurar rotas públicas (Home, Plataforma, Módulos, Planos)
-- Criar layout global responsivo com Header, Footer e navegação sticky
-- Configurar ThemeContext para suporte a múltiplos tenants
+- Gerenciamento de páginas estáticas
+- Blog corporativo com categorias
+- Captação de leads
+- Exibição de depoimentos
+- Configurações personalizáveis do site
+- Showcases de cursos
+- Menu dinâmico
 
-###  Etapa 2: Checkout Automatizado
-- Página de planos e seleção de módulos com calculadora em tempo real
-- Integração com Litex e InfinitePay (pix, boleto, cartão e recorrência)
-- Autenticação social (Google/Microsoft) para simplificar cadastro
-- Geração de credenciais e tenant no Supabase
-- Registro nas tabelas `instancias`, `clientes`, `checkout_logs`
-- Envio automático de e-mail com dados de acesso
-- Proposta personalizada para grandes clientes
+## Instalação e Execução
 
-### Etapa 3: Painel Administrativo Multiempresa
-- Área `/admin` com autenticação Supabase Auth
-- Supabase como CMS Headless para conteúdo do site
-- Gerenciamento de planos, páginas, temas e configurações
-- Editor visual para textos, cores, fontes, imagens e seções
-- Escolha de subdomínio ou domínio próprio (white-label)
-- Analytics de conversão e uso
+1. Certifique-se de que está na raiz do monorepo e execute:
 
-###  Etapa 4: Temas e Personalização
-- Sistema de temas visuais por tenant
-- Alteração de logotipo, esquema de cores, fontes e menus
-- Templates editáveis por categoria (educação básica, superior, cursos livres)
-- Suporte nativo a múltiplos idiomas (português, inglês, espanhol)
+```bash
+# Instalar dependências (caso ainda não tenha feito)
+pnpm install
 
-### Etapa 5: Otimização e Conteúdo
-- SEO otimizado para Google e redes sociais
-- Página de blog integrada (Notícias, Dicas, Atualizações)
-- Páginas de FAQ e Suporte com busca
-- Assistente IA para demonstração de funcionalidades
-- Testes finais de responsividade e segurança
-
-### Etapa 6: Publicação e Monitoramento
-- Deploy contínuo na Vercel com domínio principal e tenants
-- Criação automática de subdomínios
-- Integração com ferramentas de monitoramento como Vercel Analytics e LogSnag
-- Métricas de conversão, uso de trial e retenção de clientes
-
-## Estrutura de Páginas do Site
-### Páginas Públicas
-- `/` → Home
-- `/plataforma` → Apresentação geral
-- `/modulos` → Listagem dos módulos reais da plataforma:
-    - Comunicação com Alunos
-    - Matrículas
-    - Portal do Aluno
-    - Portal do Professor
-    - Material Didático
-    - RH e Equipe
-    - Financeiro Empresarial
-    - Contabilidade
-    - Portal do Polo
-    - Portal do Parceiro
-    - Analytics (Relatórios)
-    - Site White Label
-
-- `/planos` → Tabela comparativa entre planos:
-    - **Básico:** Portal do Aluno, Matrículas, Financeiro
-    - **Pro:** Tudo do Básico + Comunicação, Professor, Biblioteca, Suporte IA
-    - **Master:** Tudo do Pro + Portal do Parceiro, Polo, Relatórios e site white-label com painel de edição visual
-
-- `/ajuda` → FAQ, documentação e suporte
-- `/blog` → Posts institucionais
-- `/login` → Acesso à plataforma (redireciona por tenant)
-- `/demonstracao` → Demonstração guiada por IA
-
-##  Estrutura do Projeto
-``` bash
-apps/site-edunexia/
-├── src/
-│   ├── pages/             # Páginas do site
-│   ├── components/        # Componentes reutilizáveis
-│   ├── sections/          # Seções de página (Hero, Features, etc)
-│   ├── layouts/           # Layouts de página
-│   ├── hooks/             # Custom hooks
-│   ├── services/          # Serviços e chamadas de API
-│   ├── lib/               # Utilitários e helpers
-│   ├── types/             # Definições de tipos
-│   ├── utils/             # Funções utilitárias
-│   ├── context/           # Contextos React (tema, auth, etc)
-│   └── styles/            # Estilos globais
-├── public/                # Arquivos estáticos
-├── package.json           # Dependências do módulo
-├── tailwind.config.js     # Configuração do TailwindCSS
-├── tsconfig.json          # Configuração TypeScript
-├── vite.config.ts         # Configuração do Vite
-└── README.md              # Documentação específica
+# Iniciar o módulo em modo de desenvolvimento
+pnpm --filter @edunexia/site-edunexia dev
 ```
-## Administração do Site (Multiempresa)
-- Supabase como CMS Headless para conteúdo do site
-- Admins podem editar conteúdo do site pelo painel `/admin`
-- Cada instituição contratante terá seu próprio painel white-label
-- Editor visual para edição sem programação (estilo Wix/Framer)
-- Configurações salvas por tenant
-- Controle de seções ativas/inativas
-- Acesso via Supabase com permissão `admin_instituicao`
-- Dashboard com métricas de conversão e uso
 
-## Segurança
-- Controle por JWT e Supabase RLS
-- Isolamento de dados por tenant através de Row Level Security
-- Cada tenant isola seu conteúdo
-- Dados sensíveis criptografados (como credenciais de gateway)
-- Autenticação social com Google e Microsoft
-- Testes regulares de segurança
+2. Acesse [http://localhost:3000](http://localhost:3000) no navegador.
 
-##  Internacionalização
-- Site preparado desde o início para múltiplos idiomas (i18n)
-- Suporte nativo a português, inglês e espanhol
-- Conteúdo adaptável por região
-- Moedas locais nos planos de preço
+## Scripts Disponíveis
 
-##  Analytics e Métricas
-- Integração com Vercel Analytics
-- Funil de conversão de visitante para cliente
-- Métricas de uso de trials
-- Taxa de conversão de trials para pagantes
-- Monitoramento de churn e retenção
-- Alertas personalizados via LogSnag
+```bash
+# Desenvolvimento
+pnpm dev
 
-## Integração CI/CD
-- Deploy automatizado via GitHub Actions
-- Preview deployments para PRs
-- Testes automatizados
-- Versionamento semântico
+# Build
+pnpm build
 
-Com esse módulo, a Edunéxia disponibiliza um site institucional completo, pronto para apresentar e vender a plataforma de forma moderna, automática e adaptável ao crescimento de cada cliente. O site é otimizado para conversão, oferece experiência personalizada para cada visitante e se integra perfeitamente ao ecossistema Edunéxia através da arquitetura de monorepo.
+# Lint
+pnpm lint
+
+# Testes
+pnpm test
+```
+
+## Estrutura de Diretórios
+
+```
+src/
+├── components/       # Componentes reutilizáveis
+│   ├── admin/        # Componentes da área administrativa
+│   ├── blog/         # Componentes relacionados ao blog
+│   ├── common/       # Componentes comuns (botões, cards, etc.)
+│   ├── forms/        # Formulários reutilizáveis
+│   ├── layout/       # Componentes de layout (header, footer, etc.)
+│   └── sections/     # Seções específicas das páginas
+├── contexts/         # Contextos React
+├── hooks/            # Hooks personalizados
+├── lib/              # Utilitários e configurações
+├── pages/            # Páginas da aplicação
+│   ├── admin/        # Páginas da área administrativa
+│   ├── blog/         # Páginas do blog
+│   └── public/       # Páginas públicas
+├── services/         # Serviços (API, autenticação, etc.)
+├── styles/           # Estilos globais
+└── types/            # Definições de tipos TypeScript
+```
+
+## Banco de Dados
+
+Este módulo utiliza o Supabase como backend. O esquema do banco de dados inclui:
+
+### Tabelas Principais
+
+- `site_pages`: Páginas estáticas do site
+- `site_blog_posts`: Posts do blog
+- `site_blog_categories`: Categorias do blog
+- `site_leads`: Contatos/leads gerados no site
+- `site_testimonials`: Depoimentos de clientes/alunos
+- `site_settings`: Configurações gerais do site
+- `site_sections`: Seções e banners personalizáveis
+- `site_featured_courses`: Cursos em destaque
+- `site_menu_items`: Itens do menu do site
+
+Para mais detalhes sobre o esquema, consulte a [documentação completa do esquema](/docs/site-edunexia-schema.md).
+
+### Usando o Banco de Dados no Código
+
+Para interagir com o banco de dados, utilize o cliente ApiClient do pacote `@edunexia/api-client`:
+
+```typescript
+import { useApiClient } from '@edunexia/api-client';
+
+// No seu componente/hook
+const apiClient = useApiClient();
+
+// Exemplo: Buscar páginas publicadas
+const fetchPages = async () => {
+  const { data, error } = await apiClient.from('site_pages')
+    .select('*')
+    .eq('status', 'published');
+    
+  if (error) throw error;
+  return data;
+};
+```
+
+## Tipos TypeScript
+
+Os tipos para as tabelas do banco de dados estão disponíveis em `@edunexia/database-schema`:
+
+```typescript
+import { SitePage, SiteBlogPost } from '@edunexia/database-schema';
+
+// Usar os tipos
+const renderPage = (page: SitePage) => {
+  // ...
+};
+```
+
+## Fluxos Principais
+
+### Gerenciamento de Páginas
+
+1. Administrador cria/edita páginas na área administrativa
+2. As páginas são salvas no Supabase com status (rascunho/publicado)
+3. As páginas publicadas ficam disponíveis para visualização no site público
+
+### Blog
+
+1. Administrador cria categorias e posts
+2. Posts são salvos com status (rascunho/publicado)
+3. Visitantes podem navegar por categorias e ler posts publicados
+
+### Captação de Leads
+
+1. Visitante preenche formulário de contato
+2. Lead é salvo no Supabase
+3. Administrador pode visualizar e gerenciar leads na área administrativa
+
+## Integração com Outros Módulos
+
+- **Módulo de Matrículas**: Encaminhamento de leads para matrícula
+- **Módulo de Comunicação**: Envio de leads para o CRM
+- **Módulo de Material Didático**: Exibição de previews de cursos
+
+## Autenticação e Segurança
+
+- A autenticação utiliza o pacote `@edunexia/auth`
+- Row Level Security (RLS) do Supabase controla o acesso aos dados
+- Políticas de segurança garantem que:
+  - Visitantes anônimos só veem conteúdo publicado
+  - Administradores têm acesso completo à área administrativa
+
+## Deployment
+
+O site é implantado via Vercel com integração contínua:
+
+1. Push para a branch `main` inicia o processo de CI/CD
+2. Vercel constrói e implanta automaticamente
+3. O site fica disponível em `https://site.edunexia.com`
+
+## Contribuindo
+
+Para contribuir com este módulo, siga as [diretrizes gerais do monorepo](/docs/guia-contribuicao.md) e:
+
+1. Certifique-se de entender o esquema do banco de dados
+2. Utilize os componentes do design system em `@edunexia/ui-components`
+3. Mantenha a documentação atualizada
+
+## Recursos Adicionais
+
+- [Documentação do Esquema do Banco de Dados](/docs/site-edunexia-schema.md)
+- [Guia de Contribuição do Monorepo](/docs/guia-contribuicao.md)
+- [Documentação do Design System](/docs/design-system.md)
+- [Gerenciamento de Pacotes](/docs/gerenciamento-pacotes.md)

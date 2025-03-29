@@ -1,22 +1,9 @@
 import React, { createContext, useContext, useMemo } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { TypedSupabaseClient } from '../types'
-import { createSupabaseClient } from '..'
-
-interface ApiContextValue {
-  supabase: TypedSupabaseClient | null
-  supabaseUrl: string
-  supabaseKey: string
-}
+import { ApiContextValue, ApiProviderProps, TypedSupabaseClient } from './types'
+import { createSupabaseClient } from '../client-factory'
 
 const ApiContext = createContext<ApiContextValue | null>(null)
-
-interface ApiProviderProps {
-  children: React.ReactNode
-  supabaseUrl: string
-  supabaseKey: string
-  queryClient?: QueryClient
-}
 
 /**
  * Provider para o cliente API

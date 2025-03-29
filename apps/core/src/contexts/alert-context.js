@@ -15,7 +15,12 @@ export function AlertProvider({ children, position = 'top-right', defaultDuratio
     // Adiciona um novo alerta
     const addAlert = useCallback((alert) => {
         const id = generateId();
-        const newAlert = Object.assign({ id, autoClose: true, duration: defaultDuration }, alert);
+        const newAlert = {
+            id,
+            autoClose: true,
+            duration: defaultDuration,
+            ...alert
+        };
         setAlerts(prev => [...prev, newAlert]);
         // Se autoClose estiver habilitado, configura timer para fechar
         if (newAlert.autoClose) {

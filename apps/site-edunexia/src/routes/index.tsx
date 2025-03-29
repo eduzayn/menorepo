@@ -1,19 +1,20 @@
-import { Route, Routes } from 'react-router-dom';
-import DefaultLayout from '../layouts/DefaultLayout';
+import { Routes, Route } from 'react-router-dom';
 import HomePage from '../pages/HomePage';
-import AboutPage from '../pages/AboutPage';
+import BlogPage from '../pages/BlogPage';
+import BlogPostPage from '../pages/BlogPostPage';
 import ContactPage from '../pages/ContactPage';
+import DynamicPage from '../pages/DynamicPage';
+import NotFoundPage from '../pages/NotFoundPage';
 
-export function AppRoutes() {
+export default function AppRoutes() {
   return (
     <Routes>
-      <Route path="/" element={<DefaultLayout />}>
-        <Route index element={<HomePage />} />
-        <Route path="sobre" element={<AboutPage />} />
-        <Route path="contato" element={<ContactPage />} />
-      </Route>
+      <Route path="/" element={<HomePage />} />
+      <Route path="/blog" element={<BlogPage />} />
+      <Route path="/blog/:slug" element={<BlogPostPage />} />
+      <Route path="/contato" element={<ContactPage />} />
+      <Route path="/pagina/:slug" element={<DynamicPage />} />
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
-}
-
-export default AppRoutes; 
+} 

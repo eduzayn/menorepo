@@ -1,0 +1,17 @@
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+import { useEffect, useState } from 'react';
+import { usePublishedPages } from '../hooks/usePages';
+export function HomePage() {
+    const { data: pages, isLoading, error } = usePublishedPages();
+    const [connectionStatus, setConnectionStatus] = useState(null);
+    useEffect(() => {
+        if (pages) {
+            setConnectionStatus('connected');
+        }
+        else if (error) {
+            setConnectionStatus('error');
+            console.error('Erro ao buscar páginas:', error);
+        }
+    }, [pages, error]);
+    return (_jsxs("div", { className: "container mx-auto p-8", children: [_jsx("h1", { className: "text-3xl font-bold mb-8", children: "Site Edun\u00E9xia" }), _jsxs("div", { className: "mb-8 p-4 border rounded-lg", children: [_jsx("h2", { className: "text-xl font-semibold mb-2", children: "Status da Conex\u00E3o" }), isLoading ? (_jsx("p", { className: "text-gray-600", children: "Verificando conex\u00E3o com o banco de dados..." })) : connectionStatus === 'connected' ? (_jsxs("div", { className: "flex items-center text-green-600", children: [_jsx("svg", { xmlns: "http://www.w3.org/2000/svg", className: "h-6 w-6 mr-2", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor", children: _jsx("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M5 13l4 4L19 7" }) }), _jsx("span", { children: "Conectado ao banco de dados com sucesso!" })] })) : connectionStatus === 'error' ? (_jsxs("div", { className: "flex items-center text-red-600", children: [_jsx("svg", { xmlns: "http://www.w3.org/2000/svg", className: "h-6 w-6 mr-2", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor", children: _jsx("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M6 18L18 6M6 6l12 12" }) }), _jsx("span", { children: "Erro ao conectar ao banco de dados. Verifique o console." })] })) : null] }), _jsxs("div", { className: "mb-8", children: [_jsx("h2", { className: "text-xl font-semibold mb-4", children: "P\u00E1ginas Publicadas" }), isLoading ? (_jsx("p", { className: "text-gray-600", children: "Carregando p\u00E1ginas..." })) : error ? (_jsx("p", { className: "text-red-600", children: "Erro ao carregar p\u00E1ginas." })) : pages && pages.length > 0 ? (_jsx("ul", { className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4", children: pages.map((page) => (_jsxs("li", { className: "border rounded-lg p-4 hover:shadow-md transition-shadow", children: [_jsx("h3", { className: "text-lg font-medium mb-2", children: page.title }), _jsxs("p", { className: "text-gray-600 mb-2", children: ["/", page.slug] }), page.featured_image_url && (_jsx("img", { src: page.featured_image_url, alt: page.title, className: "w-full h-40 object-cover rounded mb-2" })), _jsxs("p", { className: "text-sm text-gray-500", children: ["Publicado em: ", new Date(page.published_at || page.created_at).toLocaleDateString()] })] }, page.id))) })) : (_jsxs("div", { className: "text-center p-8 border rounded-lg bg-gray-50", children: [_jsx("p", { className: "text-gray-600 mb-4", children: "Nenhuma p\u00E1gina publicada encontrada." }), _jsx("p", { className: "text-sm text-gray-500", children: "A conex\u00E3o com o banco de dados est\u00E1 funcionando, mas n\u00E3o h\u00E1 p\u00E1ginas publicadas. Utilize o painel administrativo para criar e publicar p\u00E1ginas." })] }))] })] }));
+}

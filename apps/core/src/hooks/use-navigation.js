@@ -139,7 +139,10 @@ export function useNavigation() {
             const availableRoutes = config.routes.filter(route => route.roles.includes(role));
             // Se há pelo menos uma rota disponível, adiciona o módulo
             if (availableRoutes.length > 0) {
-                availableModules[key] = Object.assign(Object.assign({}, config), { routes: availableRoutes });
+                availableModules[key] = {
+                    ...config,
+                    routes: availableRoutes
+                };
             }
         });
         return availableModules;

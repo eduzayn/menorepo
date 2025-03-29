@@ -1,5 +1,5 @@
 import { DefaultSuggestionModel } from './models/default-suggestion-model';
-import { SuggestionRequest, SuggestionResponse } from './models/suggestion-model';
+import { SuggestionRequest, AISuggestion } from './models/types';
 import { BlockType } from '@/types/editor';
 
 /**
@@ -35,25 +35,8 @@ export interface SuggestionContext {
   learningObjectives?: string[];
 }
 
-/**
- * Interface para sugestões de IA
- */
-export interface AISuggestion {
-  /** Título da sugestão */
-  title: string;
-  /** Tipo da sugestão (texto, bloco, etc) */
-  type: 'text' | 'summary' | 'objectives' | 'activity' | 'correction' | 'block';
-  /** Tipo de bloco para o qual a sugestão é aplicável */
-  blockType?: BlockType;
-  /** Nível de confiança da sugestão (0-1) */
-  confidence: number;
-  /** Preview do conteúdo para mostrar ao usuário */
-  preview: string;
-  /** Justificativa para a sugestão */
-  reasoning: string;
-  /** Conteúdo da sugestão */
-  content?: string;
-}
+// Reexportamos a interface AISuggestion para manter compatibilidade com código existente
+export { AISuggestion };
 
 /**
  * Motor de sugestões de IA para conteúdo educacional

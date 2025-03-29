@@ -9,11 +9,14 @@ import { useApi } from './use-api';
  */
 export function useQuery(queryKey, queryFn, options) {
     const { client, isLoading: isApiLoading } = useApi();
-    return useReactQuery(queryKey, () => queryFn(client), Object.assign({ 
+    return useReactQuery(queryKey, () => queryFn(client), {
         // Não executa a consulta se a API ainda estiver carregando
-        enabled: (options === null || options === void 0 ? void 0 : options.enabled) !== false && !isApiLoading, 
+        enabled: options?.enabled !== false && !isApiLoading,
         // Opções padrão que podem ser sobrescritas
-        refetchOnWindowFocus: false, retry: 1 }, options));
+        refetchOnWindowFocus: false,
+        retry: 1,
+        ...options
+    });
 }
 /**
  * Hook para carregar dados paginados
@@ -26,13 +29,16 @@ export function useQuery(queryKey, queryFn, options) {
  */
 export function usePaginatedQuery(queryKey, queryFn, page, limit, options) {
     const { client, isLoading: isApiLoading } = useApi();
-    return useReactQuery([...queryKey, page, limit], () => queryFn(client, page, limit), Object.assign({ 
+    return useReactQuery([...queryKey, page, limit], () => queryFn(client, page, limit), {
         // Atualiza a consulta quando a página ou limite mudar
-        keepPreviousData: true, 
+        keepPreviousData: true,
         // Não executa a consulta se a API ainda estiver carregando
-        enabled: (options === null || options === void 0 ? void 0 : options.enabled) !== false && !isApiLoading, 
+        enabled: options?.enabled !== false && !isApiLoading,
         // Opções padrão que podem ser sobrescritas
-        refetchOnWindowFocus: false, retry: 1 }, options));
+        refetchOnWindowFocus: false,
+        retry: 1,
+        ...options
+    });
 }
 /**
  * Hook para buscar um item por ID
@@ -49,9 +55,12 @@ export function useQueryById(resource, id, queryFn, options) {
             throw new Error(`ID é obrigatório para buscar ${resource}`);
         }
         return queryFn(client, id);
-    }, Object.assign({ 
+    }, {
         // Não executa a consulta se não houver ID ou a API estiver carregando
-        enabled: (options === null || options === void 0 ? void 0 : options.enabled) !== false && !!id && !isApiLoading, 
+        enabled: options?.enabled !== false && !!id && !isApiLoading,
         // Opções padrão que podem ser sobrescritas
-        refetchOnWindowFocus: false, retry: 1 }, options));
+        refetchOnWindowFocus: false,
+        retry: 1,
+        ...options
+    });
 }

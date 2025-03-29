@@ -1,19 +1,43 @@
 {
-  "extends": "@edunexia/typescript-config/vite.json",
+  "extends": "../../packages/typescript-config/vite.json",
   "compilerOptions": {
+    "composite": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"],
-      "@components/*": ["./src/components/*"],
-      "@hooks/*": ["./src/hooks/*"],
-      "@pages/*": ["./src/pages/*"],
-      "@services/*": ["./src/services/*"],
-      "@contexts/*": ["./src/contexts/*"],
-      "@types/*": ["./src/types/*"],
-      "@styles/*": ["./src/styles/*"],
-      "@schemas/*": ["./src/schemas/*"],
-      "@lib/*": ["./src/lib/*"]
+      "@/*": [
+        "./src/*"
+      ],
+      "@components/*": [
+        "./src/components/*"
+      ],
+      "@hooks/*": [
+        "./src/hooks/*"
+      ],
+      "@pages/*": [
+        "./src/pages/*"
+      ],
+      "@services/*": [
+        "./src/services/*"
+      ],
+      "@contexts/*": [
+        "./src/contexts/*"
+      ],
+      "@types/*": [
+        "./src/types/*"
+      ],
+      "@styles/*": [
+        "./src/styles/*"
+      ],
+      "@schemas/*": [
+        "./src/schemas/*"
+      ],
+      "@lib/*": [
+        "./src/lib/*"
+      ]
     }
   },
-  "include": ["src", "vite.config.ts"]
+  "include": [
+    "src",
+    "vite.config.ts"
+  ]
 }

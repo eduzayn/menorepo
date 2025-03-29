@@ -35,7 +35,7 @@ const generateAppTsConfig = (projectName) => {
   const paths = existingConfig.compilerOptions?.paths || { "@/*": ["./src/*"] };
 
   return {
-    extends: "@edunexia/typescript-config/vite.json",
+    extends: "../../packages/typescript-config/vite.json",
     compilerOptions: {
       composite: true,
       baseUrl: ".",
@@ -60,11 +60,18 @@ const generatePackageTsConfig = (projectName) => {
   }
 
   // Determinar qual base estender com base no tipo de pacote
-  let extendsBase = "../../tsconfig.base.json";
+  let extendsBase = "../typescript-config/base.json";
   
-  // Se já estende de @edunexia/typescript-config/*, manter isso
-  if (existingConfig.extends && existingConfig.extends.startsWith('@edunexia/typescript-config/')) {
-    extendsBase = existingConfig.extends;
+  // Se já estende de um arquivo específico, converter para caminho relativo
+  if (existingConfig.extends) {
+    if (existingConfig.extends.startsWith('@edunexia/typescript-config/')) {
+      // Converter de @edunexia/typescript-config/X.json para ../typescript-config/X.json
+      const configFile = existingConfig.extends.split('/').pop();
+      extendsBase = `../typescript-config/${configFile}`;
+    } else if (!existingConfig.extends.startsWith('..')) {
+      // Manter o extends existente se já for um caminho relativo
+      extendsBase = existingConfig.extends;
+    }
   }
 
   return {

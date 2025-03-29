@@ -6,13 +6,13 @@
     "allowJs": true,
     "jsx": "react-jsx",
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
-    "noEmit": true,
     "resolveJsonModule": true,
     "target": "ESNext",
     "useDefineForClassFields": true,
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
     "isolatedModules": true,
+    "noEmit": false,
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]

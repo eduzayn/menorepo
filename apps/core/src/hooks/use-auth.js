@@ -1,12 +1,3 @@
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 import { useState, useEffect, useCallback } from 'react';
 import { useApi, signIn, signOut, getCurrentUser } from '@edunexia/api-client';
 import { useNavigate } from 'react-router-dom';
@@ -27,11 +18,11 @@ export function useAuth() {
     /**
      * Verifica se o usuário está autenticado
      */
-    const checkAuth = useCallback(() => __awaiter(this, void 0, void 0, function* () {
+    const checkAuth = useCallback(async () => {
         setLoading(true);
         setError(null);
         try {
-            const { user: authUser, error } = yield getCurrentUser(client);
+            const { user: authUser, error } = await getCurrentUser(client);
             if (error) {
                 throw new Error(error.message);
             }
@@ -45,15 +36,15 @@ export function useAuth() {
         finally {
             setLoading(false);
         }
-    }), [client]);
+    }, [client]);
     /**
      * Realiza login com email e senha
      */
-    const login = useCallback((credentials) => __awaiter(this, void 0, void 0, function* () {
+    const login = useCallback(async (credentials) => {
         setLoading(true);
         setError(null);
         try {
-            const { user, session, error } = yield signIn(client, credentials);
+            const { user, session, error } = await signIn(client, credentials);
             if (error) {
                 throw new Error(error.message);
             }
@@ -78,14 +69,14 @@ export function useAuth() {
         finally {
             setLoading(false);
         }
-    }), [client, navigate]);
+    }, [client, navigate]);
     /**
      * Realiza logout da sessão atual
      */
-    const logout = useCallback(() => __awaiter(this, void 0, void 0, function* () {
+    const logout = useCallback(async () => {
         setLoading(true);
         try {
-            const { success, error } = yield signOut(client);
+            const { success, error } = await signOut(client);
             if (error) {
                 throw new Error(error.message);
             }
@@ -106,7 +97,7 @@ export function useAuth() {
         finally {
             setLoading(false);
         }
-    }), [client, navigate]);
+    }, [client, navigate]);
     /**
      * Verifica se o usuário tem a permissão necessária
      */

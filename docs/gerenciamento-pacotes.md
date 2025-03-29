@@ -24,6 +24,28 @@ Esta versão está definida em:
 - `package.json` (campo "packageManager")
 - Workflows do GitHub Actions
 
+## Versão do Node.js
+
+A versão padrão do Node.js para este projeto é:
+
+```
+node@18.16.0
+```
+
+Esta versão está definida em:
+- `package.json` (campo "engines")
+- `.npmrc` (campo "use-node-version")
+- `.nvmrc` e `.node-version` para compatibilidade com ferramentas de controle de versão
+
+### Importante: Formato da Versão do Node.js
+
+Ao especificar a versão do Node.js em arquivos de configuração, sempre use o formato completo X.Y.Z:
+
+✅ **Correto**: `18.16.0`  
+❌ **Incorreto**: `18` ou `>=18`
+
+O PNPM requer o formato completo X.Y.Z para baixar a versão correta do Node.js. Usar apenas o número principal da versão (como "18") causará erros.
+
 ## Instalação do pnpm
 
 ### Usando Corepack (Recomendado)
@@ -122,6 +144,17 @@ Se você encontrar problemas após a instalação:
 pnpm store prune
 pnpm install --force
 ```
+
+### Problemas com a Versão do Node.js
+
+Se você encontrar o erro `ERR_PNPM_INVALID_NODE_VERSION`:
+
+1. Verifique se o formato da versão no arquivo `.npmrc` está correto (deve ser X.Y.Z)
+2. Use o NVM para mudar para a versão correta:
+   ```bash
+   nvm use
+   ```
+3. Ou instale a versão correta do Node.js manualmente
 
 ## Considerações para CI/CD
 

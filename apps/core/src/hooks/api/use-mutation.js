@@ -1,14 +1,3 @@
-var __rest = (this && this.__rest) || function (s, e) {
-    var t = {};
-    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
-        t[p] = s[p];
-    if (s != null && typeof Object.getOwnPropertySymbols === "function")
-        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
-            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
-                t[p[i]] = s[p[i]];
-        }
-    return t;
-};
 import { useMutation as useReactMutation } from '@tanstack/react-query';
 import { useApi } from './use-api';
 import { useAlerts } from '../../contexts/alert-context';
@@ -31,8 +20,9 @@ export function useMutation(mutationFn, options) {
 export function useMutationWithFeedback(mutationFn, options = {}) {
     const { client } = useApi();
     const { addAlert } = useAlerts();
-    const { successMessage = 'Operação realizada com sucesso!', errorMessage = 'Ocorreu um erro ao realizar a operação.', successTitle = 'Sucesso', errorTitle = 'Erro', showSuccessFeedback = true, showErrorFeedback = true, onSuccess, onError } = options, restOptions = __rest(options, ["successMessage", "errorMessage", "successTitle", "errorTitle", "showSuccessFeedback", "showErrorFeedback", "onSuccess", "onError"]);
-    return useReactMutation((variables) => mutationFn(client, variables), Object.assign({ onSuccess: (data, variables, context) => {
+    const { successMessage = 'Operação realizada com sucesso!', errorMessage = 'Ocorreu um erro ao realizar a operação.', successTitle = 'Sucesso', errorTitle = 'Erro', showSuccessFeedback = true, showErrorFeedback = true, onSuccess, onError, ...restOptions } = options;
+    return useReactMutation((variables) => mutationFn(client, variables), {
+        onSuccess: (data, variables, context) => {
             // Mostra alerta de sucesso se configurado
             if (showSuccessFeedback) {
                 addAlert({
@@ -45,7 +35,8 @@ export function useMutationWithFeedback(mutationFn, options = {}) {
             if (onSuccess) {
                 onSuccess(data, variables, context);
             }
-        }, onError: (error, variables, context) => {
+        },
+        onError: (error, variables, context) => {
             // Mostra alerta de erro se configurado
             if (showErrorFeedback) {
                 addAlert({
@@ -58,5 +49,7 @@ export function useMutationWithFeedback(mutationFn, options = {}) {
             if (onError) {
                 onError(error, variables, context);
             }
-        } }, restOptions));
+        },
+        ...restOptions
+    });
 }

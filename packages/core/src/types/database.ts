@@ -1,4 +1,4 @@
-import { Database as BaseDatabase } from '@edunexia/database-types';
+import { Database as BaseDatabase } from '@edunexia/database-schema';
 
 export interface ComunicacaoTables {
   conversas: {
@@ -111,6 +111,9 @@ export interface ComunicacaoTables {
   };
 }
 
-export interface Database extends BaseDatabase {
+export interface CoreDatabase {
   public: ComunicacaoTables & BaseDatabase['public'];
-} 
+}
+
+// Re-export the original Database type to maintain compatibility
+export type { Database } from '@edunexia/database-schema'; 

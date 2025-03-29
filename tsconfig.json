@@ -1,27 +1,94 @@
 {
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@edunexia/*": ["./packages/*/src"],
-      "@apps/*": ["./apps/*/src"]
+      "@edunexia/*": [
+        "./packages/*/src"
+      ],
+      "@apps/*": [
+        "./apps/*/src"
+      ]
     }
   },
-  "exclude": ["node_modules"],
-  "include": ["**/*.ts", "**/*.tsx"],
   "references": [
-    { "path": "./apps/comunicacao" },
-    { "path": "./apps/core" },
-    { "path": "./apps/material-didatico" },
-    { "path": "./apps/matriculas" },
-    { "path": "./apps/portal-do-aluno" },
-    { "path": "./apps/portal-parceiro" },
-    { "path": "./apps/portal-polo" },
-    { "path": "./packages/api-client" },
-    { "path": "./packages/auth" },
-    { "path": "./packages/core" },
-    { "path": "./packages/database-schema" },
-    { "path": "./packages/ui-components" },
-    { "path": "./packages/utils" }
+    {
+      "path": "apps/comunicacao"
+    },
+    {
+      "path": "apps/core"
+    },
+    {
+      "path": "apps/financeiro-empresarial"
+    },
+    {
+      "path": "apps/material-didatico"
+    },
+    {
+      "path": "apps/matriculas"
+    },
+    {
+      "path": "apps/module-template"
+    },
+    {
+      "path": "apps/portal-do-aluno"
+    },
+    {
+      "path": "apps/portal-parceiro"
+    },
+    {
+      "path": "apps/portal-polo"
+    },
+    {
+      "path": "apps/site-edunexia"
+    },
+    {
+      "path": "packages/api-client"
+    },
+    {
+      "path": "packages/auth"
+    },
+    {
+      "path": "packages/config-base"
+    },
+    {
+      "path": "packages/core"
+    },
+    {
+      "path": "packages/database-schema"
+    },
+    {
+      "path": "packages/eslint-config"
+    },
+    {
+      "path": "packages/shared-types"
+    },
+    {
+      "path": "packages/tailwind-config"
+    },
+    {
+      "path": "packages/typescript-config"
+    },
+    {
+      "path": "packages/ui-components"
+    },
+    {
+      "path": "packages/utils"
+    }
+  ],
+  "exclude": [
+    "node_modules",
+    "apps/**/*",
+    "packages/**/*"
+  ],
+  "include": [
+    "./scripts/**/*.ts"
   ]
-} 
+}
