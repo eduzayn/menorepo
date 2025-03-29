@@ -15,5 +15,8 @@ export {
   type AuthProviderProps
 } from './components/AuthProvider';
 
+// Exportar componentes de proteção de rotas
+export * from './components';
+
 // Exportar funções de autenticação
 export * from './supabase-client'; 

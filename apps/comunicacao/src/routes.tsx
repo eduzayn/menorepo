@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { ROUTE_PREFIXES } from '@edunexia/core';
+// @ts-ignore - Importação do módulo core para constantes de rotas
+import { ROUTE_PREFIXES } from '@edunexia/core-types';
 import { useAuth } from '@edunexia/auth';
 import {
   ConversasPage,
@@ -21,7 +22,10 @@ import { MainLayout } from './components/layout/MainLayout';
 // Prefixo para todas as rotas deste módulo
 const PREFIX = ROUTE_PREFIXES.COMUNICACAO;
 
-// Componente para proteção de rotas
+/**
+ * @deprecated Este componente será substituído pelo RouteGuard do pacote @edunexia/auth
+ * quando o lançamento da versão estabilizar.
+ */
 const ProtectedRoute = ({ children, requiredRole }: { children: React.ReactNode, requiredRole?: string }) => {
   const { user, isAuthenticated, loading, loginPath } = useAuth();
   

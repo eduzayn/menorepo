@@ -1,41 +1,43 @@
-import React from 'react'
+/**
+ * @deprecated Este componente foi substituído pelo RouteGuard do pacote @edunexia/auth
+ * Importe diretamente: import { RouteGuard } from '@edunexia/auth'
+ * 
+ * Este arquivo será removido em versões futuras.
+ */
+
+import { ReactNode } from 'react'
 import { Navigate } from 'react-router-dom'
-import { useAuth } from '../hooks/useAuth'
-import { UserRole } from '../types/auth'
+import { useAuth, UserRole } from '../hooks/useAuth'
 
 interface ProtectedProps {
-  children: React.ReactNode
+  children: ReactNode
   requiredRoles?: UserRole[]
 }
 
 /**
- * Componente para proteger rotas baseado em autenticação e papéis de usuário
+ * Componente para proteger rotas que requerem autenticação
+ * @deprecated Será substituído pelo RouteGuard de @edunexia/auth
  */
-export function Protected({ children, requiredRoles = [] }: ProtectedProps) {
-  const { user, isLoading } = useAuth()
+export default function ProtectedRoute({ children, requiredRoles }: ProtectedProps) {
+  const { user, isAuthenticated, isLoading } = useAuth()
 
-  // Se está carregando, mostra um indicador
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Carregando...</p>
-        </div>
-      </div>
+    return <div>Carregando...</div>
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/matriculas/login" replace />
+  }
+
+  if (requiredRoles && requiredRoles.length > 0) {
+    const hasRequiredRole = requiredRoles.some(role => 
+      user?.roles?.includes(role)
     )
+    
+    if (!hasRequiredRole) {
+      return <Navigate to="/matriculas/unauthorized" replace />
+    }
   }
 
-  // Se não estiver autenticado, redireciona para login
-  if (!user) {
-    return <Navigate to="/login" replace />
-  }
-
-  // Se houver papéis requeridos, verifica se o usuário tem permissão
-  if (requiredRoles.length > 0 && !requiredRoles.includes(user.role as UserRole)) {
-    return <Navigate to="/acesso-negado" replace />
-  }
-
-  // Se passar por todas as validações, renderiza o conteúdo
   return <>{children}</>
 } 
