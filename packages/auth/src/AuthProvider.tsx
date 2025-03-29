@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { SupabaseClient, User } from '@supabase/supabase-js';
+import { SupabaseClient, User, Provider } from '@supabase/supabase-js';
 import { createSupabaseClient } from './supabase-client';
 import { ROUTE_PREFIXES, ModuleName } from '@edunexia/navigation';
 
@@ -11,8 +11,8 @@ export interface AuthContextType {
   hasRole: (role: string | string[]) => boolean;
   hasPermission: (permission: string | string[]) => boolean;
   loginWithEmailAndPassword: (email: string, password: string) => Promise<any>;
-  loginWithOAuth: (provider: 'google' | 'microsoft' | 'facebook') => Promise<any>;
-  logout: () => Promise<void>;
+  loginWithOAuth: (provider: Provider) => Promise<any>;
+  logout: () => Promise<any>;
   getCurrentUser: () => Promise<User | null>;
   forgotPassword: (email: string) => Promise<any>;
   resetPassword: (password: string) => Promise<any>;
@@ -116,7 +116,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
   };
 
   // Login com OAuth (Google, Microsoft, etc.)
-  const loginWithOAuth = async (provider: 'google' | 'microsoft' | 'facebook') => {
+  const loginWithOAuth = async (provider: Provider) => {
     return client.auth.signInWithOAuth({ provider });
   };
 

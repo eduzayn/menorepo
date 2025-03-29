@@ -31,13 +31,13 @@ Este documento registra o progresso da migração de componentes, hooks e contex
 
 | Módulo | Status | Observações |
 |--------|--------|-------------|
-| apps/portal-do-aluno | ⏳ Pendente | Verificar todas as importações de @edunexia/core |
-| apps/material-didatico | ⏳ Pendente | Verificar todas as importações de @edunexia/core |
+| apps/portal-do-aluno | ✅ Atualizado | Migrado ThemeProvider, AlertProvider e substituído UserProvider por AuthProvider |
+| apps/material-didatico | ✅ Atualizado | Já estava usando os pacotes específicos |
 | apps/comunicacao | ✅ Atualizado | Migrado ThemeProvider e AlertProvider para @edunexia/ui-components |
 | apps/portal-polo | ✅ Atualizado | Migrado ThemeProvider, AlertProvider e ApiProvider |
-| apps/matriculas | ⏳ Pendente | Verificar todas as importações de @edunexia/core |
-| apps/site-vendas | ⏳ Pendente | Verificar todas as importações de @edunexia/core |
-| packages/auth | ⚠️ Em progresso | Adicionado ModuleName em packages/navigation para compatibilidade |
+| apps/matriculas | ✅ Atualizado | Migrada importação de ROUTE_PREFIXES no Login.tsx |
+| apps/site-vendas | 🚫 Inexistente | Módulo não encontrado, módulo equivalente é site-edunexia |
+| packages/auth | ⚠️ Em progresso | Corrigidos tipos Provider e retorno de Promise<any> para logout |
 
 ## Novos Pacotes Criados
 
@@ -58,19 +58,23 @@ Este documento registra o progresso da migração de componentes, hooks e contex
 
 1. ✅ ~~Migrar os contextos AlertContext e ThemeContext para ui-components~~
 2. ✅ ~~Criar pacotes específicos para navigation e notifications~~
-3. ⏳ Atualizar todas as importações nos módulos da aplicação
+3. ✅ ~~Atualizar todas as importações nos módulos da aplicação~~
    - ✅ apps/comunicacao
    - ✅ apps/portal-polo
-   - ⏳ apps/portal-do-aluno
-   - ⏳ apps/material-didatico
-   - ⏳ apps/matriculas
-   - ⏳ apps/site-vendas
+   - ✅ apps/portal-do-aluno
+   - ✅ apps/material-didatico
+   - ✅ apps/matriculas
+   - 🚫 apps/site-vendas (inexistente)
 4. ⏳ Corrigir as dependências de tipos e constantes em packages/auth
    - ✅ Migração do tipo ModuleName para packages/navigation
    - ✅ Migração das constantes ROUTE_PREFIXES para packages/navigation
-   - ⏳ Resolver erros de tipagem no packages/auth
-5. ⏳ Executar testes para garantir que nada foi quebrado
-6. ⏳ Remover o módulo apps/core
+   - ⚠️ Parcialmente resolvido: erro de Provider e retorno de logout corrigidos
+   - ⏳ Resolver erros de ESLint no packages/auth
+5. ⏳ Criar pacote @edunexia/utils para funções utilitárias
+   - ⏳ Migrar formatCurrency, formatDate, etc.
+   - ⏳ Atualizar importações em apps/portal-polo
+6. ⏳ Executar testes para garantir que nada foi quebrado
+7. ⏳ Remover o módulo apps/core
 
 ## Observações Gerais
 
