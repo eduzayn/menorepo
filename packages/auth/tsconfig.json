@@ -3,6 +3,7 @@
   "compilerOptions": {
     "composite": true,
     "baseUrl": ".",
+    "jsx": "react",
     "paths": {
       "@/*": [
         "./src/*"

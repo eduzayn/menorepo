@@ -1,7 +1,10 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { useAuth } from './AuthProvider';
-import type { UserRole } from '@edunexia/core';
+
+import { useAuth } from '../AuthProvider';
+
+// Definindo UserRole localmente
+type UserRole = 'admin' | 'aluno' | 'professor' | 'polo' | 'parceiro' | 'guest';
 
 interface RouteGuardProps {
   children: React.ReactNode;
@@ -18,8 +21,8 @@ interface RouteGuardProps {
  * <Route
  *   path="/dashboard"
  *   element={
- *     <RouteGuard>
- *       <DashboardPage />
+ *     <RouteGuard requiredRoles={['admin', 'professor']}>
+ *       <Dashboard />
  *     </RouteGuard>
  *   }
  * />
@@ -50,21 +53,21 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({
   requiredRoles,
   requiredPermissions
 }) => {
-  const auth = useAuth();
+  const { isAuthenticated, hasRole, hasPermission, loginPath } = useAuth();
   const location = useLocation();
   
   // Verificar se está carregando
-  if (auth.loading) {
+  if (isAuthenticated === undefined) {
     // Placeholder para componente de loading
     return <div>Carregando...</div>;
   }
   
   // Verificar se está autenticado
-  if (!auth.isAuthenticated) {
+  if (!isAuthenticated) {
     // Redirecionar para a página de login com o retorno para a página atual
     return (
       <Navigate
-        to={auth.loginPath}
+        to={loginPath}
         state={{ from: location.pathname }}
         replace
       />
@@ -72,11 +75,11 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({
   }
   
   // Verificar papéis, se necessário
-  if (requiredRoles && !auth.hasRole(requiredRoles)) {
+  if (requiredRoles && !hasRole(requiredRoles)) {
     // Redirecionar para uma página de acesso negado
     return (
       <Navigate
-        to={`${auth.loginPath.split('/auth')[0]}/acesso-negado`}
+        to="/acesso-negado"
         state={{ reason: 'role' }}
         replace
       />
@@ -84,11 +87,11 @@ export const RouteGuard: React.FC<RouteGuardProps> = ({
   }
   
   // Verificar permissões, se necessário
-  if (requiredPermissions && !auth.hasPermission(requiredPermissions)) {
+  if (requiredPermissions && !hasPermission(requiredPermissions)) {
     // Redirecionar para uma página de acesso negado
     return (
       <Navigate
-        to={`${auth.loginPath.split('/auth')[0]}/acesso-negado`}
+        to="/acesso-negado"
         state={{ reason: 'permission' }}
         replace
       />

@@ -1,5 +1,5 @@
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from '@edunexia/database-schema';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 // Tipagem para variáveis de ambiente
 declare global {

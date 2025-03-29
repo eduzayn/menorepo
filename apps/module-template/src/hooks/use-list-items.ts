@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { useQuery } from '@edunexia/core/hooks/api';
-import { ApiClient } from '@edunexia/api-client';
+import { useQuery } from '@tanstack/react-query';
+import { ApiClient, useApiClient } from '@edunexia/api-client';
 
 /**
  * Interface para o item
