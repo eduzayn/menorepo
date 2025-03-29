@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { SupabaseClient, User } from '@supabase/supabase-js';
-import { createSupabaseClient } from '../supabase-client';
+import { createSupabaseClient } from './supabase-client';
 import { ROUTE_PREFIXES, ModuleName } from '@edunexia/core';
 
 export interface AuthContextType {
@@ -65,10 +65,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
 
     // Configurar listener para mudanças de autenticação
     const { data: authListener } = client.auth.onAuthStateChange(
-      async (_event, currentSession) => {
-        if (currentSession) {
-          setSession(currentSession);
-          setUser(currentSession.user);
+      async (event, session) => {
+        if (session) {
+          setSession(session);
+          setUser(session.user);
         } else {
           setSession(null);
           setUser(null);

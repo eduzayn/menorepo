@@ -1,77 +1,33 @@
-import { createContext, useContext, useEffect, useState } from 'react'
-import { SupabaseClient, User, Session } from '@supabase/supabase-js'
-import type { Database } from '@edunexia/database-schema'
-import { createSupabaseClient } from '@edunexia/auth'
+/**
+ * @deprecated Este arquivo está sendo mantido apenas para compatibilidade temporária.
+ * 
+ * O contexto de autenticação foi centralizado no pacote @edunexia/auth
+ * 
+ * Para usar a autenticação, importe diretamente:
+ * import { useAuth, AuthProvider } from '@edunexia/auth';
+ * 
+ * E use o AuthProvider com o módulo específico:
+ * <AuthProvider moduleName="MATRICULAS">
+ *   {children}
+ * </AuthProvider>
+ * 
+ * Este arquivo será removido em futuras versões.
+ */
 
-interface AuthContextType {
-  supabase: SupabaseClient<Database>
-  user: User | null
-  loading: boolean
-  signIn: (email: string, password: string) => Promise<void>
-  signOut: () => Promise<void>
-}
+// Re-exportando a implementação centralizada
+import { AuthProvider as CentralizedAuthProvider, useAuth as useCentralizedAuth } from '@edunexia/auth'
+import React from 'react'
 
-const supabase = createSupabaseClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY
-)
-
-const AuthContext = createContext<AuthContextType | undefined>(undefined)
+export const AuthContext = React.createContext<any>(undefined)
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null)
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    // Verifica se há uma sessão ativa
-    supabase.auth.getSession().then(({ data: { session } }: { data: { session: Session | null } }) => {
-      setUser(session?.user ?? null)
-      setLoading(false)
-    })
-
-    // Inscreve-se para mudanças na autenticação
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event: string, session: Session | null) => {
-      setUser(session?.user ?? null)
-    })
-
-    return () => subscription.unsubscribe()
-  }, [])
-
-  const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
-
-    if (error) {
-      throw error
-    }
-  }
-
-  const signOut = async () => {
-    const { error } = await supabase.auth.signOut()
-    if (error) {
-      throw error
-    }
-  }
-
-  const value = {
-    supabase,
-    user,
-    loading,
-    signIn,
-    signOut,
-  }
-
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
+  return (
+    <CentralizedAuthProvider moduleName="MATRICULAS">
+      {children}
+    </CentralizedAuthProvider>
+  )
 }
 
 export function useAuth() {
-  const context = useContext(AuthContext)
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider')
-  }
-  return context
+  return useCentralizedAuth()
 } 

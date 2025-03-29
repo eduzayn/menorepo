@@ -1,70 +1,110 @@
-import { useState, FormEvent, ChangeEvent } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { Button, TextField } from '@edunexia/ui-components'
+import { useState } from 'react'
+import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '@edunexia/auth'
+import { ROUTE_PREFIXES } from '@edunexia/core'
 
 export function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  
+  const { loginWithEmailAndPassword, isAuthenticated } = useAuth()
   const navigate = useNavigate()
-  const { signIn } = useAuth()
-
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+  const location = useLocation()
+  
+  // Redirecionar para o dashboard se já estiver autenticado
+  if (isAuthenticated) {
+    // Verificar se há um redirecionamento na URL
+    const from = (location.state as any)?.from || `${ROUTE_PREFIXES.MATRICULAS}/dashboard`
+    return <Navigate to={from} replace />
+  }
+  
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setError(null)
-    setLoading(true)
-
+    
+    if (!email || !password) {
+      setError('Por favor, preencha todos os campos.')
+      return
+    }
+    
     try {
-      await signIn(email, password)
-      navigate('/matriculas')
-    } catch (err) {
-      setError('Falha ao fazer login. Verifique suas credenciais.')
-      console.error('Erro ao fazer login:', err)
+      setIsLoading(true)
+      setError(null)
+      
+      const { error } = await loginWithEmailAndPassword(email, password)
+      
+      if (error) {
+        throw new Error(error.message || 'Falha na autenticação')
+      }
+      
+      // Redirecionamento será feito pelo sistema através da verificação isAuthenticated
+    } catch (err: any) {
+      setError(err.message || 'Ocorreu um erro ao fazer login. Tente novamente.')
     } finally {
-      setLoading(false)
+      setIsLoading(false)
     }
   }
-
+  
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-      <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
-        <h2 className="text-3xl font-bold text-center text-gray-900 mb-8">Login</h2>
-        {error && (
-          <div className="bg-red-50 text-red-700 p-4 rounded-md mb-6" role="alert">
-            {error}
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8">
+        <div>
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+            Sistema de Matrículas
+          </h2>
+          <p className="mt-2 text-center text-sm text-gray-600">
+            Acesse sua conta para gerenciar as matrículas
+          </p>
+        </div>
+        
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+          {error && (
+            <div className="rounded-md bg-red-50 p-4">
+              <div className="text-sm text-red-700">{error}</div>
+            </div>
+          )}
+          
+          <div className="rounded-md shadow-sm -space-y-px">
+            <div>
+              <label htmlFor="email-address" className="sr-only">Email</label>
+              <input
+                id="email-address"
+                name="email"
+                type="email"
+                autoComplete="email"
+                required
+                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
+            <div>
+              <label htmlFor="password" className="sr-only">Senha</label>
+              <input
+                id="password"
+                name="password"
+                type="password"
+                autoComplete="current-password"
+                required
+                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                placeholder="Senha"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
           </div>
-        )}
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <TextField
-            id="email"
-            type="email"
-            label="Email"
-            value={email}
-            onChange={(e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
-            required
-            placeholder="seu@email.com"
-            error={error ? 'Email ou senha inválidos' : undefined}
-          />
-          <TextField
-            id="password"
-            type="password"
-            label="Senha"
-            value={password}
-            onChange={(e: ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
-            required
-            placeholder="••••••••"
-            error={error ? 'Email ou senha inválidos' : undefined}
-          />
-          <Button
-            type="submit"
-            variant="primary"
-            className="w-full"
-            disabled={loading}
-          >
-            {loading ? 'Entrando...' : 'Entrar'}
-          </Button>
+          
+          <div>
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-70"
+            >
+              {isLoading ? 'Processando...' : 'Entrar'}
+            </button>
+          </div>
         </form>
       </div>
     </div>

@@ -11,8 +11,9 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@edunexia/api-client": "*",
-    "@edunexia/core": "*",
+    "@edunexia/api-client": "workspace:*",
+    "@edunexia/auth": "workspace:*",
+    "@edunexia/core": "workspace:*",
     "@edunexia/core-types": "*",
     "@edunexia/ui-components": "*",
     "@hookform/resolvers": "^3.3.4",

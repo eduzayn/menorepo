@@ -12,9 +12,10 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@edunexia/auth": "*",
+    "@edunexia/api-client": "workspace:*",
+    "@edunexia/auth": "workspace:*",
+    "@edunexia/core": "workspace:*",
     "@edunexia/ui-components": "*",
-    "@edunexia/api-client": "*",
     "@edunexia/database-schema": "*",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext';
+import { ROUTE_PREFIXES } from '@edunexia/core';
 
 // Layouts
 import DashboardLayout from './components/layouts/DashboardLayout';
@@ -12,6 +13,9 @@ import Login from './pages/auth/Login';
 // Páginas do dashboard
 import Dashboard from './pages/dashboard/Dashboard';
 import NotFound from './pages/NotFound';
+
+// Prefixo para todas as rotas deste módulo
+const PREFIX = ROUTE_PREFIXES.PORTAL_PARCEIRO;
 
 // Componente para rotas protegidas
 interface ProtectedRouteProps {
@@ -26,7 +30,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to={`${PREFIX}/auth/login`} replace />;
   }
 
   return <>{children}</>;
@@ -38,19 +42,19 @@ const AppRoutes: React.FC = () => {
     <Routes>
       {/* Rotas de autenticação */}
       <Route element={<AuthLayout />}>
-        <Route path="/login" element={<Login />} />
+        <Route path={`${PREFIX}/auth/login`} element={<Login />} />
       </Route>
 
       {/* Rotas protegidas */}
       <Route
-        path="/"
+        path={PREFIX}
         element={
           <ProtectedRoute>
             <DashboardLayout />
           </ProtectedRoute>
         }
       >
-        <Route index element={<Navigate to="/dashboard" replace />} />
+        <Route index element={<Navigate to={`${PREFIX}/dashboard`} replace />} />
         <Route path="dashboard" element={<Dashboard />} />
         
         {/* Placeholder para rotas futuras */}
@@ -61,6 +65,11 @@ const AppRoutes: React.FC = () => {
         <Route path="relatorios" element={<div>Relatórios</div>} />
         <Route path="configuracoes" element={<div>Configurações</div>} />
       </Route>
+
+      {/* Manter temporariamente as rotas antigas com redirecionamento para compatibilidade */}
+      <Route path="/login" element={<Navigate to={`${PREFIX}/auth/login`} replace />} />
+      <Route path="/dashboard" element={<Navigate to={`${PREFIX}/dashboard`} replace />} />
+      <Route path="/" element={<Navigate to={PREFIX} replace />} />
 
       {/* Rota 404 */}
       <Route path="*" element={<NotFound />} />

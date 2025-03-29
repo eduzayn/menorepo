@@ -7,13 +7,13 @@
 // Exportar tipos
 export * from './types';
 
-// Exportar hooks de autenticação base
-export * from './hooks/useAuth';
-
-// Exportar o provedor e hook de contexto
-export {
+// Exportar componentes e hooks de autenticação
+export { 
   AuthProvider,
-  useAuthContext,
-  // Este é o useAuth principal que os módulos devem usar
-  useAuth
-} from './components/AuthProvider'; 
+  useAuth,
+  type AuthContextType,
+  type AuthProviderProps
+} from './components/AuthProvider';
+
+// Exportar funções de autenticação
+export * from './supabase-client'; 

@@ -12,3 +12,6 @@ export type UserRole =
 
 // Exportações de utilitários puros (sem dependência de UI/React)
 export * from './utils';
+
+// Exportações das constantes
+export * from './constants/route-prefixes';
