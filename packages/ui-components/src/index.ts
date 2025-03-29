@@ -13,6 +13,16 @@ export type { StatsCardProps } from './components/data-display/StatsCard';
 export { default as DashboardLayout } from './components/layout/DashboardLayout';
 export type { DashboardLayoutProps } from './components/layout/DashboardLayout';
 
+// Forms
+export { default as FormField } from './components/forms/FormField';
+export type { FormFieldProps } from './components/forms/FormField';
+
+export { default as Input } from './components/forms/Input';
+export type { InputProps } from './components/forms/Input';
+
+export { default as Select } from './components/forms/Select';
+export type { SelectProps, SelectOption } from './components/forms/Select';
+
 // Templates
 export { default as DashboardPageTemplate } from './templates/DashboardPage';
 export type { DashboardPageTemplateProps } from './templates/DashboardPage';

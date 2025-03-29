@@ -3,13 +3,16 @@
   "compilerOptions": {
     "composite": true,
     "baseUrl": ".",
+    "jsx": "react-jsx",
+    "jsxImportSource": "react",
     "paths": {
       "@/*": [
         "./src/*"
       ]
     },
     "outDir": "./dist",
-    "rootDir": "./src"
+    "rootDir": "./src",
+    "lib": ["DOM", "DOM.Iterable", "ESNext"]
   },
   "include": [
     "src/**/*.ts",

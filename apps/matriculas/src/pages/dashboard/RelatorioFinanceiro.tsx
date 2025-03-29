@@ -14,6 +14,12 @@ import {
 import { dashboardService } from '../../services/index'
 import { DashboardFilters, FinanceiroSummary } from '../../services/dashboardService'
 import { formatCurrency } from '../../utils/formatters'
+import { useEffect, useState } from 'react'
+import { DashboardLayout } from '../../components/Layout/DashboardLayout'
+import { DashboardFilter } from '../../components/dashboard/DashboardFilter'
+import { StatsCard } from '@edunexia/ui-components'
+import { ChartMatriculasPorPeriodo } from '../../components/dashboard/ChartMatriculasPorPeriodo'
+import { DashboardCard } from '../../components/dashboard/DashboardCard'
 
 export const RelatorioFinanceiro = () => {
   const [isLoading, setIsLoading] = useState(true)
@@ -117,8 +123,8 @@ export const RelatorioFinanceiro = () => {
             title="Receita Total"
             value={formatCurrency(financeiroData?.valorTotalRecebido || 0)}
             icon={<BanknotesIcon className="h-6 w-6" />}
-            iconBgColor="bg-green-100"
-            change={{
+            className="bg-white"
+            trend={{
               value: calcularVariacaoReceita(),
               isPositive: calcularVariacaoReceita() >= 0,
               text: "vs. período anterior"
@@ -130,7 +136,7 @@ export const RelatorioFinanceiro = () => {
             title="Pagamentos Pendentes"
             value={formatCurrency(financeiroData?.valorEmAberto || 0)}
             icon={<ClockIcon className="h-6 w-6" />}
-            iconBgColor="bg-blue-100"
+            className="bg-white"
             description="Valores ainda não vencidos"
             isLoading={isLoading}
           />
@@ -139,7 +145,7 @@ export const RelatorioFinanceiro = () => {
             title="Pagamentos Vencidos"
             value={formatCurrency(financeiroData?.valorVencido || 0)}
             icon={<ExclamationTriangleIcon className="h-6 w-6" />}
-            iconBgColor="bg-red-100"
+            className="bg-white"
             description="Valores vencidos não pagos"
             isLoading={isLoading}
           />
@@ -148,7 +154,7 @@ export const RelatorioFinanceiro = () => {
             title="Previsão de Receita"
             value={formatCurrency(financeiroData?.valorTotalPrevisto || 0)}
             icon={<CurrencyDollarIcon className="h-6 w-6" />}
-            iconBgColor="bg-purple-100"
+            className="bg-white"
             description="Valor total esperado no período"
             isLoading={isLoading}
           />

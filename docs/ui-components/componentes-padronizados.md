@@ -1,159 +1,272 @@
-# Componentes Padronizados e Templates Reutilizáveis
+# Componentes Padronizados na Edunéxia
 
-Este documento descreve os componentes padronizados e templates reutilizáveis implementados no pacote `@edunexia/ui-components`. Estes elementos devem ser utilizados em todos os módulos da plataforma Edunéxia para garantir consistência visual e comportamental.
+Este documento descreve os componentes padronizados disponíveis no pacote `@edunexia/ui-components` e fornece diretrizes para sua utilização nos módulos da plataforma Edunéxia.
 
 ## Instalação e Configuração
 
-Para utilizar os componentes em qualquer módulo, importe-os diretamente do pacote:
+O pacote `@edunexia/ui-components` já está disponível como dependência no monorepo. Para utilizá-lo, basta importar os componentes necessários em seu código:
 
 ```tsx
-import { StatsCard, DashboardLayout, DashboardPageTemplate } from '@edunexia/ui-components';
+import { StatsCard, DashboardLayout, FormField, Input, Select } from '@edunexia/ui-components';
 ```
 
-## Componentes de Exibição de Dados
+## Componentes Disponíveis
 
-### StatsCard
+### Componentes de Exibição de Dados
 
-Componente para exibir métricas e estatísticas em formato de card, amplamente utilizado em dashboards.
+#### StatsCard
+
+Card padronizado para exibição de estatísticas em dashboards.
 
 ```tsx
 <StatsCard
   title="Total de Alunos"
-  value={1243}
+  value={1500}
+  description="Alunos ativos no semestre atual"
+  trend={{ value: 12, isPositive: true, text: "vs. semestre anterior" }}
   icon={<UserIcon />}
-  iconBgColor="bg-blue-100"
-  trend={{ value: 12, isPositive: true, text: "vs. mês anterior" }}
 />
 ```
 
 **Props:**
-- `title`: Título do card (obrigatório)
-- `value`: Valor principal a ser exibido (obrigatório)
-- `icon`: Ícone do card (opcional)
-- `iconBgColor`: Cor de fundo do ícone (opcional, padrão: 'bg-primary-100')
-- `description`: Descrição adicional (opcional)
-- `trend`: Dados de tendência/comparação (opcional)
-- `isLoading`: Estado de carregamento (opcional)
-- `className`: Classes CSS adicionais (opcional)
-- `to`: Link de navegação (opcional)
 
-## Layouts
+| Prop | Tipo | Descrição |
+|------|------|-----------|
+| `title` | `string` | Título do card |
+| `value` | `number \| string` | Valor principal a ser exibido |
+| `description` | `string` (opcional) | Descrição adicional |
+| `trend` | `{ value: number, isPositive: boolean, text?: string }` (opcional) | Informações de tendência |
+| `icon` | `ReactNode` (opcional) | Ícone a ser exibido |
+| `isLoading` | `boolean` (opcional) | Indica se o card está em estado de carregamento |
+| `className` | `string` (opcional) | Classes CSS adicionais |
+| `to` | `string` (opcional) | URL para navegação ao clicar no card |
 
-### DashboardLayout
+### Templates de Página
 
-Layout padrão para páginas de dashboard com menu lateral, cabeçalho e rodapé.
+#### DashboardPageTemplate
 
-```tsx
-<DashboardLayout
-  title="Módulo de Matrículas"
-  user={{ name: "João Silva", email: "joao@exemplo.com" }}
-  onLogout={() => logout()}
->
-  <div>Conteúdo principal</div>
-</DashboardLayout>
-```
-
-**Props:**
-- `children`: Conteúdo principal (obrigatório)
-- `title`: Título da página (opcional)
-- `sidebar`: Menu lateral personalizado (opcional)
-- `headerContent`: Conteúdo adicional para o cabeçalho (opcional)
-- `footer`: Rodapé personalizado (opcional)
-- `user`: Informações do usuário logado (opcional)
-- `onLogout`: Função de logout (opcional)
-
-## Templates
-
-### DashboardPageTemplate
-
-Template para criação rápida de páginas de dashboard com estrutura padronizada.
+Template para páginas de dashboard, com suporte para cabeçalho, cards de estatísticas e área de conteúdo principal.
 
 ```tsx
 <DashboardPageTemplate
-  title="Dashboard de Vendas"
-  subtitle="Acompanhe suas métricas de vendas"
-  headerActions={<Button>Nova Venda</Button>}
+  title="Dashboard de Matrículas"
+  subtitle="Visão geral das matrículas ativas"
   statsCards={
-    <>
-      <StatsCard title="Total" value={1500} />
-      <StatsCard title="Mês Atual" value={350} />
-    </>
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <StatsCard title="Total de Alunos" value={1500} />
+      <StatsCard title="Matrículas no Mês" value={120} />
+      <StatsCard title="Taxa de Evasão" value="3.2%" />
+    </div>
+  }
+  headerActions={
+    <Button>Nova Matrícula</Button>
   }
 >
-  <div>Conteúdo principal...</div>
+  <div>Conteúdo principal do dashboard</div>
 </DashboardPageTemplate>
 ```
 
 **Props:**
-- `title`: Título principal da página (obrigatório)
-- `subtitle`: Subtítulo ou descrição (opcional)
-- `headerActions`: Ações/botões para o cabeçalho (opcional)
-- `statsCards`: Cards de estatísticas (opcional)
-- `children`: Conteúdo principal (obrigatório)
-- `isLoading`: Indicador de carregamento (opcional)
-- `filters`: Filtros para o dashboard (opcional)
-- `error`: Mensagem de erro (opcional)
 
-### SettingsPageTemplate
+| Prop | Tipo | Descrição |
+|------|------|-----------|
+| `title` | `string` | Título da página |
+| `subtitle` | `string` (opcional) | Subtítulo da página |
+| `headerActions` | `ReactNode` (opcional) | Ações/botões no cabeçalho |
+| `statsCards` | `ReactNode` (opcional) | Cards de estatísticas |
+| `filters` | `ReactNode` (opcional) | Área de filtros |
+| `isLoading` | `boolean` (opcional) | Indica se a página está em estado de carregamento |
+| `error` | `string` (opcional) | Mensagem de erro a ser exibida |
+| `children` | `ReactNode` | Conteúdo principal da página |
 
-Template para páginas de configurações com múltiplas abas.
+#### SettingsPageTemplate
+
+Template para páginas de configurações, com suporte para abas de navegação.
 
 ```tsx
 <SettingsPageTemplate
-  title="Configurações"
-  subtitle="Gerencie as configurações do sistema"
+  title="Configurações do Sistema"
+  subtitle="Gerencie as preferências do sistema"
   tabs={[
     {
       id: 'general',
       title: 'Geral',
-      icon: <Settings />,
-      content: <GeneralSettingsForm />
+      content: <FormularioConfiguracoesGerais />
     },
     {
       id: 'security',
       title: 'Segurança',
-      icon: <Lock />,
-      content: <SecuritySettingsForm />
+      content: <FormularioConfiguracoesSegurana />
     }
+  ]}
+  defaultActiveTab="general"
+/>
+```
+
+**Props:**
+
+| Prop | Tipo | Descrição |
+|------|------|-----------|
+| `title` | `string` | Título da página |
+| `subtitle` | `string` (opcional) | Subtítulo da página |
+| `tabs` | `Array<{ id: string, title: string, content: ReactNode }>` | Configuração das abas |
+| `defaultActiveTab` | `string` (opcional) | ID da aba que deve estar ativa por padrão |
+| `isLoading` | `boolean` (opcional) | Indica se a página está em estado de carregamento |
+| `error` | `string` (opcional) | Mensagem de erro a ser exibida |
+| `onTabChange` | `(tabId: string) => void` (opcional) | Callback chamado quando a aba ativa é alterada |
+
+### Componentes de Layout
+
+#### DashboardLayout
+
+Layout padronizado para páginas de dashboard, incluindo cabeçalho, barra lateral e rodapé.
+
+```tsx
+<DashboardLayout
+  title="Portal do Aluno"
+  user={{ name: "João Silva", email: "joao@exemplo.com", avatar: "/images/avatar.png" }}
+  onLogout={() => handleLogout()}
+>
+  <DashboardPageTemplate title="Dashboard">
+    {/* conteúdo da página */}
+  </DashboardPageTemplate>
+</DashboardLayout>
+```
+
+**Props:**
+
+| Prop | Tipo | Descrição |
+|------|------|-----------|
+| `title` | `string` (opcional) | Título do dashboard |
+| `user` | `{ name?: string, email?: string, avatar?: string }` (opcional) | Informações do usuário logado |
+| `onLogout` | `() => void` (opcional) | Função chamada ao clicar no botão de sair |
+| `sidebar` | `ReactNode` (opcional) | Componente personalizado para a barra lateral |
+| `headerContent` | `ReactNode` (opcional) | Conteúdo personalizado para o cabeçalho |
+| `footer` | `ReactNode` (opcional) | Rodapé personalizado |
+| `children` | `ReactNode` | Conteúdo principal do layout |
+
+### Componentes de Formulário
+
+#### FormField
+
+Container padronizado para campos de formulário, com suporte para rótulo e mensagens de erro.
+
+```tsx
+<FormField
+  name="email"
+  label="E-mail"
+  required
+  error={errors.email?.message}
+  helpText="Utilize seu e-mail institucional"
+>
+  <Input name="email" placeholder="exemplo@email.com" />
+</FormField>
+```
+
+**Props:**
+
+| Prop | Tipo | Descrição |
+|------|------|-----------|
+| `name` | `string` | Nome do campo |
+| `label` | `string` | Rótulo do campo |
+| `error` | `string` (opcional) | Mensagem de erro |
+| `helpText` | `string` (opcional) | Texto de ajuda ou descrição |
+| `required` | `boolean` (opcional) | Indica se o campo é obrigatório |
+| `disabled` | `boolean` (opcional) | Indica se o campo está desabilitado |
+| `children` | `ReactNode` | Componente de input (Input, Select, etc.) |
+| `className` | `string` (opcional) | Classes CSS adicionais |
+
+#### Input
+
+Campo de entrada de texto padronizado.
+
+```tsx
+<Input
+  name="nome"
+  placeholder="Nome completo"
+  variant="outlined"
+  size="md"
+  leftIcon={<UserIcon />}
+/>
+```
+
+**Props:**
+
+| Prop | Tipo | Descrição |
+|------|------|-----------|
+| `size` | `'sm' \| 'md' \| 'lg'` (opcional) | Tamanho do campo |
+| `variant` | `'default' \| 'outlined' \| 'filled'` (opcional) | Variante de estilo |
+| `hasError` | `boolean` (opcional) | Indica se o campo tem erro |
+| `leftIcon` | `ReactNode` (opcional) | Ícone à esquerda do campo |
+| `rightIcon` | `ReactNode` (opcional) | Ícone à direita do campo |
+| `className` | `string` (opcional) | Classes CSS adicionais |
+| ... | Todas as props nativas de `<input>` | - |
+
+#### Select
+
+Campo de seleção padronizado.
+
+```tsx
+<Select
+  name="estado"
+  placeholder="Selecione um estado"
+  options={[
+    { value: 'sp', label: 'São Paulo' },
+    { value: 'rj', label: 'Rio de Janeiro' },
+    { value: 'mg', label: 'Minas Gerais' }
   ]}
 />
 ```
 
 **Props:**
-- `title`: Título da página (obrigatório)
-- `subtitle`: Subtítulo ou descrição (opcional)
-- `tabs`: Lista de abas (obrigatório)
-- `defaultActiveTab`: ID da aba ativa inicialmente (opcional)
-- `isLoading`: Indicador de carregamento (opcional)
-- `error`: Mensagem de erro (opcional)
-- `onTabChange`: Callback quando uma aba é alterada (opcional)
+
+| Prop | Tipo | Descrição |
+|------|------|-----------|
+| `options` | `Array<{ value: string, label: string, disabled?: boolean }>` | Opções do select |
+| `size` | `'sm' \| 'md' \| 'lg'` (opcional) | Tamanho do campo |
+| `variant` | `'default' \| 'outlined' \| 'filled'` (opcional) | Variante de estilo |
+| `hasError` | `boolean` (opcional) | Indica se o campo tem erro |
+| `placeholder` | `string` (opcional) | Texto para opção vazia |
+| `rightIcon` | `ReactNode` (opcional) | Ícone à direita do campo |
+| `className` | `string` (opcional) | Classes CSS adicionais |
+| ... | Todas as props nativas de `<select>` | - |
 
 ## Boas Práticas
 
-1. **Sempre priorize os componentes padronizados** sobre implementações locais.
-2. **Utilize os templates para páginas comuns** como dashboards e configurações.
-3. **Comunique necessidades de novos componentes** à equipe de UI antes de criar implementações locais.
-4. **Evite modificar o estilo dos componentes** para manter consistência visual.
-5. **Reporte bugs e problemas** encontrados nos componentes padronizados.
+### Quando usar componentes padronizados
 
-## Solicitando Novos Componentes
+- Utilize os componentes padronizados para garantir consistência visual e comportamental em todos os módulos da plataforma
+- Priorize o uso desses componentes em vez de criar implementações locais duplicadas
+- Se precisar de personalizações leves, use as props disponíveis (como `className`, `variant`, etc.)
 
-Para solicitar a inclusão de novos componentes padronizados:
+### Como estender funcionalidades
 
-1. Verifique se não existe um componente similar já implementado
-2. Documente o caso de uso e comportamento desejado
-3. Forneça exemplos de implementações existentes em diferentes módulos
-4. Abra uma issue no repositório com a tag "novo-componente"
+Se os componentes padronizados não atenderem todas as suas necessidades:
 
-## Migrando Componentes Existentes
+1. Verifique se a funcionalidade pode ser implementada usando as props existentes
+2. Considere compor os componentes para criar uma variação específica
+3. Entre em contato com a equipe de UI antes de criar implementações personalizadas
 
-Ao identificar componentes duplicados em diferentes módulos:
+### Testes
 
-1. Verifique comportamentos e props necessárias em cada implementação
-2. Implemente uma versão unificada em `@edunexia/ui-components`
-3. Atualize as instâncias nos módulos para usar a versão centralizada
-4. Remova as implementações locais
+Todos os componentes padronizados incluem testes de unidade. Ao implementar novos componentes:
+
+1. Siga os padrões de teste existentes
+2. Cubra todos os casos de uso e variações importantes
+3. Execute os testes com `pnpm test` antes de enviar seu PR
+
+## Contribuindo com novos componentes
+
+Para contribuir com novos componentes padronizados:
+
+1. Identifique componentes duplicados em diferentes módulos
+2. Analise as APIs e comportamentos existentes
+3. Extraia uma versão comum que atenda a maioria dos casos de uso
+4. Implemente o componente em `packages/ui-components`
+5. Adicione testes abrangentes
+6. Documente o componente neste arquivo
+7. Envie um PR para revisão
 
 ---
 
-Para mais detalhes sobre cada componente específico, consulte sua documentação dentro do código fonte. 
+> **Lembrete:** Atualize este documento sempre que adicionar, modificar ou remover componentes padronizados. 

@@ -7,7 +7,6 @@ import {
 } from '@heroicons/react/24/outline'
 import { 
   DashboardFilter, 
-  StatsCard, 
   ChartMatriculasPorStatus,
   ChartMatriculasPorPeriodo,
   ChartCursosPopulares
@@ -15,6 +14,7 @@ import {
 import { dashboardService } from '../../services/index'
 import { DashboardFilters, CursoPopularidade, StatusMatriculaChart, DashboardSummary } from '../../services/dashboardService'
 import { formatCurrency } from '../../utils/formatters'
+import { StatsCard } from '@edunexia/ui-components'
 
 export const Dashboard = () => {
   const [isLoading, setIsLoading] = useState(true)
@@ -127,8 +127,8 @@ export const Dashboard = () => {
             title="Total de Matrículas"
             value={summaryData?.totalMatriculas || 0}
             icon={<UserGroupIcon className="h-6 w-6" />}
-            iconBgColor="bg-blue-100"
-            change={{
+            className="bg-white"
+            trend={{
               value: calcularCrescimento(),
               isPositive: calcularCrescimento() >= 0,
               text: "vs. período anterior"
@@ -140,7 +140,7 @@ export const Dashboard = () => {
             title="Matrículas Recentes"
             value={summaryData?.matriculasRecentes || 0}
             icon={<ClipboardDocumentListIcon className="h-6 w-6" />}
-            iconBgColor="bg-green-100"
+            className="bg-white"
             description={`Nos últimos ${filters.periodo === 'mes' ? '30 dias' : 'dias'}`}
             isLoading={isLoading}
           />
@@ -149,7 +149,7 @@ export const Dashboard = () => {
             title="Total de Cursos"
             value={summaryData?.totalCursos || 0}
             icon={<AcademicCapIcon className="h-6 w-6" />}
-            iconBgColor="bg-yellow-100"
+            className="bg-white"
             isLoading={isLoading}
           />
           
@@ -157,7 +157,7 @@ export const Dashboard = () => {
             title="Total de Alunos"
             value={summaryData?.totalAlunos || 0}
             icon={<ArrowTrendingUpIcon className="h-6 w-6" />}
-            iconBgColor="bg-purple-100"
+            className="bg-white"
             isLoading={isLoading}
           />
         </div>
