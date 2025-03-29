@@ -7,7 +7,7 @@ Este documento descreve os componentes padronizados disponíveis no pacote `@edu
 O pacote `@edunexia/ui-components` já está disponível como dependência no monorepo. Para utilizá-lo, basta importar os componentes necessários em seu código:
 
 ```tsx
-import { StatsCard, DashboardLayout, FormField, Input, Select } from '@edunexia/ui-components';
+import { StatsCard, DashboardCard, DashboardLayout, FormField, Input, Select } from '@edunexia/ui-components';
 ```
 
 ## Componentes Disponíveis
@@ -40,6 +40,35 @@ Card padronizado para exibição de estatísticas em dashboards.
 | `isLoading` | `boolean` (opcional) | Indica se o card está em estado de carregamento |
 | `className` | `string` (opcional) | Classes CSS adicionais |
 | `to` | `string` (opcional) | URL para navegação ao clicar no card |
+
+#### DashboardCard
+
+Card versátil para exibição de informações em dashboards, com suporte para conteúdo personalizado.
+
+```tsx
+<DashboardCard
+  title="Matrículas por Status"
+  icon={<ChartIcon />}
+  className="h-full"
+>
+  <PieChart data={statusData} />
+</DashboardCard>
+```
+
+**Props:**
+
+| Prop | Tipo | Descrição |
+|------|------|-----------|
+| `title` | `string` | Título do card |
+| `value` | `number \| string` (opcional) | Valor principal a ser exibido |
+| `description` | `string` (opcional) | Descrição adicional |
+| `trend` | `{ value: number, isPositive: boolean, text?: string }` (opcional) | Informações de tendência |
+| `icon` | `ReactNode` (opcional) | Ícone a ser exibido |
+| `isLoading` | `boolean` (opcional) | Indica se o card está em estado de carregamento |
+| `className` | `string` (opcional) | Classes CSS adicionais |
+| `to` | `string` (opcional) | URL para navegação ao clicar no card |
+| `onClick` | `() => void` (opcional) | Função chamada ao clicar no card |
+| `children` | `ReactNode` (opcional) | Conteúdo personalizado a ser exibido dentro do card |
 
 ### Templates de Página
 

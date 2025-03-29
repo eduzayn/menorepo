@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { DashboardCard } from './DashboardCard'
+import { DashboardCard } from '@edunexia/ui-components'
 import { DadosPorPeriodo } from '../../services/dashboardService'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 

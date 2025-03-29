@@ -9,6 +9,9 @@
 export { default as StatsCard } from './components/data-display/StatsCard';
 export type { StatsCardProps } from './components/data-display/StatsCard';
 
+export { DashboardCard } from './components/data-display/DashboardCard';
+export type { DashboardCardProps } from './components/data-display/DashboardCard';
+
 // Layout
 export { default as DashboardLayout } from './components/layout/DashboardLayout';
 export type { DashboardLayoutProps } from './components/layout/DashboardLayout';

@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { DashboardCard } from './DashboardCard'
+import { DashboardCard } from '@edunexia/ui-components'
 import { CursoPopularidade } from '../../services/dashboardService'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LabelList } from 'recharts'
 

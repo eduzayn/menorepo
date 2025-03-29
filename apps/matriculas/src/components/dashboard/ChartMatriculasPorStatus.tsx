@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { DashboardCard } from './DashboardCard'
+import { DashboardCard } from '@edunexia/ui-components'
 import { StatusMatriculaChart } from '../../services/dashboardService'
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts'
 
