@@ -77,17 +77,24 @@ Este documento registra o progresso da migração dos componentes locais para a 
 1. **Card e componentes relacionados**
    - Localização anterior: `apps/portal-do-aluno/src/components/ui/card/index.tsx`
    - Implementação: `packages/ui-components/src/components/card/card.tsx`
-   - Status: Implementado na biblioteca, pendente de migração nos módulos
    - Benefícios:
      - Consistência visual em todos os módulos
      - Manutenção centralizada
      - API flexível e bem documentada
 
+2. **PageHeader**
+   - Localização anterior: (baseado no core) `apps/core/src/components/shared/page-header.tsx`
+   - Implementação: `packages/ui-components/src/components/layout/PageHeader.tsx`
+   - Melhorias:
+     - API expandida: adicionados `backIcon` e `onBackClick`
+     - Estilização aprimorada com Tailwind
+     - Tipagem melhorada
+     - Testes unitários adicionados
+
 ### 🔄 Componentes Pendentes
 
-1. **PageHeader**
-2. **FormField**
-3. **DashboardLayout**
+1. **FormField**
+2. **DashboardLayout**
 
 ## Módulo Comunicação
 
@@ -98,19 +105,27 @@ Este documento registra o progresso da migração dos componentes locais para a 
 3. **FormField**
 4. **DashboardLayout**
 
+## Módulo Material Didático
+
+### 🔄 Componentes Pendentes
+
+1. **StatsCard**
+2. **DisciplineCard**
+3. **CourseCard**
+
 ## Resumo Geral
 
-- **Componentes Migrados**: 6
+- **Componentes Migrados**: 7
 - **Componentes Não Migrados (com justificativa)**: 1
-- **Componentes Pendentes**: 6
-- **Progresso Total**: ~46%
+- **Componentes Pendentes**: 8
+- **Progresso Total**: ~47%
 
 ## Próximos Passos
 
-1. Migrar uso do Card no módulo portal-do-aluno
-2. Iniciar migração do PageHeader
+1. Verificar e atualizar referências do PageHeader nos módulos
+2. Iniciar migração do FormField
 3. Expandir cobertura de testes
-4. Documentar diretrizes de decisão para migração vs. manutenção local de componentes
+4. Continuar migração no módulo Material Didático
 
 ## Problemas Encontrados
 

@@ -16,6 +16,9 @@ export type { DashboardCardProps } from './components/data-display/DashboardCard
 export { default as DashboardLayout } from './components/layout/DashboardLayout';
 export type { DashboardLayoutProps } from './components/layout/DashboardLayout';
 
+export { default as PageHeader } from './components/layout/PageHeader';
+export type { PageHeaderProps } from './components/layout/PageHeader';
+
 // Forms
 export { default as FormField } from './components/forms/FormField';
 export type { FormFieldProps } from './components/forms/FormField';
