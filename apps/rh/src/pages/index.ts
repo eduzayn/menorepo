@@ -1,34 +1,51 @@
-// Placeholder temporário para páginas que ainda serão implementadas
-// Esses componentes serão substituídos por implementações reais
-
 import React from 'react';
 
-// Componente de página temporário para desenvolvimento
-const PlaceholderPage: React.FC<{ title: string }> = ({ title }) => (
-  <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gray-50 dark:bg-gray-900">
-    <div className="w-full max-w-4xl p-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
-      <h1 className="mb-4 text-2xl font-bold text-center text-gray-800 dark:text-white">
-        {title}
-      </h1>
-      <p className="text-center text-gray-600 dark:text-gray-300">
-        Esta página está em desenvolvimento e será implementada em breve.
-      </p>
-    </div>
-  </div>
-);
+// Importação direta das páginas implementadas
+import DashboardPageComponent from './DashboardPage';
+import ColaboradoresPageComponent from './ColaboradoresPage';
+import NovoColaboradorPageComponent from './NovoColaboradorPage';
+import DetalhesColaboradorPageComponent from './DetalhesColaboradorPage';
+import VagasPageComponent from './VagasPage';
+import NovaVagaPageComponent from './NovaVagaPage';
+import DetalhesVagaPageComponent from './DetalhesVagaPage';
+import CandidatosPageComponent from './CandidatosPage';
+import NovoCandidatoPageComponent from './NovoCandidatoPage';
+import DetalhesCandidatoPageComponent from './DetalhesCandidatoPage';
+import AvaliacoesPageComponent from './AvaliacoesPage';
+import NovaAvaliacaoPageComponent from './NovaAvaliacaoPage';
+import DetalhesAvaliacaoPageComponent from './DetalhesAvaliacaoPage';
 
-// Exporta os componentes de página (temporários)
-export const DashboardPage = () => <PlaceholderPage title="Dashboard de RH" />;
-export const VagasPage = () => <PlaceholderPage title="Gestão de Vagas" />;
-export const NovaVagaPage = () => <PlaceholderPage title="Criar Nova Vaga" />;
-export const DetalhesVagaPage = () => <PlaceholderPage title="Detalhes da Vaga" />;
-export const CandidatosPage = () => <PlaceholderPage title="Lista de Candidatos" />;
-export const DetalhesCandidatoPage = () => <PlaceholderPage title="Perfil do Candidato" />;
-export const ColaboradoresPage = () => <PlaceholderPage title="Gestão de Colaboradores" />;
-export const DetalhesColaboradorPage = () => <PlaceholderPage title="Perfil do Colaborador" />;
-export const NovoColaboradorPage = () => <PlaceholderPage title="Cadastrar Novo Colaborador" />;
-export const AvaliacoesPage = () => <PlaceholderPage title="Avaliações de Desempenho" />;
-export const DetalhesAvaliacaoPage = () => <PlaceholderPage title="Detalhes da Avaliação" />;
-export const NovaAvaliacaoPage = () => <PlaceholderPage title="Nova Avaliação" />;
-export const RedesSociaisPage = () => <PlaceholderPage title="Integração com Redes Sociais" />;
-export const NotFoundPage = () => <PlaceholderPage title="Página Não Encontrada (404)" />; 
+// Exportação das páginas implementadas
+export const DashboardPage = DashboardPageComponent;
+export const ColaboradoresPage = ColaboradoresPageComponent;
+export const NovoColaboradorPage = NovoColaboradorPageComponent;
+export const DetalhesColaboradorPage = DetalhesColaboradorPageComponent;
+export const VagasPage = VagasPageComponent;
+export const NovaVagaPage = NovaVagaPageComponent;
+export const DetalhesVagaPage = DetalhesVagaPageComponent;
+export const CandidatosPage = CandidatosPageComponent;
+export const NovoCandidatoPage = NovoCandidatoPageComponent;
+export const DetalhesCandidatoPage = DetalhesCandidatoPageComponent;
+export const AvaliacoesPage = AvaliacoesPageComponent;
+export const NovaAvaliacaoPage = NovaAvaliacaoPageComponent;
+export const DetalhesAvaliacaoPage = DetalhesAvaliacaoPageComponent;
+
+// Interface para o componente de placeholder
+interface PlaceholderProps {
+  title?: string;
+}
+
+// Componente para páginas em desenvolvimento
+export const PlaceholderPage: React.FC<PlaceholderProps> = ({ title }) => {
+  return (
+    <div className="container mx-auto px-4 py-8 flex flex-col items-center justify-center min-h-[70vh]">
+      <h1 className="text-2xl font-semibold mb-4">{title || 'Página em Desenvolvimento'}</h1>
+      <p className="text-gray-600 mb-6">Esta funcionalidade está sendo implementada.</p>
+    </div>
+  );
+};
+
+// Páginas de placeholder específicas
+export const ConfiguracoesPage: React.FC = () => <PlaceholderPage title="Configurações" />;
+export const RedesSociaisPage: React.FC = () => <PlaceholderPage title="Integração com Redes Sociais" />;
+export const NotFoundPage: React.FC = () => <PlaceholderPage title="Página Não Encontrada (404)" />; 

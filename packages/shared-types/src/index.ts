@@ -1,13 +1,14 @@
 /**
  * @edunexia/shared-types
  * 
- * Pacote de tipos compartilhados para todo o monorepo.
- * Centraliza definições de tipos comuns que são utilizados em múltiplos módulos.
+ * Este pacote centraliza as definições de tipos comuns usadas
+ * em múltiplos módulos do monorepo.
  */
 
-// Exportações de tipos
+// Exportações de tipos comuns
 export * from './common';
 export * from './user';
 export * from './pagination';
 export * from './enums';
-export * from './matricula'; 
+export * from './matricula';
+export * from './rh'; // Exportação dos tipos do módulo RH

@@ -1,29 +1,44 @@
-import { VagasService } from './vagas';
-import { CandidatosService } from './candidatos';
-import { ColaboradoresService } from './colaboradores';
-import { AvaliacoesService } from './avaliacoes';
-import { SocialMediaService } from './social';
+import { SupabaseClient } from '@supabase/supabase-js';
+import { ColaboradoresService } from './colaboradores-service';
+import { VagasService } from './vagas-service';
+import { CandidatosService } from './candidatos-service';
+import { AvaliacoesService } from './avaliacoes-service';
 
-export {
-  VagasService,
-  CandidatosService,
-  ColaboradoresService,
-  AvaliacoesService,
-  SocialMediaService
-};
+// Instância de client para todos os serviços
+let supabaseClient: SupabaseClient | null = null;
 
-// Factory para criar todas as instâncias de serviços
-import { ApiClient } from '@edunexia/api-client';
+// Função para inicializar o client
+export function initializeClient(client: SupabaseClient) {
+  supabaseClient = client;
+}
 
-export const createRhServices = (apiClient: ApiClient) => {
-  return {
-    vagas: new VagasService(apiClient),
-    candidatos: new CandidatosService(apiClient),
-    colaboradores: new ColaboradoresService(apiClient),
-    avaliacoes: new AvaliacoesService(apiClient),
-    social: new SocialMediaService(apiClient)
-  };
-};
+// Função para obter o client atual
+export function getClient(): SupabaseClient {
+  if (!supabaseClient) {
+    throw new Error('Supabase client não foi inicializado. Chame initializeClient primeiro.');
+  }
+  return supabaseClient;
+}
 
-// Tipos para o contexto de serviços
-export type RhServices = ReturnType<typeof createRhServices>; 
+// Funções para instanciar os serviços
+export function getColaboradoresService(): ColaboradoresService {
+  return new ColaboradoresService(getClient());
+}
+
+export function getVagasService(): VagasService {
+  return new VagasService(getClient());
+}
+
+export function getCandidatosService(): CandidatosService {
+  return new CandidatosService(getClient());
+}
+
+export function getAvaliacoesService(): AvaliacoesService {
+  return new AvaliacoesService(getClient());
+}
+
+// Re-exportar para facilitar o import
+export { ColaboradoresService } from './colaboradores-service';
+export { VagasService } from './vagas-service';
+export { CandidatosService } from './candidatos-service';
+export { AvaliacoesService } from './avaliacoes-service'; 

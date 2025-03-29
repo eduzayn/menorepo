@@ -25,7 +25,7 @@ edunexia-monorepo/
 │   ├── portal-polo/
 │   ├── rh/
 │   ├── contabilidade/
-│   ├── site-vendas/           # Site de apresentação e vendas self-service e whitelabel
+│   ├── site-edunexia/         # Site institucional, blog e vendas self-service
 │   ├── core/                  # Módulo central com componentes, hooks e utilitários compartilhados
 │   └── module-template/       # Template para a criação de novos módulos
 ├── packages/
@@ -54,6 +54,7 @@ Os seguintes módulos estão atualmente em desenvolvimento ativo:
 - ✅ **financeiro-empresarial** - Gestão financeira institucional
 - ✅ **comunicacao** - Mensageria, notificações e CRM
 - ✅ **matriculas** - Processo de inscrição e matrícula
+- ✅ **site-edunexia** - Site institucional, blog e vendas self-service
 
 ### Pacotes Compartilhados Implementados
 - ✅ **ui-components** - Sistema de design unificado
@@ -97,13 +98,13 @@ A Edunéxia será oferecida como uma **plataforma modular** para instituições 
   - Material Didático (Editor Inteligente)
 
 ### Sistema de Vendas Autoatendimento
-Será desenvolvido um **site de vendas independente (`site-vendas`)**, totalmente integrado ao ecossistema, com as seguintes funcionalidades:
-- Catálogo de módulos disponíveis.
-- Simulação de planos conforme escolha dos módulos.
-- Cadastro automático da instituição.
-- Pagamento on-line (via gateway).
-- Acesso imediato por e-mail após confirmação.
-- **Período de testes gratuitos de 14 dias** para novos clientes.
+O **site-edunexia** funciona como site institucional e plataforma de vendas self-service, totalmente integrado ao ecossistema, com as seguintes funcionalidades:
+- Catálogo de módulos disponíveis
+- Simulação de planos conforme escolha dos módulos
+- Cadastro automático da instituição
+- Pagamento on-line (via gateway)
+- Acesso imediato por e-mail após confirmação
+- **Período de testes gratuitos de 14 dias** para novos clientes
 
 Este modelo permite que as instituições realizem a contratação sem depender de equipe de vendas, facilitando a escalabilidade do negócio.
 
@@ -192,7 +193,7 @@ O cumprimento desta estrutura garante consistência e facilita a navegação ent
   - Verificação automatizada via scripts `circular:check` e `circular:check:all`
   - Visualização do grafo de dependências com `circular:image`
   - Executável via scripts `check-circular-deps.bat` ou `check-circular-deps.ps1`
-- Integração com gateway de pagamento no módulo `site-vendas` 🔄
+- Integração com gateway de pagamento no módulo `site-edunexia` 🔄
 - Geração automática de credenciais e e-mails transacionais 🔄
 - Backend unificado no Supabase para todos os módulos usando `@supabase/supabase-js` ✅
 - Deploy do frontend via Vercel com integrações automáticas 🔄
@@ -205,10 +206,11 @@ O cumprimento desta estrutura garante consistência e facilita a navegação ent
 - Finalizar a implementação das funcionalidades básicas dos módulos prioritários
 - Integrar completamente o sistema de autenticação centralizada
 - Implementar pipeline de CI/CD para todos os módulos
+- Desenvolvimento do módulo de RH
 
 ### Médio Prazo (3-6 meses)
-- Desenvolver módulos secundários (portal-parceiro, portal-polo)
-- Implementar o módulo de vendas self-service
+- Desenvolver módulos secundários (Contabilidade)
+- Finalizar a integração do site-edunexia com o sistema de pagamentos
 - Iniciar testes de integração entre todos os módulos
 
 ### Longo Prazo (6-12 meses)

@@ -1,6 +1,23 @@
 import React from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import * as Pages from './pages';
+import { 
+  DashboardPage,
+  ColaboradoresPage,
+  NovoColaboradorPage,
+  DetalhesColaboradorPage,
+  VagasPage,
+  NovaVagaPage,
+  DetalhesVagaPage,
+  CandidatosPage,
+  NovoCandidatoPage,
+  DetalhesCandidatoPage,
+  AvaliacoesPage,
+  NovaAvaliacaoPage,
+  DetalhesAvaliacaoPage,
+  ConfiguracoesPage,
+  RedesSociaisPage,
+  NotFoundPage
+} from './pages';
 
 // Define o caminho base do módulo
 const MODULE_BASE_PATH = '/rh';
@@ -19,71 +36,71 @@ export function ModuleRoutes({ basePath = MODULE_BASE_PATH }: ModuleRoutesProps)
       {/* Página inicial - Dashboard */}
       <Route
         path={`${basePath}`}
-        element={<Pages.DashboardPage />}
+        element={<DashboardPage />}
       />
 
       {/* Rotas de Recrutamento */}
       <Route
         path={`${basePath}/vagas`}
-        element={<Pages.VagasPage />}
+        element={<VagasPage />}
       />
       <Route
         path={`${basePath}/vagas/nova`}
-        element={<Pages.NovaVagaPage />}
+        element={<NovaVagaPage />}
       />
       <Route
         path={`${basePath}/vagas/:id`}
-        element={<Pages.DetalhesVagaPage />}
+        element={<DetalhesVagaPage />}
       />
 
       {/* Rotas de Candidatos */}
       <Route
         path={`${basePath}/candidatos`}
-        element={<Pages.CandidatosPage />}
+        element={<CandidatosPage />}
       />
       <Route
         path={`${basePath}/candidatos/:id`}
-        element={<Pages.DetalhesCandidatoPage />}
+        element={<DetalhesCandidatoPage />}
       />
 
       {/* Rotas de Colaboradores */}
       <Route
         path={`${basePath}/colaboradores`}
-        element={<Pages.ColaboradoresPage />}
+        element={<ColaboradoresPage />}
       />
       <Route
         path={`${basePath}/colaboradores/:id`}
-        element={<Pages.DetalhesColaboradorPage />}
+        element={<DetalhesColaboradorPage />}
       />
       <Route
         path={`${basePath}/colaboradores/novo`}
-        element={<Pages.NovoColaboradorPage />}
+        element={<NovoColaboradorPage />}
       />
 
       {/* Rotas de Avaliação */}
       <Route
         path={`${basePath}/avaliacoes`}
-        element={<Pages.AvaliacoesPage />}
+        element={<AvaliacoesPage />}
       />
       <Route
         path={`${basePath}/avaliacoes/:id`}
-        element={<Pages.DetalhesAvaliacaoPage />}
+        element={<DetalhesAvaliacaoPage />}
       />
       <Route
         path={`${basePath}/avaliacoes/nova`}
-        element={<Pages.NovaAvaliacaoPage />}
+        element={<NovaAvaliacaoPage />}
       />
 
       {/* Rotas de Redes Sociais */}
       <Route
         path={`${basePath}/redes-sociais`}
-        element={<Pages.RedesSociaisPage />}
+        element={<RedesSociaisPage />}
       />
 
       {/* Página 404 - Para rotas não encontradas dentro do módulo */}
       <Route
         path={`${basePath}/*`}
-        element={<Pages.NotFoundPage />}
+        element={<NotFoundPage />}
       />
     </Routes>
   );
