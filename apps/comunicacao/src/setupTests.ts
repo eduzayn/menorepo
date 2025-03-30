@@ -1,13 +1,17 @@
-import '@testing-library/jest-dom';
-import 'jest-canvas-mock';
-import { expect, afterEach } from 'vitest';
-import { cleanup } from '@testing-library/react';
-import matchers from '@testing-library/jest-dom/matchers';
+// Importação da configuração central de testes
+import '@edunexia/test-config/setup';
 
-// Estende os matchers do Vitest com os do jest-dom
-expect.extend(matchers);
+// Configurações específicas para o módulo de comunicação, se necessário
 
-// Limpa após cada teste
-afterEach(() => {
-  cleanup();
-}); 
+// Mock para navegador Web RTC
+import { vi } from 'vitest';
+
+// Mock de MediaStream e RTCPeerConnection para testes de chamadas de vídeo
+const mockMediaStream = {
+  getTracks: vi.fn().mockReturnValue([
+    { kind: 'video', stop: vi.fn(), enabled: true },
+    { kind: 'audio', stop: vi.fn(), enabled: true }
+  ])
+};
+
+globalThis.MediaStream = vi.fn().mockImplementation(() => mockMediaStream); 

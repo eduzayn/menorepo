@@ -1,10 +1,9 @@
-/// <reference types="vitest" />
-import { createVitestConfig } from '@edunexia/test-config'
-import path from 'path'
+import { createVitestConfig } from '@edunexia/test-config';
+import path from 'path';
 
 export default createVitestConfig('./', {
   plugins: [
-    // Plugins específicos para o módulo de comunicação, se necessário
+    // Plugins específicos para o Portal do Aluno, se necessário
   ],
   resolve: {
     alias: {
@@ -12,11 +11,12 @@ export default createVitestConfig('./', {
       '@components': path.resolve(__dirname, './src/components'),
       '@contexts': path.resolve(__dirname, './src/contexts'),
       '@hooks': path.resolve(__dirname, './src/hooks'),
-      '@pages': path.resolve(__dirname, './src/pages'),
       '@services': path.resolve(__dirname, './src/services'),
       '@styles': path.resolve(__dirname, './src/styles'),
       '@types': path.resolve(__dirname, './src/types'),
-      '@utils': path.resolve(__dirname, './src/utils')
+      '@utils': path.resolve(__dirname, './src/utils'),
+      '@app': path.resolve(__dirname, './src/app'),
+      '@lib': path.resolve(__dirname, './src/lib')
     }
   },
   test: {
@@ -25,8 +25,9 @@ export default createVitestConfig('./', {
         'src/components/**',
         'src/hooks/**',
         'src/utils/**',
-        'src/services/**'
+        'src/services/**',
+        'src/contexts/**'
       ],
     },
   },
-}) 
+}); 
