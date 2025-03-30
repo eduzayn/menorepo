@@ -1,10 +1,9 @@
-import { ReactNode } from 'react';
 import Header from './Header';
 import Footer from './Footer';
 import ErrorBoundary from './ErrorBoundary';
 
 interface LayoutProps {
-  children: ReactNode;
+  children: React.ReactNode;
 }
 
 /**
@@ -13,7 +12,7 @@ interface LayoutProps {
  * 1. Com children: <Layout><SeuComponente /></Layout>
  * 2. Como wrapper de rotas com Outlet: <Route element={<Layout />}>...</Route>
  */
-export default function Layout({ children }: LayoutProps) {
+const Layout = ({ children }: LayoutProps) => {
   return (
     <ErrorBoundary fallback={
       <div className="min-h-screen flex flex-col items-center justify-center text-center p-4">
@@ -27,13 +26,15 @@ export default function Layout({ children }: LayoutProps) {
         </button>
       </div>
     }>
-      <div className="flex min-h-screen flex-col">
+      <div className="flex flex-col min-h-screen">
         <Header />
-        <main className="flex-1">
+        <main className="flex-grow">
           {children}
         </main>
         <Footer />
       </div>
     </ErrorBoundary>
   );
-} 
+};
+
+export default Layout; 

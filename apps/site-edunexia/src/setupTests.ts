@@ -3,6 +3,7 @@ import '@edunexia/test-config/setup';
 
 // Configurações específicas para o site Edunexia, se necessário
 import { vi } from 'vitest';
+import { ReactNode } from 'react';
 
 // Mock do cliente de API/Supabase para os testes
 vi.mock('@edunexia/api-client', () => ({
@@ -49,14 +50,14 @@ vi.mock('@tanstack/react-query', () => ({
   QueryClient: vi.fn().mockImplementation(() => ({
     invalidateQueries: vi.fn()
   })),
-  QueryClientProvider: ({ children }) => children
+  QueryClientProvider: ({ children }: { children: ReactNode }) => children
 }));
 
 // Mock para react-router-dom
 vi.mock('react-router-dom', async () => {
-  const actual = await vi.importActual('react-router-dom');
+  const actual = await vi.importActual<any>('react-router-dom');
   return {
-    ...actual,
+    ...(actual as object),
     useParams: vi.fn().mockReturnValue({}),
     useNavigate: vi.fn().mockReturnValue(vi.fn()),
     useLocation: vi.fn().mockReturnValue({
@@ -70,7 +71,7 @@ vi.mock('react-router-dom', async () => {
 });
 
 // Mock para hooks personalizados
-vi.mock('../hooks/useAuth', () => ({
+vi.mock('./hooks/useAuth', () => ({
   useAuth: vi.fn().mockReturnValue({
     user: null,
     isLoading: false,
