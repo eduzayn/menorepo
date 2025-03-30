@@ -10,43 +10,36 @@
       "@components/*": [
         "./src/components/*"
       ],
-      "@pages/*": [
-        "./src/pages/*"
-      ],
       "@hooks/*": [
         "./src/hooks/*"
-      ],
-      "@contexts/*": [
-        "./src/contexts/*"
-      ],
-      "@utils/*": [
-        "./src/utils/*"
-      ],
-      "@styles/*": [
-        "./src/styles/*"
-      ],
-      "@assets/*": [
-        "./src/assets/*"
       ],
       "@services/*": [
         "./src/services/*"
       ],
-      "@types/*": [
-        "./src/types/*"
+      "@utils/*": [
+        "./src/utils/*"
       ],
       "@layouts/*": [
         "./src/layouts/*"
       ],
-      "@edunexia/api-client/*": [
-        "../../packages/api-client/*"
+      "@contexts/*": [
+        "./src/contexts/*"
       ],
-      "@edunexia/database-schema/*": [
-        "../../packages/database-schema/*"
+      "@types/*": [
+        "./src/types/*"
+      ],
+      "@pages/*": [
+        "./src/pages/*"
+      ],
+      "@assets/*": [
+        "./src/assets/*"
       ]
     }
   },
   "include": [
-    "src/**/*.ts",
-    "src/**/*.tsx"
+    "src",
+    "vite.config.ts",
+    "vitest.config.ts",
+    "src/setupTests.ts"
   ]
 }

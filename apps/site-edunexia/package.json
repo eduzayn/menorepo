@@ -9,6 +9,8 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
   },
   "dependencies": {
@@ -26,6 +28,7 @@
   },
   "devDependencies": {
     "@edunexia/eslint-config": "*",
+    "@edunexia/test-config": "workspace:*",
     "@edunexia/typescript-config": "*",
     "@edunexia/tailwind-config": "*",
     "@types/react": "^18.2.15",
