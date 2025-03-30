@@ -200,21 +200,55 @@ yarn run-all-tests
 
 ## Cobertura de Testes
 
-Buscamos uma cobertura mínima de:
+### Metas de Cobertura
 
-- **80%** para testes unitários
-- **70%** para testes de componentes
-- Testes E2E devem cobrir todos os fluxos críticos
+Temos metas específicas de cobertura para diferentes módulos do sistema, baseadas no risco e criticidade de cada funcionalidade:
 
-Os relatórios de cobertura são gerados em `coverage/` e podem ser visualizados abrindo `coverage/index.html`.
+| Módulo | Statements | Branches | Functions | Lines | Observações |
+|--------|------------|----------|-----------|-------|------------|
+| Global | 80% | 80% | 80% | 80% | Meta mínima para todo o código |
+| Módulos Críticos | 90% | 90% | 90% | 90% | Matrículas, Auth, Portal do Aluno |
+| Pagamentos | 95% | 90% | 95% | 95% | Componentes de pagamento requerem alta cobertura |
+| Autenticação | 95% | 95% | 95% | 95% | Componentes de segurança exigem alta cobertura |
+| Outros módulos | 70% | 70% | 75% | 75% | Módulos em desenvolvimento inicial |
 
-## Integração com CI/CD
+As metas de cobertura são configuradas e aplicadas através do pacote `@edunexia/test-config`, que oferece utilitários para definir e verificar thresholds específicos para cada módulo.
 
-Os testes são executados automaticamente:
+### Relatórios de Cobertura
 
-1. **Pull Requests**: Testes unitários e de componentes
-2. **Merge na branch principal**: Testes E2E completos
-3. **Deploy**: Verificação completa antes de cada deploy
+Os relatórios de cobertura são gerados em formatos diversos:
+
+- **HTML**: Visualização interativa da cobertura do código (`coverage/index.html`)
+- **LCOV**: Formato padrão para integração com ferramentas externas
+- **JSON**: Consumo por ferramentas de CI/CD e scripts
+- **Texto**: Visualização rápida no terminal
+
+Para gerar um relatório de cobertura consolidado para todo o monorepo:
+
+```bash
+cd packages/test-config
+yarn coverage
+```
+
+Este comando irá:
+1. Executar os testes com cobertura em todos os módulos
+2. Consolidar os relatórios individuais
+3. Verificar se as metas de cobertura foram atingidas
+4. Exibir um resumo detalhado no terminal
+5. Abrir o relatório HTML no navegador
+
+### Integração com CI/CD
+
+Os relatórios de cobertura são automaticamente:
+
+1. Gerados em cada Pull Request e no build da branch principal
+2. Verificados contra as metas definidas (build falha se abaixo dos thresholds)
+3. Publicados no Codecov para visualização histórica e análise de tendências
+4. Armazenados como artefatos do workflow para referência futura
+
+A verificação de thresholds é feita em dois níveis:
+- Durante a execução dos testes em cada módulo individualmente
+- No pipeline de CI/CD para o relatório consolidado
 
 ## Conclusão
 

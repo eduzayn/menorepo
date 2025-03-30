@@ -26,4 +26,29 @@ export function createTestConfig(type: 'vitest' | 'jest', options: any = {}) {
     default:
       throw new Error(`Tipo de configuração de teste não suportado: ${type}`);
   }
-} 
+}
+
+// Re-export de utilidades do React Testing Library
+export { render, screen, waitFor, fireEvent } from '@testing-library/react';
+export { default as userEvent } from '@testing-library/user-event';
+
+// Exportar configurações do Vitest
+export { 
+  createVitestConfig,
+  createComponentTestConfig,
+  createIntegrationTestConfig
+} from './vitest-config';
+
+// Exportar funções e constantes de thresholds de cobertura
+export {
+  DEFAULT_THRESHOLD,
+  CRITICAL_MODULES_THRESHOLD,
+  getThresholdForModule,
+  generateCoverageThresholds
+} from './coverage-thresholds';
+
+// Exportar geradores de dados para testes
+export * from './test-data-generators';
+
+// Exportar tipos
+export * from './types'; 

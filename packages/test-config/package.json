@@ -22,7 +22,8 @@
     "test": "vitest run",
     "clean": "rm -rf dist",
     "dev": "tsup --watch",
-    "run-all-tests": "ts-node scripts/run-all-tests.ts"
+    "run-all-tests": "ts-node scripts/run-all-tests.ts",
+    "coverage": "ts-node scripts/generate-coverage-report.ts"
   },
   "devDependencies": {
     "@types/jest": "^29.5.0",
@@ -35,11 +36,15 @@
     "typescript": "^5.0.2"
   },
   "dependencies": {
+    "@istanbuljs/nyc-config-typescript": "^1.0.2",
     "@testing-library/jest-dom": "^6.1.5",
     "@testing-library/react": "^14.1.2",
     "@testing-library/user-event": "^14.5.1",
     "chalk": "^4.1.2",
     "jsdom": "^22.1.0",
+    "nyc": "^15.1.0",
+    "open": "^8.4.2",
+    "ts-node": "^10.9.1",
     "vitest": "^0.34.6",
     "jest-environment-jsdom": "^29.7.0",
     "ts-jest": "^29.1.0",

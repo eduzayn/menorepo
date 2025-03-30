@@ -1,0 +1,97 @@
+name: Testes e Cobertura
+
+on:
+  push:
+    branches: [ main, dev ]
+  pull_request:
+    branches: [ main, dev ]
+
+jobs:
+  test:
+    name: Testes e Análise de Cobertura
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'yarn'
+      
+      - name: Instalar dependências
+        run: yarn install --frozen-lockfile
+      
+      - name: Executar testes unitários e de componentes
+        run: cd packages/test-config && yarn run-all-tests
+      
+      - name: Gerar relatório de cobertura
+        run: cd packages/test-config && yarn coverage
+      
+      - name: Upload do relatório de cobertura para o Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          directory: ./coverage-report
+          fail_ci_if_error: true
+          verbose: true
+      
+      - name: Verificar thresholds de cobertura
+        run: |
+          cd packages/test-config
+          node -e "
+            const fs = require('fs');
+            const path = require('path');
+            
+            const reportPath = path.resolve('../../coverage-report/coverage-summary.json');
+            if (!fs.existsSync(reportPath)) {
+              console.error('Relatório de cobertura não encontrado!');
+              process.exit(1);
+            }
+            
+            const report = JSON.parse(fs.readFileSync(reportPath, 'utf-8'));
+            const total = report.total;
+            
+            const threshold = {
+              statements: 80,
+              branches: 80,
+              functions: 80,
+              lines: 80
+            };
+            
+            let failed = false;
+            
+            if (total.statements.pct < threshold.statements) {
+              console.error(`❌ Cobertura de statements: ${total.statements.pct}% (esperado: ${threshold.statements}%)`);
+              failed = true;
+            }
+            
+            if (total.branches.pct < threshold.branches) {
+              console.error(`❌ Cobertura de branches: ${total.branches.pct}% (esperado: ${threshold.branches}%)`);
+              failed = true;
+            }
+            
+            if (total.functions.pct < threshold.functions) {
+              console.error(`❌ Cobertura de functions: ${total.functions.pct}% (esperado: ${threshold.functions}%)`);
+              failed = true;
+            }
+            
+            if (total.lines.pct < threshold.lines) {
+              console.error(`❌ Cobertura de lines: ${total.lines.pct}% (esperado: ${threshold.lines}%)`);
+              failed = true;
+            }
+            
+            if (failed) {
+              process.exit(1);
+            } else {
+              console.log('✅ Todas as métricas de cobertura atendem ou excedem os thresholds!');
+            }
+          "
+      
+      - name: Publicar relatório de cobertura como artefato
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-report
+          path: ./coverage-report
+          retention-days: 14 
