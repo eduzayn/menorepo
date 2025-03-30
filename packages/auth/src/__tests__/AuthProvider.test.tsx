@@ -337,15 +337,17 @@ describe('AuthProvider', () => {
     }));
     
     // Configurar mock para from (consultas ao banco)
-    const updateMock = vi.fn().mockResolvedValue({
+    const updateEqMock = vi.fn().mockResolvedValue({
       error: null
     });
     
-    const eqMock = vi.fn().mockReturnThis();
+    const updateMock = vi.fn().mockReturnValue({
+      eq: updateEqMock
+    });
     
     mockSupabaseClient.from.mockImplementation(() => ({
       select: vi.fn().mockReturnThis(),
-      eq: eqMock,
+      eq: vi.fn().mockReturnThis(),
       update: updateMock,
       single: vi.fn().mockResolvedValue({
         data: mockUser,
@@ -372,6 +374,7 @@ describe('AuthProvider', () => {
     
     // Verificar que a função update foi chamada
     expect(updateMock).toHaveBeenCalledWith({ nome: 'Nome Atualizado' });
+    expect(updateEqMock).toHaveBeenCalledWith('id', 'user-123');
     
     // Verificar que o update foi bem-sucedido
     await waitFor(() => {
@@ -413,12 +416,18 @@ describe('AuthProvider', () => {
     // Configurar erro ao atualizar
     const updateError = new Error('Erro ao atualizar perfil');
     
+    const errorUpdateEqMock = vi.fn().mockResolvedValue({
+      error: updateError
+    });
+    
+    const errorUpdateMock = vi.fn().mockReturnValue({
+      eq: errorUpdateEqMock
+    });
+    
     mockSupabaseClient.from.mockImplementation(() => ({
       select: vi.fn().mockReturnThis(),
       eq: vi.fn().mockReturnThis(),
-      update: vi.fn().mockResolvedValue({
-        error: updateError
-      }),
+      update: errorUpdateMock,
       single: vi.fn().mockResolvedValue({
         data: mockUser,
         error: null
