@@ -1,139 +1,153 @@
-# Integração entre Módulos RH e Contabilidade
+# Documentação da Integração RH-Contabilidade
 
 ## Visão Geral
 
-Este documento detalha a arquitetura e as funcionalidades de integração entre os módulos de Recursos Humanos (RH) e Contabilidade na plataforma Edunéxia.
-
-A integração permite que eventos financeiros relacionados a recursos humanos (folha de pagamento, férias, benefícios) sejam automaticamente refletidos na contabilidade da instituição, garantindo consistência nos registros contábeis e facilitando o fechamento mensal.
+Este documento descreve a implementação da integração entre os módulos de Recursos Humanos (RH) e Contabilidade na plataforma Edunéxia. A integração permite a contabilização automatizada de eventos do RH, como folha de pagamento, provisões de férias e 13º salário, gerando lançamentos contábeis correspondentes.
 
 ## Arquitetura da Integração
 
-A integração é construída em três camadas:
+A integração foi implementada com os seguintes componentes:
 
-1. **Frontend**: Componentes React em ambos os módulos (RH e Contabilidade)
-2. **Backend**: Funções Supabase Edge (Deno) e funções PL/pgSQL 
-3. **Banco de Dados**: Tabelas, triggers e schemas de integração
+1. **Schemas SQL**:
+   - `rh`: Contém tabelas e funções relacionadas ao módulo de RH
+   - `contabilidade`: Contém tabelas e funções do módulo contábil
 
-## Funcionalidades Principais
+2. **Tabelas Principais**:
+   - `rh.pendencias_contabilizacao`: Registra eventos de RH pendentes de contabilização
+   - `contabilidade.contas`: Armazena o plano de contas da instituição
+   - `contabilidade.lancamentos`: Registra os lançamentos contábeis
+   - `contabilidade.integracoes`: Registra o histórico de integrações entre módulos
 
-### 1. Contabilização da Folha de Pagamento
+3. **Funções de Integração**:
+   - `contabilidade.gerar_plano_contas_rh()`: Gera um plano de contas específico para RH
+   - `contabilidade.contabilizar_folha_pagamento()`: Gera lançamentos contábeis da folha
+   - `contabilidade.verificar_plano_contas_rh()`: Verifica se o plano de contas RH já existe
 
-- **Endpoint**: `/integrar-rh-contabilidade` (operacao: `contabilizar_folha`)
-- **Função DB**: `contabilidade.contabilizar_folha_pagamento()`
-- **Acionamento**: 
-  - Manual via interface
-  - Automático via trigger `trigger_folha_aprovada_contabilizar`
-- **Fluxo**:
-  1. Ao aprovar uma folha de pagamento no módulo RH
-  2. Um registro é inserido em `rh.pendencias_contabilizacao`
-  3. A contabilização pode ser processada individualmente ou em lote
-  4. São gerados lançamentos contábeis para:
-     - Débito em despesas de pessoal
-     - Crédito em obrigações trabalhistas
+4. **Edge Function**:
+   - `integrar-rh-contabilidade`: API RESTful para executar funções de integração
 
-### 2. Contabilização de Provisões de Férias
+## Fluxo da Integração
 
-- **Endpoint**: `/integrar-rh-contabilidade` (operacao: `contabilizar_ferias`)
-- **Função DB**: `contabilidade.contabilizar_provisao_ferias()`
-- **Acionamento**: 
-  - Manual mensalmente
-  - Pode ser programado para execução automática
-- **Fluxo**:
-  1. Cálculo de provisão baseado nos colaboradores ativos
-  2. Geração de lançamentos contábeis para:
-     - Débito em despesas com provisões
-     - Crédito em provisões trabalhistas (passivo)
+### Contabilização da Folha de Pagamento
 
-### 3. Relatório de Custos de Pessoal
+1. **Preparação**: O módulo de RH processa a folha de pagamento e aprova os valores.
+2. **Pendência**: Ao aprovar a folha, uma entrada é gerada em `rh.pendencias_contabilizacao`.
+3. **Contabilização**: O contador acessa a tela de integração e solicita a contabilização.
+4. **Processamento**: O sistema executa a função `contabilidade.contabilizar_folha_pagamento()`.
+5. **Resultado**: São criados lançamentos contábeis nas contas apropriadas:
+   - Débito: Despesas com Pessoal (3.1.1.01)
+   - Crédito: Salários a Pagar (2.1.3.01)
+6. **Atualização**: A pendência é marcada como processada e um registro de integração é criado.
 
-- **Endpoint**: `/integrar-rh-contabilidade` (operacao: `relatorio_custos`)
-- **Função DB**: `contabilidade.relatorio_custos_pessoal()`
-- **Periodicidade**: Mensal
-- **Conteúdo**:
-  - Totais por departamento
-  - Totais por cargo
-  - Comparativo com meses anteriores
-  - Detalhamento por tipo de despesa
+### Plano de Contas para RH
 
-### 4. Processamento em Lote de Integrações Pendentes
+Para utilizar a integração, cada instituição precisa ter um plano de contas específico para RH. A estrutura básica inclui:
 
-- **Endpoint**: `/integrar-rh-contabilidade` (operacao: `processar_pendencias`)
-- **Função DB**: (não listada nos exemplos anteriores)
-- **Utilidade**: Processa todas as pendências de contabilização em uma única operação
+- **Despesas (3)**
+  - **Despesas Operacionais (3.1)**
+    - **Despesas com Pessoal (3.1.1)**
+      - Salários e Ordenados (3.1.1.01)
+      - Encargos Sociais (3.1.1.02)
+      - INSS (3.1.1.03)
+      - FGTS (3.1.1.04)
+      - etc.
+    - **Provisões Trabalhistas (3.1.2)**
+      - Provisão para Férias (3.1.2.01)
+      - Provisão para 13º (3.1.2.02)
+      - etc.
 
-## Plano de Contas para RH
+- **Passivo (2)**
+  - **Passivo Circulante (2.1)**
+    - **Obrigações Trabalhistas (2.1.3)**
+      - Salários a Pagar (2.1.3.01)
+      - Encargos a Recolher (2.1.3.02)
+      - etc.
+    - **Provisões Trabalhistas (2.1.4)**
+      - Provisão para Férias (2.1.4.01)
+      - Provisão para 13º (2.1.4.02)
+      - etc.
 
-Para padronizar a integração, foi criada a função `contabilidade.gerar_plano_contas_rh()` que configura automaticamente um plano de contas padrão para operações de RH, incluindo:
+## Estrutura de SQL Migrations
 
-- Contas de despesa para:
-  - Salários e ordenados
-  - Encargos sociais (INSS, FGTS, PIS)
-  - Benefícios (VT, VA/VR, assistência médica)
-  - Provisões (férias, 13º, rescisões)
+Os scripts de migração estão organizados da seguinte forma:
 
-- Contas de passivo para:
-  - Obrigações trabalhistas
-  - Encargos a recolher
-  - Provisões
+1. `20240701_tipos_enumerados.sql`: Cria os tipos enumerados necessários
+2. `20240702_tabelas_integracao.sql`: Cria as tabelas de integração
+3. `20240703_funcao_contabilizar_folha.sql`: Implementa a função de contabilização
+4. `20240704_correcao_check_contas.sql`: Corrige validações do plano de contas
+5. `usuarios_instituicoes.sql`: Cria tabela de usuários e instituições
+6. `correcao_policias_rls.sql`: Corrige políticas de segurança
 
-## Políticas de Segurança
+Para executar todas as migrações em sequência, use o script `migrate_integration.sh`.
 
-As integrações seguem políticas de segurança rigorosas:
+## Teste da Integração
 
-1. Apenas usuários autenticados podem acessar as funções
-2. Apenas administradores podem executar operações de contabilização
-3. Cada operação é registrada em logs de auditoria (`integration_logs`)
-4. Políticas RLS garantem que usuários só acessem dados de sua instituição
+Para testar a integração:
 
-## Implementação Frontend
+1. **Preparação**:
+   - Certifique-se de que os schemas `rh` e `contabilidade` existem
+   - Verifique se as tabelas de integração foram criadas
+   - Gere o plano de contas RH para a instituição de teste
 
-O módulo de contabilidade inclui uma página de teste específica para integrações (`TesteIntegracoes.tsx`) que permite:
+2. **Execução**:
+   - Acesse a página de testes `/contabilidade/teste-integracoes`
+   - Selecione a operação "Contabilizar Folha de Pagamento"
+   - Informe o mês, ano e instituição
+   - Execute e verifique o resultado
 
-1. Selecionar o tipo de integração
-2. Definir parâmetros (mês/ano)
-3. Executar a operação
-4. Visualizar resultados
+3. **Verificação**:
+   - Consulte a tabela `contabilidade.lancamentos` para ver os lançamentos gerados
+   - Consulte a tabela `contabilidade.integracoes` para ver o histórico de integrações
+   - Verifique se as pendências foram marcadas como processadas
 
-## Tabelas de Integração
+## Políticas de Segurança (RLS)
 
-| Tabela | Descrição |
-|--------|-----------|
-| `contabilidade.integracoes` | Registra todas as operações de integração entre módulos |
-| `rh.pendencias_contabilizacao` | Armazena operações pendentes de contabilização |
-| `integration_logs` | Log detalhado de todas as operações (auditoria) |
+As seguintes políticas de segurança foram implementadas:
 
-## Fluxo de Dados
+- Usuários só podem ver dados de suas instituições
+- Apenas usuários com perfil `contador` podem executar contabilizações
+- Apenas usuários com perfil `admin` podem ver todos os logs de integração
 
+## Manutenção e Solução de Problemas
+
+### Logs e Monitoramento
+
+Todas as operações de integração são registradas na tabela `public.integration_logs`. Para investigar problemas:
+
+```sql
+SELECT * FROM public.integration_logs 
+WHERE modulo = 'RH' 
+ORDER BY timestamp DESC;
 ```
-[Módulo RH] → [Trigger] → [Pendências] → [Edge Function] → [Função DB] → [Lançamentos Contábeis]
-```
 
-## Execução de Migrações
+### Erros Comuns
 
-As migrações para esta integração devem ser executadas na seguinte ordem:
+1. **Plano de contas não encontrado**:
+   ```sql
+   SELECT contabilidade.gerar_plano_contas_rh('UUID_DA_INSTITUICAO');
+   ```
 
-1. `20240702_schema_rh.sql`
-2. `20240703_integracao_rh_contabilidade.sql`
-3. `20240704_plano_contas_rh.sql`
+2. **Contabilização duplicada**:
+   - Verifique se já existem lançamentos para o período
+   ```sql
+   SELECT * FROM contabilidade.lancamentos 
+   WHERE EXTRACT(MONTH FROM data_competencia) = mes_desejado
+   AND EXTRACT(YEAR FROM data_competencia) = ano_desejado;
+   ```
 
-## Testes e Validação
+3. **Erro na tabela `usuarios_instituicoes`**:
+   - Execute o script `usuarios_instituicoes.sql` para criar ou corrigir a tabela
 
-Após a implementação, é recomendável testar:
+## Melhorias Futuras
 
-1. A criação automática do plano de contas
-2. A contabilização manual da folha de pagamento
-3. O trigger automático ao aprovar uma folha
-4. A geração de relatórios de custos
-5. As políticas de segurança (tentando acessar com usuários sem permissão)
+- Implementação de contabilização de férias
+- Contabilização automática de rescisões
+- Dashboard para monitoramento das integrações
+- Relatórios de custos de pessoal por departamento
 
-## Próximos Passos e Melhorias
+## Referências
 
-- Implementar contabilização de 13º salário
-- Criar dashboards específicos para custos de pessoal
-- Implementar integração com centro de custos por departamento
-- Adicionar suporte a rateios automáticos
-
----
-
-**Desenvolvido por:** Equipe Edunéxia  
-**Última atualização:** Julho/2024 
+- Documentação Supabase: https://supabase.com/docs
+- Scripts SQL: `packages/database-schema/supabase/migrations/`
+- Instruções de implementação: `packages/database-schema/supabase/INSTRUCOES_IMPLEMENTACAO.md`
+- Documentação de migrações: `packages/database-schema/supabase/MIGRATIONS.md` 

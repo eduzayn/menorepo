@@ -2,18 +2,18 @@
 // Esta função permite executar operações de integração entre os módulos RH e Contabilidade
 // https://supabase.com/docs/guides/functions
 
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
+};
 
 serve(async (req) => {
   // Handle CORS preflight request
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
+    return new Response('ok', { headers: corsHeaders });
   }
 
   try {
@@ -26,12 +26,12 @@ serve(async (req) => {
           headers: { Authorization: req.headers.get('Authorization')! },
         },
       }
-    )
+    );
 
     // Verificar token de autorização
     const {
       data: { user },
-    } = await supabaseClient.auth.getUser()
+    } = await supabaseClient.auth.getUser();
 
     if (!user) {
       return new Response(
@@ -40,11 +40,11 @@ serve(async (req) => {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           status: 401,
         }
-      )
+      );
     }
 
     // Processar requisição e executar operação de integração
-    const { operacao, instituicaoId, mes, ano, detalhes } = await req.json()
+    const { operacao, instituicaoId, mes, ano, detalhes } = await req.json();
 
     // Verificar parâmetros obrigatórios
     if (!operacao || !instituicaoId) {
@@ -56,10 +56,10 @@ serve(async (req) => {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           status: 400,
         }
-      )
+      );
     }
 
-    let resultado
+    let resultado;
 
     // Executar a operação de integração solicitada
     switch (operacao) {
@@ -73,7 +73,7 @@ serve(async (req) => {
               headers: { ...corsHeaders, 'Content-Type': 'application/json' },
               status: 400,
             }
-          )
+          );
         }
 
         // Chamar função do banco de dados para contabilizar folha
@@ -84,10 +84,10 @@ serve(async (req) => {
             p_mes: mes,
             p_ano: ano,
           }
-        )
+        );
 
-        resultado = dataFolha || { error: errorFolha?.message }
-        break
+        resultado = dataFolha || { error: errorFolha?.message };
+        break;
 
       case 'contabilizar_ferias':
         if (!mes || !ano) {
@@ -99,7 +99,7 @@ serve(async (req) => {
               headers: { ...corsHeaders, 'Content-Type': 'application/json' },
               status: 400,
             }
-          )
+          );
         }
 
         // Chamar função do banco de dados para contabilizar provisão de férias
@@ -110,10 +110,10 @@ serve(async (req) => {
             p_mes: mes,
             p_ano: ano,
           }
-        )
+        );
 
-        resultado = dataFerias || { error: errorFerias?.message }
-        break
+        resultado = dataFerias || { error: errorFerias?.message };
+        break;
 
       case 'relatorio_custos':
         if (!mes || !ano) {
@@ -125,7 +125,7 @@ serve(async (req) => {
               headers: { ...corsHeaders, 'Content-Type': 'application/json' },
               status: 400,
             }
-          )
+          );
         }
 
         // Chamar função do banco de dados para gerar relatório de custos
@@ -136,10 +136,10 @@ serve(async (req) => {
             p_mes: mes,
             p_ano: ano,
           }
-        )
+        );
 
-        resultado = dataRelatorio || { error: errorRelatorio?.message }
-        break
+        resultado = dataRelatorio || { error: errorRelatorio?.message };
+        break;
 
       case 'processar_pendencias':
         // Chamar função do banco de dados para processar pendências em lote
@@ -148,10 +148,10 @@ serve(async (req) => {
           {
             p_instituicao_id: instituicaoId,
           }
-        )
+        );
 
-        resultado = dataPendencias || { error: errorPendencias?.message }
-        break
+        resultado = dataPendencias || { error: errorPendencias?.message };
+        break;
 
       default:
         return new Response(
@@ -168,7 +168,7 @@ serve(async (req) => {
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
             status: 400,
           }
-        )
+        );
     }
 
     // Registrar log da operação
@@ -182,7 +182,7 @@ serve(async (req) => {
         parametros: JSON.stringify({ mes, ano, detalhes }),
         resultado: JSON.stringify(resultado),
       })
-      .select()
+      .select();
 
     // Retornar resultado da operação
     return new Response(
@@ -191,9 +191,9 @@ serve(async (req) => {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200,
       }
-    )
+    );
   } catch (error) {
-    console.error('Erro na função Edge de integração RH-Contabilidade:', error)
+    console.error('Erro na função Edge de integração RH-Contabilidade:', error);
 
     return new Response(
       JSON.stringify({ 
@@ -204,6 +204,6 @@ serve(async (req) => {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 500,
       }
-    )
+    );
   }
-}) 
+}); 

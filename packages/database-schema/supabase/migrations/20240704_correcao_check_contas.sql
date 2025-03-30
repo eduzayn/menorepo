@@ -1,8 +1,45 @@
--- Script para gerar Plano de Contas específico para RH
+-- Script para corrigir a verificação de existência de contas RH
 -- Executado por: Supabase CLI
 -- Criado em: 2024-07-04
 
--- Função para criar plano de contas específico para RH
+-- Esta função verifica primeiro se já existem contas de RH para a instituição
+-- A versão anterior tinha um erro de sintaxe na consulta
+CREATE OR REPLACE FUNCTION contabilidade.verificar_plano_contas_rh(
+  p_instituicao_id UUID
+) RETURNS BOOLEAN
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, contabilidade
+AS $$
+DECLARE
+  v_existe BOOLEAN := FALSE;
+BEGIN
+  -- Verificar se já existe alguma conta com código relacionado a RH
+  SELECT EXISTS (
+    SELECT 1 
+    FROM contabilidade.contas 
+    WHERE instituicao_id = p_instituicao_id 
+      AND (
+        codigo LIKE '3.1.1%' OR 
+        codigo LIKE '3.1.2%' OR 
+        codigo LIKE '2.1.3%' OR 
+        codigo LIKE '2.1.4%'
+      )
+    LIMIT 1
+  ) INTO v_existe;
+  
+  RETURN v_existe;
+EXCEPTION WHEN OTHERS THEN
+  RAISE NOTICE 'Erro ao verificar plano de contas: %', SQLERRM;
+  RETURN FALSE;
+END;
+$$;
+
+-- Comentários
+COMMENT ON FUNCTION contabilidade.verificar_plano_contas_rh IS 
+  'Verifica se já existe plano de contas RH para a instituição';
+
+-- Modificar a função principal para usar a função de verificação
 CREATE OR REPLACE FUNCTION contabilidade.gerar_plano_contas_rh(
   p_instituicao_id UUID
 ) RETURNS JSONB
@@ -17,7 +54,7 @@ DECLARE
   v_inseridos INTEGER := 0;
   v_rejeitados INTEGER := 0;
 
-  -- Estrutura de contas para RH
+  -- Estrutura de contas para RH (sem alterações)
   v_contas_rh TEXT[][] := ARRAY[
     -- Código, Nome, Tipo, Natureza, Pai (código)
     -- Estrutura para despesas com RH
@@ -69,35 +106,35 @@ BEGIN
     );
   END IF;
   
-  -- Verificar se já existe alguma conta com código relacionado a RH
-  BEGIN
-    -- Exemplos de códigos que procuramos para determinar se o plano já existe
-    SELECT EXISTS (
-      SELECT 1 FROM contabilidade.contas 
-      WHERE instituicao_id = p_instituicao_id 
-        AND (codigo LIKE '3.1.1%' OR codigo LIKE '3.1.2%' OR codigo LIKE '2.1.3%' OR codigo LIKE '2.1.4%')
-      LIMIT 1
-    ) INTO v_ja_existente;
-    
-    IF v_ja_existente THEN
-      RETURN jsonb_build_object(
-        'sucesso', FALSE,
-        'mensagem', 'Plano de contas para RH já existe nesta instituição',
-        'dados', NULL
-      );
-    END IF;
-  END;
+  -- CORREÇÃO: Chamar a função de verificação em vez de fazer a verificação diretamente
+  v_ja_existente := contabilidade.verificar_plano_contas_rh(p_instituicao_id);
   
+  IF v_ja_existente THEN
+    RETURN jsonb_build_object(
+      'sucesso', FALSE,
+      'mensagem', 'Plano de contas para RH já existe nesta instituição',
+      'dados', NULL
+    );
+  END IF;
+  
+  -- Resto da função segue igual...
   -- Iniciar inserção das contas
   FOR i IN 1..array_length(v_contas_rh, 1) LOOP
     DECLARE
-      v_codigo ALIAS FOR v_contas_rh[i][1];
-      v_nome ALIAS FOR v_contas_rh[i][2];
-      v_tipo ALIAS FOR v_contas_rh[i][3];
-      v_natureza ALIAS FOR v_contas_rh[i][4];
-      v_pai_codigo ALIAS FOR v_contas_rh[i][5];
+      v_codigo TEXT;
+      v_nome TEXT;
+      v_tipo TEXT;
+      v_natureza TEXT;
+      v_pai_codigo TEXT;
       v_pai_id UUID := NULL;
     BEGIN
+      -- Atribuir valores do array
+      v_codigo := v_contas_rh[i][1];
+      v_nome := v_contas_rh[i][2];
+      v_tipo := v_contas_rh[i][3];
+      v_natureza := v_contas_rh[i][4];
+      v_pai_codigo := v_contas_rh[i][5];
+      
       -- Verificar se a conta já existe
       IF EXISTS (SELECT 1 FROM contabilidade.contas WHERE instituicao_id = p_instituicao_id AND codigo = v_codigo) THEN
         v_rejeitados := v_rejeitados + 1;
@@ -162,8 +199,5 @@ EXCEPTION WHEN OTHERS THEN
   );
 END;
 $$;
-
--- Comentários
-COMMENT ON FUNCTION contabilidade.gerar_plano_contas_rh IS 'Gera um plano de contas padrão para o módulo RH';
 
 -- [Fim do arquivo] 
