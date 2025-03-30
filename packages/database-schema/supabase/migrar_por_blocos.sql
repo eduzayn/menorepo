@@ -1,15 +1,22 @@
--- Script para executar as migrações em blocos seguros (executar um por vez)
--- Cada bloco pode ser executado separadamente e verificado
--- INSTRUÇÕES: execute cada seção separadamente, confirmando o sucesso antes de continuar
+-- Script para executar as migrações em blocos seguros
+-- Executado por: Supabase CLI ou SQL Editor
+-- Criado em: 2024-07-06
+-- 
+-- INSTRUÇÕES: 
+-- 1. Execute cada bloco separadamente no SQL Editor do Supabase
+-- 2. Verifique o resultado de cada bloco antes de prosseguir
+-- 3. Adapte os UUIDs conforme necessário para seu ambiente
+-- 4. Este script é interativo e não deve ser executado integralmente de uma só vez
 
 ---------------------------------------------
--- BLOCO 1: Verificar a estrutura atual do banco
+-- BLOCO 1: Verificar e criar esquemas (schemas)
 ---------------------------------------------
+-- Verificar schemas existentes
 SELECT schema_name
 FROM information_schema.schemata
 WHERE schema_name IN ('contabilidade', 'rh');
 
--- Se não existirem, criá-los
+-- Criar schemas se não existirem
 DO $$
 BEGIN
   IF NOT EXISTS(SELECT 1 FROM information_schema.schemata WHERE schema_name = 'contabilidade') THEN
@@ -28,7 +35,7 @@ BEGIN
 END $$;
 
 ---------------------------------------------
--- BLOCO 2: Criar tipos enumerados (se não existirem)
+-- BLOCO 2: Criar tipos enumerados
 ---------------------------------------------
 -- Verificar tipos enumerados existentes
 SELECT n.nspname as schema,
@@ -77,9 +84,10 @@ BEGIN
   END IF;
 END $$;
 
--- Criar status de pendência (se não existir)
+-- Criar tipo e status de pendência (se não existirem)
 DO $$
 BEGIN
+  -- Criar status_pendencia
   IF NOT EXISTS (SELECT 1 FROM pg_type t JOIN pg_namespace n ON n.oid = t.typnamespace 
                  WHERE t.typname = 'status_pendencia' AND n.nspname = 'rh') THEN
     CREATE TYPE rh.status_pendencia AS ENUM (
@@ -88,6 +96,17 @@ BEGIN
     RAISE NOTICE 'Tipo rh.status_pendencia criado com sucesso';
   ELSE
     RAISE NOTICE 'Tipo rh.status_pendencia já existe';
+  END IF;
+  
+  -- Criar tipo_pendencia
+  IF NOT EXISTS (SELECT 1 FROM pg_type t JOIN pg_namespace n ON n.oid = t.typnamespace 
+                 WHERE t.typname = 'tipo_pendencia' AND n.nspname = 'rh') THEN
+    CREATE TYPE rh.tipo_pendencia AS ENUM (
+      'FOLHA_PAGAMENTO', 'FERIAS', 'DECIMO_TERCEIRO', 'RESCISAO', 'BENEFICIOS'
+    );
+    RAISE NOTICE 'Tipo rh.tipo_pendencia criado com sucesso';
+  ELSE
+    RAISE NOTICE 'Tipo rh.tipo_pendencia já existe';
   END IF;
 END $$;
 
@@ -126,6 +145,36 @@ BEGIN
     CREATE INDEX idx_contas_instituicao ON contabilidade.contas(instituicao_id);
     CREATE INDEX idx_contas_pai ON contabilidade.contas(conta_pai_id);
     
+    -- RLS (Row Level Security)
+    ALTER TABLE contabilidade.contas ENABLE ROW LEVEL SECURITY;
+    
+    -- Políticas de acesso
+    CREATE POLICY policy_contas_select ON contabilidade.contas
+      FOR SELECT 
+      USING (TRUE);  -- Todos podem visualizar contas
+      
+    CREATE POLICY policy_contas_insert ON contabilidade.contas
+      FOR INSERT 
+      WITH CHECK (
+        EXISTS (
+          SELECT 1 FROM public.usuarios_instituicoes ui
+          WHERE ui.usuario_id = auth.uid() 
+            AND ui.instituicao_id = instituicao_id
+            AND ui.tipo_usuario IN ('ADMIN', 'FINANCEIRO', 'CONTADOR')
+        )
+      );
+      
+    CREATE POLICY policy_contas_update ON contabilidade.contas
+      FOR UPDATE 
+      USING (
+        EXISTS (
+          SELECT 1 FROM public.usuarios_instituicoes ui
+          WHERE ui.usuario_id = auth.uid() 
+            AND ui.instituicao_id = instituicao_id
+            AND ui.tipo_usuario IN ('ADMIN', 'FINANCEIRO', 'CONTADOR')
+        )
+      );
+    
     RAISE NOTICE 'Tabela contabilidade.contas criada com sucesso';
   ELSE
     RAISE NOTICE 'Tabela contabilidade.contas já existe';
@@ -135,7 +184,7 @@ END $$;
 ---------------------------------------------
 -- BLOCO 4: Criar função verificar_plano_contas_rh
 ---------------------------------------------
--- Função para verificar existência de plano de contas
+-- Criar função para verificar existência de plano de contas RH
 CREATE OR REPLACE FUNCTION contabilidade.verificar_plano_contas_rh(
   p_instituicao_id UUID
 ) RETURNS BOOLEAN
@@ -167,6 +216,10 @@ EXCEPTION WHEN OTHERS THEN
 END;
 $$;
 
+-- Adicionar comentário à função (documentação)
+COMMENT ON FUNCTION contabilidade.verificar_plano_contas_rh IS 
+  'Verifica se já existe plano de contas RH para a instituição';
+
 ---------------------------------------------
 -- BLOCO 5: Testar a função de verificação
 ---------------------------------------------
@@ -177,26 +230,19 @@ LIMIT 1;
 
 -- Testar a função com uma instituição existente
 -- Substitua o UUID pelo encontrado na consulta anterior
-SELECT contabilidade.verificar_plano_contas_rh('COLOQUE-UM-UUID-AQUI'::UUID) AS ja_existe_plano_contas_rh;
+SELECT contabilidade.verificar_plano_contas_rh('00000000-0000-0000-0000-000000000000'::UUID) AS ja_existe_plano_contas_rh;
 
 ---------------------------------------------
--- BLOCO 6: Criar a tabela pendencias_contabilizacao (se não existir)
+-- BLOCO 6: Criar a tabela pendencias_contabilizacao
 ---------------------------------------------
--- Verificar se o tipo pendência existe
-DO $$
-BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_type t JOIN pg_namespace n ON n.oid = t.typnamespace 
-                 WHERE t.typname = 'tipo_pendencia' AND n.nspname = 'rh') THEN
-    CREATE TYPE rh.tipo_pendencia AS ENUM (
-      'FOLHA_PAGAMENTO', 'FERIAS', 'DECIMO_TERCEIRO', 'RESCISAO', 'BENEFICIOS'
-    );
-    RAISE NOTICE 'Tipo rh.tipo_pendencia criado com sucesso';
-  ELSE
-    RAISE NOTICE 'Tipo rh.tipo_pendencia já existe';
-  END IF;
-END $$;
+-- Verificar se a tabela já existe
+SELECT EXISTS (
+  SELECT 1 
+  FROM information_schema.tables 
+  WHERE table_schema = 'rh' AND table_name = 'pendencias_contabilizacao'
+) AS tabela_pendencias_existe;
 
--- Criar a tabela de pendências
+-- Criar a tabela de pendências (se não existir)
 DO $$
 BEGIN
   IF NOT EXISTS(SELECT 1 FROM information_schema.tables WHERE table_schema = 'rh' AND table_name = 'pendencias_contabilizacao') THEN
@@ -222,6 +268,42 @@ BEGIN
     CREATE INDEX idx_pendencias_status ON rh.pendencias_contabilizacao(status);
     CREATE INDEX idx_pendencias_periodo ON rh.pendencias_contabilizacao(mes, ano);
     
+    -- RLS (Row Level Security)
+    ALTER TABLE rh.pendencias_contabilizacao ENABLE ROW LEVEL SECURITY;
+    
+    -- Políticas de acesso
+    CREATE POLICY policy_pendencias_select ON rh.pendencias_contabilizacao
+      FOR SELECT 
+      USING (
+        EXISTS (
+          SELECT 1 FROM public.usuarios_instituicoes ui
+          WHERE ui.usuario_id = auth.uid() 
+            AND ui.instituicao_id = instituicao_id
+        )
+      );
+      
+    CREATE POLICY policy_pendencias_insert ON rh.pendencias_contabilizacao
+      FOR INSERT 
+      WITH CHECK (
+        EXISTS (
+          SELECT 1 FROM public.usuarios_instituicoes ui
+          WHERE ui.usuario_id = auth.uid() 
+            AND ui.instituicao_id = instituicao_id
+            AND ui.tipo_usuario IN ('ADMIN', 'RH', 'FINANCEIRO')
+        )
+      );
+      
+    CREATE POLICY policy_pendencias_update ON rh.pendencias_contabilizacao
+      FOR UPDATE 
+      USING (
+        EXISTS (
+          SELECT 1 FROM public.usuarios_instituicoes ui
+          WHERE ui.usuario_id = auth.uid() 
+            AND ui.instituicao_id = instituicao_id
+            AND ui.tipo_usuario IN ('ADMIN', 'RH', 'FINANCEIRO', 'CONTADOR')
+        )
+      );
+    
     RAISE NOTICE 'Tabela rh.pendencias_contabilizacao criada com sucesso';
   ELSE
     RAISE NOTICE 'Tabela rh.pendencias_contabilizacao já existe';
@@ -246,13 +328,24 @@ DECLARE
   v_inseridos INTEGER := 0;
   v_rejeitados INTEGER := 0;
 
-  -- Estrutura de contas para RH
+  -- Estrutura de contas para RH (versão simplificada para este script)
   v_contas_rh TEXT[][] := ARRAY[
-    -- Apenas para demonstração, inclua apenas algumas contas aqui
+    -- Código, Nome, Tipo, Natureza, Pai (código)
     ARRAY['3', 'DESPESAS', 'SINTETICA', 'DEVEDORA', NULL],
     ARRAY['3.1', 'DESPESAS OPERACIONAIS', 'SINTETICA', 'DEVEDORA', '3'],
-    ARRAY['3.1.1', 'DESPESAS COM PESSOAL', 'SINTETICA', 'DEVEDORA', '3.1']
-    -- ... adicione mais contas conforme necessário
+    ARRAY['3.1.1', 'DESPESAS COM PESSOAL', 'SINTETICA', 'DEVEDORA', '3.1'],
+    ARRAY['3.1.1.01', 'Salários e Ordenados', 'ANALITICA', 'DEVEDORA', '3.1.1'],
+    ARRAY['3.1.1.02', 'Encargos Sociais', 'ANALITICA', 'DEVEDORA', '3.1.1'],
+    
+    -- Provisões
+    ARRAY['3.1.2', 'PROVISÕES TRABALHISTAS', 'SINTETICA', 'DEVEDORA', '3.1'],
+    ARRAY['3.1.2.01', 'Provisão para Férias', 'ANALITICA', 'DEVEDORA', '3.1.2'],
+    
+    -- Passivos
+    ARRAY['2', 'PASSIVO', 'SINTETICA', 'CREDORA', NULL],
+    ARRAY['2.1', 'PASSIVO CIRCULANTE', 'SINTETICA', 'CREDORA', '2'],
+    ARRAY['2.1.3', 'OBRIGAÇÕES TRABALHISTAS', 'SINTETICA', 'CREDORA', '2.1'],
+    ARRAY['2.1.3.01', 'Salários a Pagar', 'ANALITICA', 'CREDORA', '2.1.3']
   ];
   
 BEGIN
@@ -276,7 +369,7 @@ BEGIN
     );
   END IF;
   
-  -- Inserir apenas 3 contas para teste
+  -- Inserir contas para teste
   FOR i IN 1..array_length(v_contas_rh, 1) LOOP
     DECLARE
       v_codigo TEXT;
@@ -344,7 +437,7 @@ BEGIN
     'mensagem', 'Plano de contas para RH (teste) gerado com sucesso',
     'dados', jsonb_build_object(
       'contas_inseridas', v_inseridos,
-      'contas_rejeitados', v_rejeitados
+      'contas_rejeitadas', v_rejeitados
     )
   );
   
@@ -358,6 +451,10 @@ EXCEPTION WHEN OTHERS THEN
 END;
 $$;
 
+-- Adicionar comentário à função (documentação)
+COMMENT ON FUNCTION contabilidade.gerar_plano_contas_rh IS 
+  'Gera o plano de contas específico para o módulo RH';
+
 ---------------------------------------------
 -- BLOCO 8: Testar a função gerar_plano_contas_rh
 ---------------------------------------------
@@ -366,14 +463,83 @@ SELECT id, nome
 FROM public.institutions
 LIMIT 1;
 
--- Executar a função com uma instituição (substitua o UUID)
-SELECT contabilidade.gerar_plano_contas_rh('COLOQUE-UM-UUID-AQUI'::UUID);
+-- Executar a função com uma instituição (substitua o UUID pelo real)
+SELECT contabilidade.gerar_plano_contas_rh('00000000-0000-0000-0000-000000000000'::UUID);
 
 -- Verificar as contas criadas
-SELECT * FROM contabilidade.contas WHERE instituicao_id = 'COLOQUE-O-MESMO-UUID-AQUI'::UUID;
+SELECT codigo, nome, tipo, natureza, permite_lancamentos 
+FROM contabilidade.contas 
+WHERE instituicao_id = '00000000-0000-0000-0000-000000000000'::UUID
+ORDER BY codigo;
 
 ---------------------------------------------
--- BLOCO 9: Verificar se todas as migrações foram aplicadas
+-- BLOCO 9: Criar tabela de integração
+---------------------------------------------
+-- Verificar se a tabela existe
+SELECT EXISTS (
+  SELECT 1 
+  FROM information_schema.tables 
+  WHERE table_schema = 'contabilidade' AND table_name = 'integracoes'
+) AS tabela_integracoes_existe;
+
+-- Criar a tabela de integrações (se não existir)
+DO $$
+BEGIN
+  IF NOT EXISTS(SELECT 1 FROM information_schema.tables WHERE table_schema = 'contabilidade' AND table_name = 'integracoes') THEN
+    CREATE TABLE contabilidade.integracoes (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      instituicao_id UUID NOT NULL REFERENCES public.institutions(id) ON DELETE CASCADE,
+      modulo_origem VARCHAR(50) NOT NULL,
+      modulo_destino VARCHAR(50) NOT NULL,
+      referencia_origem UUID NOT NULL,
+      referencia_destino UUID,
+      data_integracao TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      realizado_por UUID REFERENCES auth.users(id),
+      sucesso BOOLEAN NOT NULL DEFAULT TRUE,
+      mensagem TEXT,
+      detalhes JSONB,
+      
+      CONSTRAINT uk_integracao_ref UNIQUE (instituicao_id, modulo_origem, referencia_origem)
+    );
+    
+    -- Índices para melhor performance
+    CREATE INDEX idx_integracoes_instituicao ON contabilidade.integracoes(instituicao_id);
+    CREATE INDEX idx_integracoes_modulos ON contabilidade.integracoes(modulo_origem, modulo_destino);
+    CREATE INDEX idx_integracoes_data ON contabilidade.integracoes(data_integracao);
+    
+    -- RLS (Row Level Security)
+    ALTER TABLE contabilidade.integracoes ENABLE ROW LEVEL SECURITY;
+    
+    -- Políticas de acesso
+    CREATE POLICY policy_integracoes_select ON contabilidade.integracoes
+      FOR SELECT 
+      USING (
+        EXISTS (
+          SELECT 1 FROM public.usuarios_instituicoes ui
+          WHERE ui.usuario_id = auth.uid() 
+            AND ui.instituicao_id = instituicao_id
+        )
+      );
+      
+    CREATE POLICY policy_integracoes_insert ON contabilidade.integracoes
+      FOR INSERT 
+      WITH CHECK (
+        EXISTS (
+          SELECT 1 FROM public.usuarios_instituicoes ui
+          WHERE ui.usuario_id = auth.uid() 
+            AND ui.instituicao_id = instituicao_id
+            AND ui.tipo_usuario IN ('ADMIN', 'FINANCEIRO', 'CONTADOR')
+        )
+      );
+    
+    RAISE NOTICE 'Tabela contabilidade.integracoes criada com sucesso';
+  ELSE
+    RAISE NOTICE 'Tabela contabilidade.integracoes já existe';
+  END IF;
+END $$;
+
+---------------------------------------------
+-- BLOCO 10: Verificar se todas as migrações foram aplicadas
 ---------------------------------------------
 -- Verificar schemas
 SELECT schema_name
@@ -399,4 +565,12 @@ ORDER BY table_schema, table_name;
 SELECT routine_schema, routine_name
 FROM information_schema.routines
 WHERE routine_schema IN ('contabilidade', 'rh')
-ORDER BY routine_schema, routine_name; 
+ORDER BY routine_schema, routine_name;
+
+-- Verificar políticas RLS
+SELECT tablename, policyname, permissive, cmd
+FROM pg_policies
+WHERE schemaname IN ('contabilidade', 'rh')
+ORDER BY tablename, policyname;
+
+-- [FIM DO SCRIPT] 
