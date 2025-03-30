@@ -1,13 +1,40 @@
 import React, { useState } from 'react';
-import { Content, Block } from '@/types/editor';
+import { Content, Block, BlockType } from '@/types/editor';
 import { Button } from '../../components/ui/button';
-import { Plus } from 'lucide-react';
+import { Plus, MoveVertical, GripVertical } from 'lucide-react';
+import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 
 // Componente placeholder para renderizar blocos (será expandido posteriormente)
-const BlockRenderer = ({ block }: { block: Block }) => {
+const BlockRenderer = ({ 
+  block, 
+  onRemove, 
+  onUpdate, 
+  isSelected, 
+  dragHandleProps 
+}: { 
+  block: Block, 
+  onRemove: (id: string) => void,
+  onUpdate: (id: string, updates: Partial<Block>) => void,
+  isSelected: boolean,
+  dragHandleProps?: any
+}) => {
   return (
-    <div className="p-4 mb-4 border rounded-lg">
-      <h3 className="text-lg font-medium mb-2">{block.title}</h3>
+    <div className={`p-4 mb-4 border rounded-lg ${isSelected ? 'border-blue-500 shadow-sm' : ''}`}>
+      <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center">
+          {dragHandleProps && (
+            <div {...dragHandleProps} className="cursor-grab mr-2 text-gray-400 hover:text-gray-600">
+              <GripVertical size={18} />
+            </div>
+          )}
+          <h3 className="text-lg font-medium">{block.title}</h3>
+        </div>
+        <div className="flex space-x-2">
+          <Button variant="ghost" size="sm" onClick={() => onRemove(block.id)}>
+            Remover
+          </Button>
+        </div>
+      </div>
       <div className="prose">{block.content}</div>
     </div>
   );
@@ -23,10 +50,10 @@ export function ContentEditor({ content, onChange, disciplineId }: ContentEditor
   const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null);
 
   // Adicionar um novo bloco vazio
-  const addBlock = () => {
+  const addBlock = (type: BlockType = 'text') => {
     const newBlock: Block = {
       id: `block-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
-      type: 'text',
+      type,
       title: 'Novo bloco',
       content: '',
       order: content.blocks.length,
@@ -67,6 +94,36 @@ export function ContentEditor({ content, onChange, disciplineId }: ContentEditor
     onChange({
       ...content,
       blocks: reorderedBlocks
+    });
+  };
+
+  // Gerenciar o arrastar e soltar
+  const handleDragEnd = (result: DropResult) => {
+    // Ignorar se soltar fora de uma área válida
+    if (!result.destination) return;
+    
+    // Ignorar se soltou na mesma posição
+    if (result.destination.index === result.source.index) return;
+    
+    // Criar uma cópia dos blocos atuais
+    const reorderedBlocks = Array.from(content.blocks);
+    
+    // Remover o bloco arrastado da posição original
+    const [movedBlock] = reorderedBlocks.splice(result.source.index, 1);
+    
+    // Inserir o bloco na nova posição
+    reorderedBlocks.splice(result.destination.index, 0, movedBlock);
+    
+    // Atualizar as ordens dos blocos
+    const updatedBlocks = reorderedBlocks.map((block, index) => ({
+      ...block,
+      order: index
+    }));
+    
+    // Atualizar o conteúdo com os blocos reordenados
+    onChange({
+      ...content,
+      blocks: updatedBlocks
     });
   };
 
@@ -118,24 +175,64 @@ export function ContentEditor({ content, onChange, disciplineId }: ContentEditor
         {content.blocks.length === 0 ? (
           <div className="p-8 text-center border-2 border-dashed rounded-lg">
             <p className="mb-4 text-gray-500">Este material não possui conteúdo ainda.</p>
-            <Button onClick={addBlock} className="gap-2">
+            <Button onClick={() => addBlock()} className="gap-2">
               <Plus className="h-4 w-4" />
               Adicionar bloco
             </Button>
           </div>
         ) : (
-          <>
-            {content.blocks.map((block) => (
-              <BlockRenderer key={block.id} block={block} />
-            ))}
+          <DragDropContext onDragEnd={handleDragEnd}>
+            <Droppable droppableId="content-blocks">
+              {(provided) => (
+                <div
+                  {...provided.droppableProps}
+                  ref={provided.innerRef}
+                  className="space-y-2"
+                >
+                  {content.blocks.map((block, index) => (
+                    <Draggable key={block.id} draggableId={block.id} index={index}>
+                      {(provided, snapshot) => (
+                        <div
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          className={snapshot.isDragging ? 'opacity-70' : ''}
+                        >
+                          <BlockRenderer
+                            key={block.id}
+                            block={block}
+                            onRemove={removeBlock}
+                            onUpdate={updateBlock}
+                            isSelected={selectedBlockId === block.id}
+                            dragHandleProps={provided.dragHandleProps}
+                          />
+                        </div>
+                      )}
+                    </Draggable>
+                  ))}
+                  {provided.placeholder}
+                </div>
+              )}
+            </Droppable>
             
-            <div className="pt-4">
-              <Button onClick={addBlock} variant="outline" className="gap-2">
+            <div className="pt-4 flex space-x-2">
+              <Button onClick={() => addBlock('text')} variant="outline" className="gap-2">
                 <Plus className="h-4 w-4" />
-                Adicionar bloco
+                Texto
+              </Button>
+              <Button onClick={() => addBlock('video')} variant="outline" className="gap-2">
+                <Plus className="h-4 w-4" />
+                Vídeo
+              </Button>
+              <Button onClick={() => addBlock('quiz')} variant="outline" className="gap-2">
+                <Plus className="h-4 w-4" />
+                Quiz
+              </Button>
+              <Button onClick={() => addBlock('activity')} variant="outline" className="gap-2">
+                <Plus className="h-4 w-4" />
+                Atividade
               </Button>
             </div>
-          </>
+          </DragDropContext>
         )}
       </div>
     </div>

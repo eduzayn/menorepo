@@ -17,9 +17,9 @@
     "@edunexia/api-client": "workspace:*",
     "@edunexia/auth": "workspace:*",
     "@edunexia/core-types": "workspace:*",
+    "@edunexia/database-schema": "workspace:*",
     "@edunexia/ui-components": "workspace:*",
     "@edunexia/utils": "workspace:*",
-    "@edunexia/database-schema": "workspace:*",
     "@supabase/supabase-js": "^2.39.3",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
@@ -36,8 +36,10 @@
   },
   "devDependencies": {
     "@edunexia/test-config": "workspace:*",
+    "@hello-pangea/dnd": "^18.0.1",
     "@types/node": "^20.11.16",
     "@types/react": "^18.2.43",
+    "@types/react-beautiful-dnd": "^13.1.8",
     "@types/react-dom": "^18.2.17",
     "@typescript-eslint/eslint-plugin": "^6.14.0",
     "@typescript-eslint/parser": "^6.14.0",
@@ -52,4 +54,4 @@
     "vite": "^5.0.8",
     "vitest": "^0.34.6"
   }
-} 
+}
