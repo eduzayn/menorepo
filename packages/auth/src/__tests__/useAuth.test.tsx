@@ -1,9 +1,8 @@
 import { renderHook, act, waitFor } from '@testing-library/react';
 import React from 'react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-
-import { useAuth } from '../hooks/useAuth';
-
+import { useAuth, AuthProvider } from '../useAuth';
+import { createClient } from '@supabase/supabase-js';
 
 // Mock para o Supabase
 vi.mock('@edunexia/api-client', () => ({
@@ -32,313 +31,304 @@ vi.mock('@edunexia/api-client', () => ({
   })
 }));
 
+// Mock do cliente Supabase
+vi.mock('@supabase/supabase-js', () => ({
+  createClient: vi.fn(() => ({
+    auth: {
+      getSession: vi.fn(),
+      signInWithPassword: vi.fn(),
+      signOut: vi.fn(),
+      onAuthStateChange: vi.fn(() => ({ 
+        data: { subscription: { unsubscribe: vi.fn() } } 
+      }))
+    }
+  }))
+}));
+
 // Componente wrapper para o contexto
 const Wrapper = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
-describe('useAuth Hook', () => {
+describe('useAuth', () => {
+  const mockUser = {
+    id: 'user-123',
+    email: 'usuario@edunexia.com',
+    user_metadata: { nome: 'Usuário Teste' }
+  };
+
+  const mockSession = {
+    user: mockUser,
+    access_token: 'token-123',
+    refresh_token: 'refresh-123',
+    expires_at: Date.now() + 3600
+  };
+
+  const mockSupabaseClient = createClient('https://test.supabase.co', 'fake-key');
+
+  // Wrapper para prover o contexto de autenticação
+  const wrapper = ({ children }: { children: React.ReactNode }) => (
+    <AuthProvider supabaseClient={mockSupabaseClient}>
+      {children}
+    </AuthProvider>
+  );
+
   beforeEach(() => {
     vi.clearAllMocks();
+    localStorage.clear();
   });
 
   afterEach(() => {
     vi.resetAllMocks();
   });
 
-  it('deve iniciar com o estado de carregamento', async () => {
-    const { result } = renderHook(() => useAuth(), { wrapper: Wrapper });
+  it('deve iniciar com o estado de autenticação não carregado', () => {
+    const { result } = renderHook(() => useAuth(), { wrapper });
     
-    // Verificar estado inicial
-    expect(result.current.loading).toBe(true);
-    expect(result.current.user).toBe(null);
-    expect(result.current.session).toBe(null);
-    expect(result.current.error).toBe(null);
-    
-    // Aguardar o fim da verificação de sessão
-    await waitFor(() => {
-      expect(result.current.loading).toBe(false);
-    });
+    expect(result.current.isLoaded).toBe(false);
+    expect(result.current.isAuthenticated).toBe(false);
+    expect(result.current.user).toBeNull();
   });
 
-  it('deve verificar a sessão na inicialização', async () => {
-    const mockSupabase = vi.mocked(require('@edunexia/api-client').useSupabaseClient());
-    
-    renderHook(() => useAuth(), { wrapper: Wrapper });
-    
-    // Verificar se getSession foi chamado
-    await waitFor(() => {
-      expect(mockSupabase.auth.getSession).toHaveBeenCalled();
-    });
-  });
-
-  it('deve realizar login com credenciais corretas', async () => {
-    const mockUser = {
-      id: 'user-123',
-      nome: 'Teste',
-      email: 'teste@edunexia.com.br',
-      permissoes: ['ler', 'escrever'],
-      perfil: 'aluno'
-    };
-    
-    const mockSession = {
-      access_token: 'access-token',
-      refresh_token: 'refresh-token',
-      expires_at: Date.now() + 3600000,
-      token_type: 'bearer'
-    };
-    
-    // Mock do retorno de signInWithPassword
-    const mockSupabase = vi.mocked(require('@edunexia/api-client').useSupabaseClient());
-    mockSupabase.auth.signInWithPassword.mockResolvedValueOnce({
-      data: {
-        user: { id: 'user-123' },
-        session: mockSession
-      },
+  it('deve validar a sessão existente durante a inicialização', async () => {
+    // Configurar o mock para retornar uma sessão existente
+    mockSupabaseClient.auth.getSession = vi.fn().mockResolvedValue({
+      data: { session: mockSession },
       error: null
     });
     
-    // Mock do retorno da consulta ao usuário
-    mockSupabase.from.mockImplementationOnce(() => ({
-      select: vi.fn().mockReturnThis(),
-      eq: vi.fn().mockReturnThis(),
-      single: vi.fn().mockResolvedValueOnce({ data: mockUser, error: null })
-    }));
+    const { result } = renderHook(() => useAuth(), { wrapper });
     
-    const { result } = renderHook(() => useAuth(), { wrapper: Wrapper });
+    // Verificar o estado inicial (carregando)
+    expect(result.current.isLoaded).toBe(false);
     
-    // Aguardar o fim da verificação de sessão inicial
+    // Aguardar a autenticação ser processada
     await waitFor(() => {
-      expect(result.current.loading).toBe(false);
+      expect(result.current.isLoaded).toBe(true);
     });
     
-    // Realizar login
+    // Verificar o estado final (autenticado)
+    expect(result.current.isAuthenticated).toBe(true);
+    expect(result.current.user).toEqual(mockUser);
+  });
+
+  it('deve lidar com erros na verificação da sessão', async () => {
+    // Configurar o mock para retornar um erro
+    mockSupabaseClient.auth.getSession = vi.fn().mockResolvedValue({
+      data: { session: null },
+      error: new Error('Erro ao buscar sessão')
+    });
+    
+    // Espionar o console.error para evitar que o erro apareça nos logs de teste
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    
+    const { result } = renderHook(() => useAuth(), { wrapper });
+    
+    // Aguardar a autenticação ser processada
+    await waitFor(() => {
+      expect(result.current.isLoaded).toBe(true);
+    });
+    
+    // Verificar o estado final (não autenticado devido ao erro)
+    expect(result.current.isAuthenticated).toBe(false);
+    expect(result.current.user).toBeNull();
+    
+    consoleSpy.mockRestore();
+  });
+
+  it('deve autenticar o usuário com sucesso', async () => {
+    // Configurar o mock para iniciar sem sessão
+    mockSupabaseClient.auth.getSession = vi.fn().mockResolvedValue({
+      data: { session: null },
+      error: null
+    });
+    
+    // Configurar o mock para login com sucesso
+    mockSupabaseClient.auth.signInWithPassword = vi.fn().mockResolvedValue({
+      data: { session: mockSession, user: mockUser },
+      error: null
+    });
+    
+    const { result } = renderHook(() => useAuth(), { wrapper });
+    
+    // Aguardar a verificação inicial de sessão
+    await waitFor(() => {
+      expect(result.current.isLoaded).toBe(true);
+    });
+    
+    // Realizar o login
     await act(async () => {
-      const response = await result.current.signIn({
-        email: 'teste@edunexia.com.br',
+      await result.current.signIn({
+        email: 'usuario@edunexia.com',
         password: 'senha123'
       });
-      
-      // Verificar o retorno da função de login
-      expect(response.user).not.toBeNull();
-      expect(response.error).toBeNull();
     });
     
-    // Verificar se o estado foi atualizado corretamente
+    // Verificar o estado final (autenticado)
+    expect(result.current.isAuthenticated).toBe(true);
     expect(result.current.user).toEqual(mockUser);
-    expect(result.current.session).not.toBeNull();
-    expect(result.current.session?.token.access_token).toBe('access-token');
+    
+    // Verificar se a função de login foi chamada com os parâmetros corretos
+    expect(mockSupabaseClient.auth.signInWithPassword).toHaveBeenCalledWith({
+      email: 'usuario@edunexia.com',
+      password: 'senha123'
+    });
   });
 
-  it('deve lidar com erros durante o login', async () => {
-    const mockError = new Error('Credenciais inválidas');
-    
-    // Mock do retorno de signInWithPassword com erro
-    const mockSupabase = vi.mocked(require('@edunexia/api-client').useSupabaseClient());
-    mockSupabase.auth.signInWithPassword.mockResolvedValueOnce({
-      data: { user: null, session: null },
-      error: mockError
+  it('deve retornar erro ao falhar na autenticação', async () => {
+    // Configurar o mock para iniciar sem sessão
+    mockSupabaseClient.auth.getSession = vi.fn().mockResolvedValue({
+      data: { session: null },
+      error: null
     });
     
-    const { result } = renderHook(() => useAuth(), { wrapper: Wrapper });
+    // Configurar o mock para falha no login
+    const authError = new Error('Credenciais inválidas');
+    mockSupabaseClient.auth.signInWithPassword = vi.fn().mockResolvedValue({
+      data: { session: null, user: null },
+      error: authError
+    });
     
-    // Aguardar o fim da verificação de sessão inicial
+    const { result } = renderHook(() => useAuth(), { wrapper });
+    
+    // Aguardar a verificação inicial de sessão
     await waitFor(() => {
-      expect(result.current.loading).toBe(false);
+      expect(result.current.isLoaded).toBe(true);
     });
     
-    // Tentar realizar login
+    // Realizar o login com credenciais inválidas
+    let error;
     await act(async () => {
-      const response = await result.current.signIn({
-        email: 'teste@edunexia.com.br',
-        password: 'senha_errada'
-      });
-      
-      // Verificar o retorno da função de login
-      expect(response.user).toBeNull();
-      expect(response.error).not.toBeNull();
-      expect(response.error?.message).toBe('Credenciais inválidas');
-    });
-    
-    // Verificar se o estado de erro foi atualizado
-    expect(result.current.error).not.toBeNull();
-    expect(result.current.user).toBeNull();
-    expect(result.current.session).toBeNull();
-  });
-
-  it('deve realizar logout corretamente', async () => {
-    // Simular um usuário já logado
-    const mockUser = {
-      id: 'user-123',
-      nome: 'Teste',
-      email: 'teste@edunexia.com.br',
-      permissoes: ['ler', 'escrever'],
-      perfil: 'aluno'
-    };
-    
-    const mockSession = {
-      access_token: 'access-token',
-      refresh_token: 'refresh-token',
-      expires_at: Date.now() + 3600000,
-      token_type: 'bearer'
-    };
-    
-    // Mock para getSession para simular usuário logado
-    const mockSupabase = vi.mocked(require('@edunexia/api-client').useSupabaseClient());
-    mockSupabase.auth.getSession.mockResolvedValueOnce({
-      data: {
-        session: mockSession
+      try {
+        await result.current.signIn({
+          email: 'usuario@edunexia.com',
+          password: 'senha-incorreta'
+        });
+      } catch (e) {
+        error = e;
       }
     });
     
-    // Mock para busca de dados do usuário
-    mockSupabase.from.mockImplementationOnce(() => ({
-      select: vi.fn().mockReturnThis(),
-      eq: vi.fn().mockReturnThis(),
-      single: vi.fn().mockResolvedValueOnce({ data: mockUser, error: null })
-    }));
+    // Verificar que o erro foi lançado
+    expect(error).toEqual(authError);
     
-    const { result } = renderHook(() => useAuth(), { wrapper: Wrapper });
-    
-    // Aguardar o fim da verificação de sessão inicial e definição do usuário
-    await waitFor(() => {
-      expect(result.current.loading).toBe(false);
-      expect(result.current.user).not.toBeNull();
-    });
-    
-    // Realizar logout
-    await act(async () => {
-      const response = await result.current.signOut();
-      
-      // Verificar o retorno da função de logout
-      expect(response.success).toBe(true);
-      expect(response.error).toBeNull();
-    });
-    
-    // Verificar se o estado foi limpo corretamente
+    // Verificar que o estado continua como não autenticado
+    expect(result.current.isAuthenticated).toBe(false);
     expect(result.current.user).toBeNull();
-    expect(result.current.session).toBeNull();
   });
 
-  it('deve verificar permissões corretamente', async () => {
-    // Simular um usuário com permissões específicas
-    const mockUser = {
-      id: 'user-123',
-      nome: 'Teste',
-      email: 'teste@edunexia.com.br',
-      permissoes: ['ler', 'escrever', 'editar_alunos'],
-      perfil: 'coordenador'
-    };
+  it('deve fazer logout com sucesso', async () => {
+    // Configurar o mock para iniciar com sessão
+    mockSupabaseClient.auth.getSession = vi.fn().mockResolvedValue({
+      data: { session: mockSession },
+      error: null
+    });
     
-    const mockSession = {
-      access_token: 'access-token',
-      refresh_token: 'refresh-token',
-      expires_at: Date.now() + 3600000,
-      token_type: 'bearer'
-    };
+    // Configurar o mock para logout com sucesso
+    mockSupabaseClient.auth.signOut = vi.fn().mockResolvedValue({
+      error: null
+    });
     
-    // Mock para getSession para simular usuário logado
-    const mockSupabase = vi.mocked(require('@edunexia/api-client').useSupabaseClient());
-    mockSupabase.auth.getSession.mockResolvedValueOnce({
-      data: {
-        session: mockSession
+    const { result } = renderHook(() => useAuth(), { wrapper });
+    
+    // Aguardar a autenticação ser processada
+    await waitFor(() => {
+      expect(result.current.isAuthenticated).toBe(true);
+    });
+    
+    // Realizar o logout
+    await act(async () => {
+      await result.current.signOut();
+    });
+    
+    // Verificar que o estado foi atualizado (não autenticado)
+    expect(result.current.isAuthenticated).toBe(false);
+    expect(result.current.user).toBeNull();
+    
+    // Verificar se a função de logout foi chamada
+    expect(mockSupabaseClient.auth.signOut).toHaveBeenCalled();
+  });
+
+  it('deve lidar com erros durante o logout', async () => {
+    // Configurar o mock para iniciar com sessão
+    mockSupabaseClient.auth.getSession = vi.fn().mockResolvedValue({
+      data: { session: mockSession },
+      error: null
+    });
+    
+    // Configurar o mock para falha no logout
+    const logoutError = new Error('Erro ao fazer logout');
+    mockSupabaseClient.auth.signOut = vi.fn().mockResolvedValue({
+      error: logoutError
+    });
+    
+    const { result } = renderHook(() => useAuth(), { wrapper });
+    
+    // Aguardar a autenticação ser processada
+    await waitFor(() => {
+      expect(result.current.isAuthenticated).toBe(true);
+    });
+    
+    // Realizar o logout com erro
+    let error;
+    await act(async () => {
+      try {
+        await result.current.signOut();
+      } catch (e) {
+        error = e;
       }
     });
     
-    // Mock para busca de dados do usuário
-    mockSupabase.from.mockImplementationOnce(() => ({
-      select: vi.fn().mockReturnThis(),
-      eq: vi.fn().mockReturnThis(),
-      single: vi.fn().mockResolvedValueOnce({ data: mockUser, error: null })
-    }));
+    // Verificar que o erro foi lançado
+    expect(error).toEqual(logoutError);
     
-    const { result } = renderHook(() => useAuth(), { wrapper: Wrapper });
-    
-    // Aguardar o fim da verificação de sessão inicial e definição do usuário
-    await waitFor(() => {
-      expect(result.current.user).not.toBeNull();
-    });
-    
-    // Verificar permissões
-    expect(result.current.hasPermission('ler')).toBe(true);
-    expect(result.current.hasPermission('escrever')).toBe(true);
-    expect(result.current.hasPermission('editar_alunos')).toBe(true);
-    expect(result.current.hasPermission('excluir')).toBe(false);
-    
-    // Verificar perfil
-    expect(result.current.hasRole('coordenador')).toBe(true);
-    expect(result.current.hasRole('professor')).toBe(true); // Deve passar porque coordenador > professor
-    expect(result.current.hasRole('admin')).toBe(false); // Deve falhar porque admin > coordenador
+    // Estado deve permanecer autenticado, pois o logout falhou
+    expect(result.current.isAuthenticated).toBe(true);
+    expect(result.current.user).toEqual(mockUser);
   });
 
-  it('deve responder ao evento de alteração de autenticação', async () => {
-    const mockUser = {
-      id: 'user-123',
-      nome: 'Teste',
-      email: 'teste@edunexia.com.br',
-      permissoes: ['ler'],
-      perfil: 'aluno'
-    };
+  it('deve atualizar o estado quando a autenticação muda', async () => {
+    // Configurar o mock para iniciar sem sessão
+    mockSupabaseClient.auth.getSession = vi.fn().mockResolvedValue({
+      data: { session: null },
+      error: null
+    });
     
-    const mockSession = {
-      access_token: 'access-token',
-      refresh_token: 'refresh-token',
-      expires_at: Date.now() + 3600000,
-      token_type: 'bearer'
-    };
-    
-    const mockSupabase = vi.mocked(require('@edunexia/api-client').useSupabaseClient());
-    
-    // Capturar a função de callback registrada no listener
+    // Guardar a função de callback do evento de autenticação para chamar manualmente
     let authChangeCallback: Function;
-    mockSupabase.auth.onAuthStateChange.mockImplementationOnce((callback) => {
+    mockSupabaseClient.auth.onAuthStateChange = vi.fn((callback) => {
       authChangeCallback = callback;
-      return {
-        data: {
-          subscription: {
-            unsubscribe: vi.fn()
-          }
-        }
-      };
+      return { data: { subscription: { unsubscribe: vi.fn() } } };
     });
     
-    // Mock para busca de dados do usuário
-    mockSupabase.from.mockImplementation(() => ({
-      select: vi.fn().mockReturnThis(),
-      eq: vi.fn().mockReturnThis(),
-      single: vi.fn().mockResolvedValue({ data: mockUser, error: null })
-    }));
+    const { result } = renderHook(() => useAuth(), { wrapper });
     
-    const { result } = renderHook(() => useAuth(), { wrapper: Wrapper });
-    
-    // Aguardar o fim da verificação de sessão inicial
+    // Aguardar a verificação inicial de sessão
     await waitFor(() => {
-      expect(result.current.loading).toBe(false);
+      expect(result.current.isLoaded).toBe(true);
     });
+    expect(result.current.isAuthenticated).toBe(false);
     
-    // Simular evento de login
+    // Simular um evento de alteração de autenticação (login)
     await act(async () => {
-      // @ts-ignore - Ignorar tipo porque estamos chamando diretamente a callback capturada
-      authChangeCallback('SIGNED_IN', mockSession);
+      if (authChangeCallback) {
+        authChangeCallback('SIGNED_IN', { session: mockSession });
+      }
     });
     
-    // Aguardar a atualização do estado
-    await waitFor(() => {
-      expect(result.current.user).not.toBeNull();
-      expect(result.current.session).not.toBeNull();
-    });
-    
-    // Verificar se os dados foram atualizados
+    // Verificar que o estado foi atualizado para autenticado
+    expect(result.current.isAuthenticated).toBe(true);
     expect(result.current.user).toEqual(mockUser);
     
-    // Simular evento de logout
+    // Simular um evento de alteração de autenticação (logout)
     await act(async () => {
-      // @ts-ignore - Ignorar tipo porque estamos chamando diretamente a callback capturada
-      authChangeCallback('SIGNED_OUT', null);
+      if (authChangeCallback) {
+        authChangeCallback('SIGNED_OUT', { session: null });
+      }
     });
     
-    // Verificar se o estado foi limpo
+    // Verificar que o estado foi atualizado para não autenticado
+    expect(result.current.isAuthenticated).toBe(false);
     expect(result.current.user).toBeNull();
-    expect(result.current.session).toBeNull();
   });
 }); 

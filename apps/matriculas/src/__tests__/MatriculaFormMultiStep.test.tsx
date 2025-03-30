@@ -1,16 +1,47 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, userEvent } from '@edunexia/test-config';
 import { MatriculaFormMultiStep } from '../components/MatriculaFormMultiStep';
-import { MemoryRouter } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
-// Mock do hook useMatriculas
+// Mock de React Router
+vi.mock('react-router-dom', () => ({
+  useNavigate: () => vi.fn(),
+}));
+
+// Mock dos serviços
+vi.mock('../services/alunoService', () => ({
+  alunoService: {
+    buscarAlunos: vi.fn().mockResolvedValue([
+      { id: 'aluno-1', nome: 'João Silva', cpf: '123.456.789-00' },
+      { id: 'aluno-2', nome: 'Maria Santos', cpf: '987.654.321-00' }
+    ]),
+    buscarAluno: vi.fn().mockResolvedValue({ id: 'aluno-1', nome: 'João Silva', cpf: '123.456.789-00' })
+  }
+}));
+
+vi.mock('../services/cursoService', () => ({
+  cursoService: {
+    listarCursos: vi.fn().mockResolvedValue([
+      { id: 'curso-1', nome: 'Desenvolvimento Web', valor: 1200.00 },
+      { id: 'curso-2', nome: 'Data Science', valor: 1500.00 }
+    ])
+  }
+}));
+
+vi.mock('../services/planoService', () => ({
+  planoService: {
+    listarPlanos: vi.fn().mockResolvedValue([
+      { id: 'plano-1', nome: 'Mensal', parcelas: 12 },
+      { id: 'plano-2', nome: 'Trimestral', parcelas: 4 }
+    ])
+  }
+}));
+
+// Mock do hook de matrícula
 vi.mock('../hooks/useMatriculas', () => ({
   useCriarMatricula: () => ({
-    mutate: vi.fn((data, options) => {
-      // Simula uma chamada de API bem-sucedida
-      if (options && options.onSuccess) {
-        setTimeout(() => options.onSuccess(), 0);
-      }
+    mutate: vi.fn().mockImplementation((data, options) => {
+      options.onSuccess({ id: 'matricula-1', ...data });
     }),
     isPending: false
   })
@@ -18,143 +49,230 @@ vi.mock('../hooks/useMatriculas', () => ({
 
 // Mock dos componentes de documentos e contratos
 vi.mock('../components/documentos/DocumentoUpload', () => ({
-  DocumentoUpload: () => <div data-testid="documento-upload">Mock de Upload de Documentos</div>
+  DocumentoUpload: vi.fn().mockImplementation(({ matriculaId, onComplete }) => (
+    <div data-testid="documento-upload">
+      <p>Upload de documentos para: {matriculaId}</p>
+      <button onClick={() => onComplete()}>Concluir Upload</button>
+    </div>
+  ))
 }));
 
 vi.mock('../components/contratos/ContratoViewer', () => ({
-  ContratoViewer: () => <div data-testid="contrato-viewer">Mock de Visualizador de Contrato</div>
+  ContratoViewer: vi.fn().mockImplementation(({ matriculaId, onAccept }) => (
+    <div data-testid="contrato-viewer">
+      <p>Contrato para: {matriculaId}</p>
+      <button onClick={() => onAccept()}>Aceitar Contrato</button>
+    </div>
+  ))
 }));
 
+// Mock do componente de toast
+vi.mock('@edunexia/ui-components', async () => {
+  const actual = await vi.importActual('@edunexia/ui-components');
+  return {
+    ...actual,
+    toast: {
+      success: vi.fn(),
+      error: vi.fn()
+    }
+  };
+});
+
+// Setup do QueryClient para React Query
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+    },
+  },
+});
+
+// Wrapper para prover o contexto do React Query
+const wrapper = ({ children }: { children: React.ReactNode }) => (
+  <QueryClientProvider client={queryClient}>
+    {children}
+  </QueryClientProvider>
+);
+
 describe('MatriculaFormMultiStep', () => {
-  const mockOnSuccess = vi.fn();
-  
   beforeEach(() => {
     vi.clearAllMocks();
+    queryClient.clear();
   });
-  
-  it('deve renderizar o primeiro passo (Dados Básicos) corretamente', () => {
-    render(
-      <MemoryRouter>
-        <MatriculaFormMultiStep onSuccess={mockOnSuccess} />
-      </MemoryRouter>
-    );
+
+  it('deve renderizar o formulário com a primeira etapa', async () => {
+    render(<MatriculaFormMultiStep />, { wrapper });
     
-    // Verificar se o título do passo está presente
-    expect(screen.getByText('Dados Básicos')).toBeInTheDocument();
-    
-    // Verificar se os campos obrigatórios do primeiro passo estão presentes
-    expect(screen.getByLabelText('Aluno')).toBeInTheDocument();
-    expect(screen.getByLabelText('Curso')).toBeInTheDocument();
-    expect(screen.getByLabelText('Plano de Pagamento')).toBeInTheDocument();
-    expect(screen.getByLabelText('Status')).toBeInTheDocument();
-    expect(screen.getByLabelText('Data de Início')).toBeInTheDocument();
-    expect(screen.getByLabelText('Data de Fim')).toBeInTheDocument();
-    expect(screen.getByLabelText('Observações')).toBeInTheDocument();
-    
-    // Verificar se o botão de próximo está presente
-    expect(screen.getByRole('button', { name: /próximo/i })).toBeInTheDocument();
+    // Verificar se o título da primeira etapa está presente
+    expect(await screen.findByText('Dados Básicos')).toBeInTheDocument();
+    expect(screen.getByText('Informações iniciais da matrícula')).toBeInTheDocument();
   });
-  
-  it('deve avançar para o segundo passo (Documentação) ao preencher e enviar o primeiro formulário', async () => {
-    render(
-      <MemoryRouter>
-        <MatriculaFormMultiStep onSuccess={mockOnSuccess} />
-      </MemoryRouter>
-    );
+
+  it('deve permitir buscar e selecionar um aluno', async () => {
+    render(<MatriculaFormMultiStep />, { wrapper });
     
-    // Preencher os campos obrigatórios
-    fireEvent.change(screen.getByLabelText('Aluno'), { target: { value: 'aluno-123' } });
-    fireEvent.change(screen.getByLabelText('Curso'), { target: { value: 'curso-123' } });
-    fireEvent.change(screen.getByLabelText('Plano de Pagamento'), { target: { value: 'plano-123' } });
+    // Buscar o campo de busca de aluno
+    const buscaInput = await screen.findByPlaceholderText('Busque pelo nome ou CPF do aluno');
     
-    // Selecionar o status
-    const statusSelect = screen.getByRole('combobox', { name: /status/i });
-    fireEvent.click(statusSelect);
-    fireEvent.click(screen.getByRole('option', { name: /pendente/i }));
+    // Digitar o termo de busca
+    const user = userEvent.setup();
+    await user.type(buscaInput, 'João');
     
-    // Preencher datas
-    fireEvent.change(screen.getByLabelText('Data de Início'), { target: { value: '2024-04-01' } });
-    fireEvent.change(screen.getByLabelText('Data de Fim'), { target: { value: '2025-04-01' } });
-    
-    // Adicionar observações
-    fireEvent.change(screen.getByLabelText('Observações'), { target: { value: 'Observações de teste' } });
-    
-    // Clicar no botão de próximo
-    fireEvent.click(screen.getByRole('button', { name: /próximo/i }));
-    
-    // Aguardar o avanço para o próximo passo
+    // Esperar pelos resultados da busca
     await waitFor(() => {
-      expect(screen.getByText('Documentação')).toBeInTheDocument();
+      expect(screen.getByText('João Silva')).toBeInTheDocument();
+    });
+    
+    // Selecionar o aluno
+    await user.click(screen.getByText('João Silva'));
+    
+    // Verificar se o aluno foi selecionado
+    expect(screen.getByText(/Selecionado/)).toBeInTheDocument();
+  });
+
+  it('deve permitir selecionar curso e plano', async () => {
+    render(<MatriculaFormMultiStep />, { wrapper });
+    
+    // Esperar pelos seletores de curso e plano
+    await waitFor(() => {
+      expect(screen.getAllByRole('combobox').length).toBeGreaterThanOrEqual(2);
+    });
+    
+    const user = userEvent.setup();
+    
+    // Selecionar curso
+    const cursosSelects = screen.getAllByRole('combobox');
+    await user.click(cursosSelects[0]);
+    
+    // Esperar pelas opções de curso
+    await waitFor(() => {
+      expect(screen.getByText('Desenvolvimento Web')).toBeInTheDocument();
+    });
+    
+    // Selecionar o curso
+    await user.click(screen.getByText('Desenvolvimento Web'));
+    
+    // Selecionar plano
+    await user.click(cursosSelects[1]);
+    
+    // Esperar pelas opções de plano
+    await waitFor(() => {
+      expect(screen.getByText('Mensal')).toBeInTheDocument();
+    });
+    
+    // Selecionar o plano
+    await user.click(screen.getByText('Mensal'));
+  });
+
+  it('deve avançar para a próxima etapa ao preencher os dados básicos', async () => {
+    render(<MatriculaFormMultiStep />, { wrapper });
+    
+    const user = userEvent.setup();
+    
+    // Preencher dados do aluno
+    const buscaInput = await screen.findByPlaceholderText('Busque pelo nome ou CPF do aluno');
+    await user.type(buscaInput, 'João');
+    
+    await waitFor(() => {
+      expect(screen.getByText('João Silva')).toBeInTheDocument();
+    });
+    
+    await user.click(screen.getByText('João Silva'));
+    
+    // Selecionar curso e plano
+    const selects = screen.getAllByRole('combobox');
+    
+    // Curso
+    await user.click(selects[0]);
+    await waitFor(() => {
+      expect(screen.getByText('Desenvolvimento Web')).toBeInTheDocument();
+    });
+    await user.click(screen.getByText('Desenvolvimento Web'));
+    
+    // Plano
+    await user.click(selects[1]);
+    await waitFor(() => {
+      expect(screen.getByText('Mensal')).toBeInTheDocument();
+    });
+    await user.click(screen.getByText('Mensal'));
+    
+    // Clicar no botão próximo
+    const proximoButton = screen.getByRole('button', { name: /Próximo/i });
+    await user.click(proximoButton);
+    
+    // Verificar se avançou para a etapa de documentos
+    await waitFor(() => {
       expect(screen.getByTestId('documento-upload')).toBeInTheDocument();
     });
   });
-  
-  it('deve permitir navegar entre os passos', async () => {
-    render(
-      <MemoryRouter>
-        <MatriculaFormMultiStep onSuccess={mockOnSuccess} />
-      </MemoryRouter>
-    );
+
+  it('deve completar todo o fluxo de matrícula até o final', async () => {
+    render(<MatriculaFormMultiStep />, { wrapper });
     
-    // Preencher o primeiro formulário
-    fireEvent.change(screen.getByLabelText('Aluno'), { target: { value: 'aluno-123' } });
-    fireEvent.change(screen.getByLabelText('Curso'), { target: { value: 'curso-123' } });
-    fireEvent.change(screen.getByLabelText('Plano de Pagamento'), { target: { value: 'plano-123' } });
+    const user = userEvent.setup();
     
-    // Clicar no botão de próximo
-    fireEvent.click(screen.getByRole('button', { name: /próximo/i }));
+    // Etapa 1: Dados Básicos
+    // Preencher dados do aluno
+    const buscaInput = await screen.findByPlaceholderText('Busque pelo nome ou CPF do aluno');
+    await user.type(buscaInput, 'João');
     
-    // Aguardar o avanço para o próximo passo
     await waitFor(() => {
-      expect(screen.getByText('Documentação')).toBeInTheDocument();
+      expect(screen.getByText('João Silva')).toBeInTheDocument();
     });
     
-    // Clicar no botão de voltar
-    fireEvent.click(screen.getByRole('button', { name: /voltar/i }));
+    await user.click(screen.getByText('João Silva'));
     
-    // Verificar se voltou para o primeiro passo
+    // Selecionar curso e plano
+    const selects = screen.getAllByRole('combobox');
+    
+    // Curso
+    await user.click(selects[0]);
     await waitFor(() => {
-      expect(screen.getByText('Dados Básicos')).toBeInTheDocument();
+      expect(screen.getByText('Desenvolvimento Web')).toBeInTheDocument();
     });
-  });
-  
-  it('deve chamar onSuccess ao finalizar todos os passos', async () => {
-    render(
-      <MemoryRouter>
-        <MatriculaFormMultiStep onSuccess={mockOnSuccess} />
-      </MemoryRouter>
-    );
+    await user.click(screen.getByText('Desenvolvimento Web'));
     
-    // Navegar através de todos os passos
-    // Passo 1: Preencher dados básicos
-    fireEvent.change(screen.getByLabelText('Aluno'), { target: { value: 'aluno-123' } });
-    fireEvent.change(screen.getByLabelText('Curso'), { target: { value: 'curso-123' } });
-    fireEvent.change(screen.getByLabelText('Plano de Pagamento'), { target: { value: 'plano-123' } });
-    fireEvent.click(screen.getByRole('button', { name: /próximo/i }));
-    
-    // Passo 2: Documentação
+    // Plano
+    await user.click(selects[1]);
     await waitFor(() => {
-      expect(screen.getByText('Documentação')).toBeInTheDocument();
+      expect(screen.getByText('Mensal')).toBeInTheDocument();
     });
-    fireEvent.click(screen.getByRole('button', { name: /próximo/i }));
+    await user.click(screen.getByText('Mensal'));
     
-    // Passo 3: Contrato
-    await waitFor(() => {
-      expect(screen.getByText('Contrato')).toBeInTheDocument();
-    });
-    fireEvent.click(screen.getByRole('button', { name: /próximo/i }));
+    // Avançar para a próxima etapa
+    const proximoButton = screen.getByRole('button', { name: /Próximo/i });
+    await user.click(proximoButton);
     
-    // Passo 4: Pagamento
+    // Etapa 2: Documentos
     await waitFor(() => {
-      expect(screen.getByText('Pagamento')).toBeInTheDocument();
+      expect(screen.getByTestId('documento-upload')).toBeInTheDocument();
     });
     
-    // Finalizar o processo
-    fireEvent.click(screen.getByRole('button', { name: /concluir/i }));
+    // Concluir upload de documentos
+    const concluirUploadButton = screen.getByRole('button', { name: /Concluir Upload/i });
+    await user.click(concluirUploadButton);
     
-    // Verificar se onSuccess foi chamado
+    // Etapa 3: Contrato
     await waitFor(() => {
-      expect(mockOnSuccess).toHaveBeenCalled();
+      expect(screen.getByTestId('contrato-viewer')).toBeInTheDocument();
+    });
+    
+    // Aceitar contrato
+    const aceitarContratoButton = screen.getByRole('button', { name: /Aceitar Contrato/i });
+    await user.click(aceitarContratoButton);
+    
+    // Etapa 4: Pagamento
+    await waitFor(() => {
+      expect(screen.getByText(/Escolha a forma de pagamento/i)).toBeInTheDocument();
+    });
+    
+    // Selecionar forma de pagamento e avançar
+    const finalizarButton = screen.getByRole('button', { name: /Finalizar/i });
+    await user.click(finalizarButton);
+    
+    // Etapa 5: Conclusão
+    await waitFor(() => {
+      expect(screen.getByText(/Matrícula realizada com sucesso/i)).toBeInTheDocument();
     });
   });
 }); 
