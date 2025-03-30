@@ -23,9 +23,6 @@
       "path": "apps/comunicacao"
     },
     {
-      "path": "apps/core"
-    },
-    {
       "path": "apps/financeiro-empresarial"
     },
     {
@@ -51,6 +48,9 @@
     },
     {
       "path": "apps/site-edunexia"
+    },
+    {
+      "path": "apps/contabilidade"
     },
     {
       "path": "packages/api-client"
