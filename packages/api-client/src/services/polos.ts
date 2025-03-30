@@ -145,11 +145,17 @@ export class PolosService {
   async listarAlunosPolo(poloId: string): Promise<AlunosPolo[]> {
     try {
       const { data, error } = await this.client.from('polos.alunos_polo')
-        .select('*, auth.users!inner(*), public.matriculas!inner(*), public.cursos!inner(*)')
-        .eq('polo_id', poloId);
+        .select('*, auth.users!inner(*), public.matriculas!inner(*), public.cursos!inner(*)');
       
       if (error) throw error;
-      return data as AlunosPolo[];
+      
+      // Verificação de segurança para garantir que o resultado é um array válido
+      if (!data || !Array.isArray(data)) {
+        return [];
+      }
+      
+      // Conversão segura para o tipo esperado
+      return data as unknown as AlunosPolo[];
     } catch (error) {
       throw new ApiError(`Erro ao listar alunos do polo ${poloId}`, error);
     }

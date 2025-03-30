@@ -1,5 +1,4 @@
 import { ApiError } from './types';
-import { formatters } from '@edunexia/utils';
 
 /**
  * Trata erros da API de forma padronizada
@@ -37,26 +36,27 @@ export function handleApiError(error: unknown, defaultMessage = 'Ocorreu um erro
  * Formata datas para exibição no formato BR
  * @param date Data a ser formatada
  * @returns String formatada
- * @deprecated Use formatDate de '@edunexia/utils'
  */
 export function formatDate(date: Date | string): string {
-  return formatters.formatDate(date);
+  const d = typeof date === 'string' ? new Date(date) : date;
+  return new Intl.DateTimeFormat('pt-BR').format(d);
 }
 
 /**
  * Formata valores monetários no padrão R$
  * @param value Valor a ser formatado
  * @returns String formatada
- * @deprecated Use formatCurrency de '@edunexia/utils'
  */
 export function formatCurrency(value: number): string {
-  return formatters.formatCurrency(value);
+  return new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+  }).format(value);
 }
 
 /**
  * Gera um ID único para uso temporário (não use como chave permanente)
  * @returns String com ID único
- * @deprecated Use generateId de '@edunexia/utils'
  */
 export function generateTempId(): string {
   return Math.random().toString(36).substr(2, 9);
