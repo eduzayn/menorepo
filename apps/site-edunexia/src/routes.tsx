@@ -19,6 +19,8 @@ const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 const LoginPage = lazy(() => import('./pages/admin/LoginPage'));
 const DashboardPage = lazy(() => import('./pages/admin/DashboardPage'));
 const PaginasPage = lazy(() => import('./pages/admin/PaginasPage'));
+const NewPagePage = lazy(() => import('./pages/admin/NewPagePage'));
+const EditPagePage = lazy(() => import('./pages/admin/EditPagePage'));
 const LeadsPage = lazy(() => import('./pages/admin/LeadsPage'));
 
 // Componente de loading para Suspense
@@ -86,16 +88,8 @@ function AppRoutes() {
         
         {/* Gerenciamento de páginas */}
         <Route path="paginas" element={<SuspenseWrapper><PaginasPage /></SuspenseWrapper>} />
-        <Route path="paginas/nova" element={
-          <SuspenseWrapper>
-            <div className="p-4">Criação de nova página - Em desenvolvimento</div>
-          </SuspenseWrapper>
-        } />
-        <Route path="paginas/editar/:id" element={
-          <SuspenseWrapper>
-            <div className="p-4">Edição de página - Em desenvolvimento</div>
-          </SuspenseWrapper>
-        } />
+        <Route path="paginas/nova" element={<SuspenseWrapper><NewPagePage /></SuspenseWrapper>} />
+        <Route path="paginas/editar/:id" element={<SuspenseWrapper><EditPagePage /></SuspenseWrapper>} />
         
         {/* Gerenciamento de Leads */}
         <Route path="leads" element={<SuspenseWrapper><LeadsPage /></SuspenseWrapper>} />

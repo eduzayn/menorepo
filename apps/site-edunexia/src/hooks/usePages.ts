@@ -117,6 +117,27 @@ export function useDeletePage() {
   });
 }
 
+/**
+ * Hook para buscar uma página pelo ID
+ */
+export function usePageById(id: string) {
+  const { client } = useApi();
+  
+  return useQuery({
+    queryKey: ['site-page', id],
+    queryFn: async () => {
+      // Como não temos um método específico, vamos buscar todas as páginas e filtrar
+      const { pages, error } = await SitePageService.getAllPages(client);
+      if (error) throw error;
+      
+      const page = pages.find(p => p.id === id);
+      return page || null;
+    },
+    enabled: !!id,
+    staleTime: 5 * 60 * 1000, // 5 minutos
+  });
+}
+
 // Tipos...
 
 // Declaração de módulo sem 'export' na interface
