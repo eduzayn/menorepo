@@ -9,8 +9,7 @@
   ],
   "scripts": {
     "dev": "tsup --watch",
-    "build": "echo 'Temporary build skip - Bypassing build errors' && if not exist dist mkdir dist && type nul > dist/index.js",
-    "build:full": "tsup",
+    "build": "tsup --dts-resolve",
     "lint": "eslint src --ext ts,tsx",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
     "test": "vitest run",
@@ -18,7 +17,6 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@edunexia/api-client": "workspace:*",
     "date-fns": "^2.30.0",
     "lodash": "^4.17.21"
   },
