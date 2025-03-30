@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@edunexia/auth';
+
+// Importando o DynamicMenu novamente para garantir que está atualizado
 import DynamicMenu from './DynamicMenu';
 
 export default function Header() {
@@ -62,8 +64,32 @@ export default function Header() {
 
         {/* Versão desktop do menu */}
         <div className="hidden md:flex items-center space-x-3">
-          <nav className="mr-6" aria-label="Menu Principal">
-            <DynamicMenu />
+          <nav className="flex items-center space-x-6 mr-6" aria-label="Menu Principal">
+            <Link to="/" className="text-sm font-medium text-white hover:text-primary-100">Início</Link>
+            <Link to="/sobre" className="text-sm font-medium text-white hover:text-primary-100">Sobre</Link>
+            <Link to="/blog" className="text-sm font-medium text-white hover:text-primary-100">Blog</Link>
+            <Link to="/contato" className="text-sm font-medium text-white hover:text-primary-100">Contato</Link>
+            
+            {/* Dropdown Soluções */}
+            <div className="relative group">
+              <button className="flex items-center text-sm font-medium text-white hover:text-primary-100 focus:outline-none">
+                <span>Soluções</span>
+                <svg className="ml-1 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                </svg>
+              </button>
+              <div className="absolute left-0 mt-2 w-60 bg-white rounded-md shadow-lg overflow-hidden z-20 hidden group-hover:block">
+                <div className="py-1">
+                  <Link to="/matriculas" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Sistema de Matrículas</Link>
+                  <Link to="/portal-do-aluno" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Portal do Aluno</Link>
+                  <Link to="/material-didatico" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Material Didático</Link>
+                  <Link to="/comunicacao" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Comunicação</Link>
+                  <Link to="/financeiro" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Gestão Financeira</Link>
+                  <div className="border-t border-gray-100 my-1"></div>
+                  <Link to="/planos" className="block px-4 py-2 text-sm text-primary-600 font-medium hover:bg-gray-100">Conheça nossos planos</Link>
+                </div>
+              </div>
+            </div>
           </nav>
           
           {isAuthenticated ? (
@@ -143,7 +169,86 @@ export default function Header() {
             className="md:hidden absolute top-full left-0 w-full bg-white shadow-md rounded-b-lg mt-1 border-t border-gray-200"
           >
             <div className="p-4">
-              <DynamicMenu mobile onClose={handleMobileMenuClose} />
+              <nav className="space-y-1">
+                <Link 
+                  to="/" 
+                  className="block py-2 px-3 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50"
+                  onClick={handleMobileMenuClose}
+                >
+                  Início
+                </Link>
+                <Link 
+                  to="/sobre" 
+                  className="block py-2 px-3 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50"
+                  onClick={handleMobileMenuClose}
+                >
+                  Sobre
+                </Link>
+                <Link 
+                  to="/blog" 
+                  className="block py-2 px-3 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50"
+                  onClick={handleMobileMenuClose}
+                >
+                  Blog
+                </Link>
+                <Link 
+                  to="/contato" 
+                  className="block py-2 px-3 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50"
+                  onClick={handleMobileMenuClose}
+                >
+                  Contato
+                </Link>
+                
+                <div className="py-2 px-3">
+                  <div className="font-medium text-gray-800 mb-2">Soluções</div>
+                  <div className="pl-3 space-y-1 border-l-2 border-gray-100">
+                    <Link 
+                      to="/matriculas" 
+                      className="block py-1 text-sm text-gray-600 hover:text-primary-600"
+                      onClick={handleMobileMenuClose}
+                    >
+                      Sistema de Matrículas
+                    </Link>
+                    <Link 
+                      to="/portal-do-aluno" 
+                      className="block py-1 text-sm text-gray-600 hover:text-primary-600"
+                      onClick={handleMobileMenuClose}
+                    >
+                      Portal do Aluno
+                    </Link>
+                    <Link 
+                      to="/material-didatico" 
+                      className="block py-1 text-sm text-gray-600 hover:text-primary-600"
+                      onClick={handleMobileMenuClose}
+                    >
+                      Material Didático
+                    </Link>
+                    <Link 
+                      to="/comunicacao" 
+                      className="block py-1 text-sm text-gray-600 hover:text-primary-600"
+                      onClick={handleMobileMenuClose}
+                    >
+                      Comunicação
+                    </Link>
+                    <Link 
+                      to="/financeiro" 
+                      className="block py-1 text-sm text-gray-600 hover:text-primary-600"
+                      onClick={handleMobileMenuClose}
+                    >
+                      Gestão Financeira
+                    </Link>
+                  </div>
+                </div>
+                
+                <Link 
+                  to="/planos" 
+                  className="block py-2 px-3 rounded-md text-base font-medium text-primary-600 hover:bg-gray-50"
+                  onClick={handleMobileMenuClose}
+                >
+                  Conheça nossos planos
+                </Link>
+              </nav>
+              
               {!isAuthenticated && (
                 <div className="mt-4 pt-4 border-t border-gray-200">
                   <Link 
