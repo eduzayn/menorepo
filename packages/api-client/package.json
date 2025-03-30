@@ -8,7 +8,7 @@
     "dist/**"
   ],
   "scripts": {
-    "build": "tsup",
+    "build": "node ../../node_modules/tsup/dist/cli-default.js --no-dts",
     "dev": "tsc --watch",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
@@ -28,11 +28,11 @@
     "@typescript-eslint/eslint-plugin": "^6.14.0",
     "@typescript-eslint/parser": "^6.14.0",
     "eslint": "^8.55.0",
-    "tsup": "^8.0.1",
+    "tsup": "^8.4.0",
     "typescript": "^5.2.2"
   },
   "peerDependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   }
-} 
+}

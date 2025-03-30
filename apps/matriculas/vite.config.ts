@@ -26,5 +26,32 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     sourcemap: true,
+    rollupOptions: {
+      external: [
+        '@edunexia/ui-components',
+        '@edunexia/ui-components/components/ui',
+        'react',
+        'react-dom',
+        'react-router-dom'
+      ]
+    },
+    // Ignorar problemas de resolução de tsconfig externos
+    commonjsOptions: {
+      transformMixedEsModules: true,
+    },
+    // Opções para o esbuild ignorar tsconfig problematicos
+    minify: 'esbuild',
+    target: 'es2015',
   },
+  optimizeDeps: {
+    esbuildOptions: {
+      tsconfig: resolve(__dirname, 'tsconfig.json'),
+      tsconfigRaw: {
+        compilerOptions: {
+          experimentalDecorators: true,
+          jsx: 'react-jsx',
+        }
+      }
+    }
+  }
 });

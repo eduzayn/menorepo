@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "dev": "tsup --watch",
-    "build": "tsup --dts-resolve",
+    "build": "node ../../node_modules/tsup/dist/cli-default.js --no-dts",
     "lint": "eslint src --ext ts,tsx",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
     "test": "vitest run",
