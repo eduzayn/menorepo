@@ -1,10 +1,8 @@
-import { createVitestConfig } from '@edunexia/test-config';
+import { defineConfig } from 'vitest/config';
 import path from 'path';
 
-export default createVitestConfig('./', {
-  plugins: [
-    // Plugins específicos para o pacote de autenticação, se necessário
-  ],
+export default defineConfig({
+  plugins: [],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
@@ -15,6 +13,7 @@ export default createVitestConfig('./', {
   },
   test: {
     environment: 'jsdom',
+    globals: true,
     coverage: {
       include: [
         'src/hooks/**',

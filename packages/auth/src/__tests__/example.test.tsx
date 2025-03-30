@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { render, screen } from '@edunexia/test-config';
+import { render, screen } from '@testing-library/react';
 
 describe('Auth Package - Exemplo', () => {
   it('deve renderizar corretamente', () => {

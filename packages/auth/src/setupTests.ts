@@ -1,5 +1,11 @@
-// Importação da configuração central de testes
-import '@edunexia/test-config/setup';
+import '@testing-library/jest-dom';
+import { expect, afterEach } from 'vitest';
+import { cleanup } from '@testing-library/react';
+
+// Limpar após cada teste
+afterEach(() => {
+  cleanup();
+});
 
 // Configurações específicas para o pacote de autenticação
 import { vi } from 'vitest';
