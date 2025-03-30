@@ -1,239 +1,251 @@
-import { useState, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { Button } from '@edunexia/ui-components';
 import { documentoService } from '../../services/documentoService';
 
-type TipoDocumento = {
-  id: string;
-  nome: string;
-  obrigatorio: boolean;
-};
-
-// Lista de tipos de documentos aceitos
-const TIPOS_DOCUMENTO: TipoDocumento[] = [
-  { id: 'rg', nome: 'RG', obrigatorio: true },
-  { id: 'cpf', nome: 'CPF', obrigatorio: true },
-  { id: 'comp_residencia', nome: 'Comprovante de Residência', obrigatorio: true },
-  { id: 'certificado', nome: 'Certificado de Conclusão', obrigatorio: true },
-  { id: 'historico', nome: 'Histórico Escolar', obrigatorio: true },
-  { id: 'titulo_eleitor', nome: 'Título de Eleitor', obrigatorio: false },
-  { id: 'cert_nascimento', nome: 'Certidão de Nascimento', obrigatorio: false },
-  { id: 'cert_casamento', nome: 'Certidão de Casamento', obrigatorio: false },
-  { id: 'carteira_trabalho', nome: 'Carteira de Trabalho', obrigatorio: false },
-  { id: 'outros', nome: 'Outros', obrigatorio: false },
+// Tipos de documento aceitos no sistema
+const TIPOS_DOCUMENTO = [
+  { id: 'rg', label: 'RG' },
+  { id: 'cpf', label: 'CPF' },
+  { id: 'comprovante_residencia', label: 'Comprovante de Residência' },
+  { id: 'historico_escolar', label: 'Histórico Escolar' },
+  { id: 'diploma', label: 'Diploma' },
+  { id: 'declaracao_matricula', label: 'Declaração de Matrícula' },
+  { id: 'foto', label: 'Foto 3x4' },
+  { id: 'outros', label: 'Outros' }
 ];
 
-export const DocumentoUpload = () => {
-  const { alunoId } = useParams<{ alunoId: string }>();
-  const navigate = useNavigate();
-  const fileInputRef = useRef<HTMLInputElement>(null);
+// Tipos de arquivo aceitos para upload
+const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'application/pdf'];
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
-  const [tipoDocumento, setTipoDocumento] = useState('');
-  const [outroTipo, setOutroTipo] = useState('');
+export const DocumentoUpload = () => {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  
+  const [tipo, setTipo] = useState<string>('');
   const [arquivo, setArquivo] = useState<File | null>(null);
-  const [enviando, setEnviando] = useState(false);
-  const [erro, setErro] = useState<string | null>(null);
-  const [nomePersonalizado, setNomePersonalizado] = useState('');
+  const [outroTipo, setOutroTipo] = useState<string>('');
+  const [descricao, setDescricao] = useState<string>('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+
+  if (!id) {
+    return (
+      <div className="bg-red-50 border-l-4 border-red-500 p-4">
+        <p className="text-red-700">ID da matrícula não fornecido</p>
+      </div>
+    );
+  }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const file = e.target.files[0];
-      
-      if (file.size > 10 * 1024 * 1024) { // 10MB
-        setErro('O arquivo excede o tamanho máximo de 10MB.');
-        setArquivo(null);
-        if (fileInputRef.current) {
-          fileInputRef.current.value = '';
-        }
-        return;
-      }
-      
-      const allowedTypes = [
-        'application/pdf',
-        'image/jpeg',
-        'image/png',
-        'image/jpg',
-        'application/msword',
-        'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-      ];
-      
-      if (!allowedTypes.includes(file.type)) {
-        setErro('Formato de arquivo não suportado. Utilize PDF, JPEG, PNG ou DOC/DOCX.');
-        setArquivo(null);
-        if (fileInputRef.current) {
-          fileInputRef.current.value = '';
-        }
-        return;
-      }
-      
-      setArquivo(file);
-      setErro(null);
-      
-      // Define um nome personalizado baseado no nome original do arquivo
-      if (!nomePersonalizado) {
-        setNomePersonalizado(file.name);
-      }
-    }
-  };
-
-  const getTipoDocumentoNome = () => {
-    if (tipoDocumento === 'outros') {
-      return outroTipo;
+    const selectedFile = e.target.files?.[0];
+    setError(null);
+    
+    if (!selectedFile) {
+      setArquivo(null);
+      return;
     }
     
-    const tipo = TIPOS_DOCUMENTO.find(t => t.id === tipoDocumento);
-    return tipo ? tipo.nome : '';
+    // Validar tipo de arquivo
+    if (!ALLOWED_TYPES.includes(selectedFile.type)) {
+      setError(`Tipo de arquivo não permitido. Utilize: ${ALLOWED_TYPES.map(t => t.split('/')[1]).join(', ')}`);
+      setArquivo(null);
+      return;
+    }
+    
+    // Validar tamanho do arquivo
+    if (selectedFile.size > MAX_FILE_SIZE) {
+      setError(`Arquivo muito grande. O tamanho máximo permitido é ${MAX_FILE_SIZE / (1024 * 1024)}MB`);
+      setArquivo(null);
+      return;
+    }
+    
+    setArquivo(selectedFile);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!arquivo) {
-      setErro('Selecione um arquivo para upload.');
+      setError('Selecione um arquivo para enviar');
       return;
     }
     
-    if (!tipoDocumento) {
-      setErro('Selecione o tipo de documento.');
+    if (!tipo) {
+      setError('Selecione o tipo de documento');
+      return;
+    }
+
+    const tipoFinal = tipo === 'outros' ? outroTipo : 
+      TIPOS_DOCUMENTO.find(t => t.id === tipo)?.label || '';
+    
+    if (tipo === 'outros' && !outroTipo) {
+      setError('Especifique o tipo de documento');
       return;
     }
     
-    if (tipoDocumento === 'outros' && !outroTipo.trim()) {
-      setErro('Informe o tipo de documento.');
-      return;
-    }
-    
-    setEnviando(true);
-    setErro(null);
-    
+    setLoading(true);
+    setError(null);
+
     try {
-      const formData = new FormData();
-      formData.append('arquivo', arquivo);
-      formData.append('aluno_id', alunoId || '');
-      formData.append('tipo', getTipoDocumentoNome());
-      formData.append('nome_arquivo', nomePersonalizado || arquivo.name);
+      // Criar path único para o arquivo
+      const fileExtension = arquivo.name.split('.').pop();
+      const timestamp = new Date().getTime();
+      const path = `matricula/${id}/${tipoFinal.replace(/\s+/g, '_').toLowerCase()}_${timestamp}.${fileExtension}`;
       
-      // Aqui estamos simulando o upload, mas o ideal seria usar o serviço real
-      // que faria o upload para o storage e depois salvaria no banco
-      const documentoUpload = {
-        aluno_id: alunoId || '',
-        tipo: getTipoDocumentoNome(),
-        nome_arquivo: nomePersonalizado || arquivo.name,
-        url: URL.createObjectURL(arquivo), // Simulação para teste
-        status: 'pendente' as const,
-        observacao: ''
-      };
+      // Upload do arquivo para o storage
+      const publicUrl = await documentoService.uploadDocumento(arquivo, path);
       
-      await documentoService.criarDocumento(documentoUpload);
+      // Criar registro do documento no banco
+      await documentoService.criarDocumento({
+        matricula_id: id,
+        tipo: tipoFinal,
+        nome_arquivo: arquivo.name,
+        url: publicUrl,
+        descricao: descricao,
+        status: 'pendente'
+      });
       
-      navigate(`/documentos/${alunoId}`);
+      setSuccess('Documento enviado com sucesso!');
+      
+      // Limpar formulário
+      setTipo('');
+      setOutroTipo('');
+      setDescricao('');
+      setArquivo(null);
+      
+      // Redirecionar após 2 segundos
+      setTimeout(() => {
+        navigate(`/matriculas/${id}/documentos`);
+      }, 2000);
+      
     } catch (error) {
-      console.error('Erro no upload do documento:', error);
-      setErro('Não foi possível fazer o upload do documento. Tente novamente.');
+      console.error('Erro ao enviar documento:', error);
+      setError('Não foi possível enviar o documento. Tente novamente.');
     } finally {
-      setEnviando(false);
+      setLoading(false);
     }
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">Upload de Documento</h1>
+    <div className="max-w-2xl mx-auto p-6 bg-white shadow-md rounded-lg">
+      <h2 className="text-xl font-semibold mb-6">Upload de Documento</h2>
       
-      <div className="bg-white shadow-md rounded-md p-6">
-        {erro && (
-          <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
-            <p className="text-red-700">{erro}</p>
-          </div>
-        )}
+      {error && (
+        <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+          <p className="text-red-700">{error}</p>
+        </div>
+      )}
+      
+      {success && (
+        <div className="bg-green-50 border-l-4 border-green-500 p-4 mb-4">
+          <p className="text-green-700">{success}</p>
+        </div>
+      )}
+      
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Tipo de Documento*
+          </label>
+          <select
+            value={tipo}
+            onChange={(e) => setTipo(e.target.value)}
+            className="w-full rounded-md border border-gray-300 p-2"
+            disabled={loading}
+            required
+          >
+            <option value="">Selecione um tipo</option>
+            {TIPOS_DOCUMENTO.map((tipo) => (
+              <option key={tipo.id} value={tipo.id}>
+                {tipo.label}
+              </option>
+            ))}
+          </select>
+        </div>
         
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label htmlFor="tipoDocumento" className="block text-gray-700 font-medium mb-2">
-              Tipo de Documento*
-            </label>
-            <select
-              id="tipoDocumento"
-              value={tipoDocumento}
-              onChange={(e) => setTipoDocumento(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-md"
-              required
-            >
-              <option value="">Selecione um tipo</option>
-              {TIPOS_DOCUMENTO.map((tipo) => (
-                <option key={tipo.id} value={tipo.id}>
-                  {tipo.nome} {tipo.obrigatorio ? '(Obrigatório)' : ''}
-                </option>
-              ))}
-            </select>
-          </div>
-          
-          {tipoDocumento === 'outros' && (
-            <div className="mb-4">
-              <label htmlFor="outroTipo" className="block text-gray-700 font-medium mb-2">
-                Especifique o Tipo*
-              </label>
-              <input
-                type="text"
-                id="outroTipo"
-                value={outroTipo}
-                onChange={(e) => setOutroTipo(e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded-md"
-                placeholder="Ex: Carteira de Vacinação"
-                required
-              />
-            </div>
-          )}
-          
-          <div className="mb-4">
-            <label htmlFor="arquivo" className="block text-gray-700 font-medium mb-2">
-              Arquivo*
-            </label>
-            <input
-              type="file"
-              id="arquivo"
-              ref={fileInputRef}
-              onChange={handleFileChange}
-              className="w-full p-2 border border-gray-300 rounded-md"
-              accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
-              required
-            />
-            <p className="text-sm text-gray-500 mt-1">
-              Formatos aceitos: PDF, JPEG, PNG, DOC, DOCX. Tamanho máximo: 10MB.
-            </p>
-          </div>
-          
-          <div className="mb-6">
-            <label htmlFor="nomePersonalizado" className="block text-gray-700 font-medium mb-2">
-              Nome do Arquivo (opcional)
+        {tipo === 'outros' && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Especifique o tipo*
             </label>
             <input
               type="text"
-              id="nomePersonalizado"
-              value={nomePersonalizado}
-              onChange={(e) => setNomePersonalizado(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-md"
-              placeholder="Ex: CPF_JoaoSilva"
+              value={outroTipo}
+              onChange={(e) => setOutroTipo(e.target.value)}
+              className="w-full rounded-md border border-gray-300 p-2"
+              disabled={loading}
+              required
             />
           </div>
-          
-          <div className="flex justify-end space-x-4">
-            <button
-              type="button"
-              onClick={() => navigate(`/documentos/${alunoId}`)}
-              className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-              disabled={enviando}
-            >
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
-              disabled={enviando}
-            >
-              {enviando ? 'Enviando...' : 'Enviar Documento'}
-            </button>
+        )}
+        
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Descrição (opcional)
+          </label>
+          <textarea
+            value={descricao}
+            onChange={(e) => setDescricao(e.target.value)}
+            className="w-full rounded-md border border-gray-300 p-2"
+            rows={3}
+            disabled={loading}
+          />
+        </div>
+        
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Arquivo*
+          </label>
+          <input
+            type="file"
+            onChange={handleFileChange}
+            className="w-full border border-gray-300 rounded-md p-2"
+            disabled={loading}
+            accept={ALLOWED_TYPES.join(',')}
+          />
+          <p className="text-xs text-gray-500 mt-1">
+            Formatos permitidos: PDF, JPG, PNG. Tamanho máximo: 5MB
+          </p>
+        </div>
+        
+        {arquivo && (
+          <div className="p-3 bg-gray-50 rounded-md">
+            <p className="text-sm">
+              <span className="font-medium">Arquivo selecionado:</span> {arquivo.name}
+            </p>
+            <p className="text-xs text-gray-500">
+              Tamanho: {(arquivo.size / (1024 * 1024)).toFixed(2)}MB
+            </p>
           </div>
-        </form>
-      </div>
+        )}
+        
+        <div className="flex justify-end gap-4 pt-2">
+          <Button
+            variant="outline"
+            onClick={() => navigate(`/matriculas/${id}/documentos`)}
+            disabled={loading}
+          >
+            Cancelar
+          </Button>
+          
+          <Button
+            type="submit"
+            disabled={loading || !arquivo || !tipo || (tipo === 'outros' && !outroTipo)}
+          >
+            {loading ? (
+              <>
+                <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                Enviando...
+              </>
+            ) : (
+              'Enviar Documento'
+            )}
+          </Button>
+        </div>
+      </form>
     </div>
   );
 }; 
