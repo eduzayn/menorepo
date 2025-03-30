@@ -2,36 +2,31 @@
  * Hooks para o cliente API
  */
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useContext } from 'react'
 import { useQuery, useMutation } from '@tanstack/react-query'
-import { TypedSupabaseClient } from '../types'
-import { createSupabaseClient } from '..'
+import { ApiContext } from '../providers/context'
+import { SupabaseClient } from '@supabase/supabase-js'
+import { Database } from '@edunexia/database-schema'
+
+// Tipagem para o cliente Supabase
+type TypedSupabaseClient = SupabaseClient<Database>
 
 /**
- * Hook para criar e usar o cliente Supabase
- * 
- * @param supabaseUrl URL da instância do Supabase
- * @param supabaseKey Chave de API do Supabase
+ * Hook para acessar o cliente Supabase
  * @returns Cliente Supabase tipado
  */
-export function useSupabase(supabaseUrl: string, supabaseKey: string) {
-  const [client, setClient] = useState<TypedSupabaseClient | null>(null)
+export function useSupabaseClient(): TypedSupabaseClient {
+  const context = useContext(ApiContext)
   
-  useEffect(() => {
-    if (!supabaseUrl || !supabaseKey) {
-      console.error('Supabase URL e API Key são necessários')
-      return
-    }
-    
-    const supabase = createSupabaseClient(supabaseUrl, supabaseKey)
-    setClient(supabase)
-    
-    return () => {
-      // Cleanup quando o componente for desmontado
-    }
-  }, [supabaseUrl, supabaseKey])
+  if (!context) {
+    throw new Error('useSupabaseClient deve ser usado dentro de um ApiProvider')
+  }
   
-  return client
+  if (!context.supabase) {
+    throw new Error('Cliente Supabase não inicializado')
+  }
+  
+  return context.supabase
 }
 
 /**
