@@ -1,24 +1,15 @@
 /**
- * @edunexia/auth
- * 
- * Módulo de autenticação unificado para a plataforma Edunéxia
+ * Pacote de autenticação para Edunéxia
  */
 
-// Exportar tipos
-export * from './types';
-
-// Exportar componentes de autenticação
-export { 
-  AuthProvider,
-  type AuthContextType,
-  type AuthProviderProps
-} from './components/AuthProvider';
-
-// Exportar o hook useAuth do AuthProvider
-export { useAuth } from './components/AuthProvider';
-
-// Exportar componentes de proteção de rotas
+// Exporta todos os componentes
 export * from './components';
 
-// Exportar funções de autenticação
-export * from './supabase-client'; 
+// Exporta o cliente Supabase
+export * from './supabase-client';
+
+// Exporta tipos
+export * from './types';
+
+// Re-exports de tipos com alias para evitar conflitos
+export { AuthError } from '@supabase/supabase-js'; 

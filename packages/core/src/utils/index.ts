@@ -6,29 +6,27 @@
  * - Este arquivo está mantido apenas para compatibilidade
  * 
  * Para TODAS as funções utilitárias, importe diretamente de '@edunexia/utils':
- * import { formatCurrency, formatDate, isValidCPF, isValidEmail, ... } from '@edunexia/utils';
+ * import { formatters, validators } from '@edunexia/utils';
  * 
  * Este arquivo será removido em versões futuras.
  */
 
-// Re-exporta as funções do pacote utils centralizado
+// Importa os namespaces de formatters e validators
 import { 
-  formatCurrency as formatCurrencyUtil,
-  formatDate as formatDateUtil,
-  isValidCPF as isValidCPFUtil,
-  isValidCNPJ as isValidCNPJUtil,
-  isValidEmail as isValidEmailUtil,
-  isValidPassword as isValidPasswordUtil
+  formatarData,
+  formatarMoeda,
+  formatters,
+  validators
 } from '@edunexia/utils';
 
 // Funções de formatação mantidas para compatibilidade
-export const formatCurrency = formatCurrencyUtil;
-export const formatDate = formatDateUtil;
+export const formatCurrency = formatarMoeda;
+export const formatDate = formatarData;
 
 // Funções de validação mantidas para compatibilidade
-export const validateCPF = isValidCPFUtil;
-export const validateCNPJ = isValidCNPJUtil;
-export const isValidCPF = isValidCPFUtil;
-export const isValidCNPJ = isValidCNPJUtil;
-export const isValidEmail = isValidEmailUtil;
-export const isValidPassword = isValidPasswordUtil; 
+export const validateCPF = validators.isValidCPF;
+export const validateCNPJ = validators.isValidCNPJ;
+export const isValidCPF = validators.isValidCPF;
+export const isValidCNPJ = validators.isValidCNPJ;
+export const isValidEmail = validators.isValidEmail;
+export const isValidPassword = validators.isValidPassword; 

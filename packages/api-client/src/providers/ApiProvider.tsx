@@ -1,72 +1,62 @@
 import React, { createContext, useContext, useMemo } from 'react'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { createClient } from '@supabase/supabase-js'
 import { ApiContextValue, ApiProviderProps, TypedSupabaseClient } from './types'
-import { createSupabaseClient } from '../client-factory'
-
-const ApiContext = createContext<ApiContextValue | null>(null)
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
 /**
- * Provider para o cliente API
- * Disponibiliza o cliente Supabase e o React Query para toda a aplicação
+ * Contexto da API
  */
-export function ApiProvider({
-  children,
-  supabaseUrl,
-  supabaseKey,
-  queryClient = new QueryClient({
-    defaultOptions: {
-      queries: {
-        staleTime: 1000 * 60 * 5, // 5 minutos
-        retry: 1
-      }
-    }
-  })
-}: ApiProviderProps) {
-  // Cria o cliente Supabase apenas uma vez
-  const supabase = useMemo(() => {
-    if (!supabaseUrl || !supabaseKey) {
-      return null
-    }
-    return createSupabaseClient(supabaseUrl, supabaseKey)
-  }, [supabaseUrl, supabaseKey])
-  
-  // Valor do contexto
-  const value = useMemo(
-    () => ({ supabase, supabaseUrl, supabaseKey }),
-    [supabase, supabaseUrl, supabaseKey]
-  )
-  
-  return (
-    <QueryClientProvider client={queryClient}>
-      <ApiContext.Provider value={value}>
-        {children}
-      </ApiContext.Provider>
-    </QueryClientProvider>
-  )
-}
+const ApiContext = createContext<ApiContextValue>({
+  supabase: null,
+  supabaseUrl: '',
+  supabaseKey: ''
+})
 
 /**
- * Hook para acessar o contexto do cliente API
+ * Hook para acessar o cliente da API
  */
-export function useApiContext() {
+export const useApiClient = () => {
   const context = useContext(ApiContext)
   
   if (!context) {
-    throw new Error('useApiContext deve ser usado dentro de um ApiProvider')
+    throw new Error('useApiClient deve ser usado dentro de um ApiProvider')
   }
   
   return context
 }
 
 /**
- * Hook para acessar o cliente Supabase do contexto
+ * Provedor de contexto da API
  */
-export function useSupabaseClient() {
-  const { supabase } = useApiContext()
+export const ApiProvider: React.FC<ApiProviderProps> = ({
+  children,
+  supabaseUrl,
+  supabaseKey,
+  queryClient
+}) => {
+  // Criar um cliente Supabase com tipagem
+  const supabase = useMemo<TypedSupabaseClient | null>(() => {
+    if (!supabaseUrl || !supabaseKey) return null
+    return createClient(supabaseUrl, supabaseKey) as TypedSupabaseClient
+  }, [supabaseUrl, supabaseKey])
   
-  if (!supabase) {
-    throw new Error('Cliente Supabase não inicializado')
-  }
+  // Criar um cliente de query se não for fornecido
+  const client = useMemo(() => {
+    return queryClient || new QueryClient()
+  }, [queryClient])
   
-  return supabase
+  // Criar o valor do contexto
+  const value = useMemo<ApiContextValue>(() => ({
+    supabase,
+    supabaseUrl,
+    supabaseKey
+  }), [supabase, supabaseUrl, supabaseKey])
+  
+  return (
+    <QueryClientProvider client={client}>
+      <ApiContext.Provider value={value}>
+        {children}
+      </ApiContext.Provider>
+    </QueryClientProvider>
+  )
 } 

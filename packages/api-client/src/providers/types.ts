@@ -1,5 +1,11 @@
-import { TypedSupabaseClient } from '../types'
+import { SupabaseClient } from '@supabase/supabase-js'
+import { Database } from '@edunexia/database-schema'
 import { QueryClient } from '@tanstack/react-query'
+
+/**
+ * Cliente Supabase tipado com o schema do banco de dados
+ */
+export type TypedSupabaseClient = SupabaseClient<Database>
 
 /**
  * Interface para o valor do contexto da API
