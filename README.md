@@ -33,7 +33,8 @@ edunexia-monorepo/
 │   ├── ui-components/         # Design System compartilhado
 │   ├── auth/                  # Autenticação unificada (SSO)
 │   ├── database-schema/       # Tipos e schemas do banco de dados
-│   └── api-client/            # Cliente de API unificado para comunicação com o backend
+│   ├── api-client/            # Cliente de API unificado para comunicação com o backend
+│   └── test-config/           # Configuração centralizada de testes
 ├── docs/                      # Documentação técnica detalhada
 │   ├── arquitetura/           # Detalhes arquiteturais
 │   ├── workflows/             # Fluxos de trabalho e processos
@@ -63,6 +64,7 @@ Os seguintes módulos estão atualmente em desenvolvimento ativo:
 - ✅ **api-client** - Cliente padronizado para interação com o backend
 - ✅ **auth** - Sistema centralizado de autenticação
 - ✅ **database-schema** - Definições de tipos e modelos de dados
+- ✅ **test-config** - Utilitários e configurações para testes automatizados
 
 ## Módulos Especiais e Infraestrutura
 
@@ -213,6 +215,11 @@ O cumprimento desta estrutura garante consistência e facilita a navegação ent
   - Verificação automatizada com `pnpm lint:imports`
   - Documentação detalhada em `/docs/padronizacao-imports.md`
   - Previne duplicações e inconsistências entre módulos
+- **Configuração de testes centralizada em `packages/test-config`** ✅
+  - Configurações compartilhadas para Vitest e Jest
+  - Utilitários de teste padronizados para todos os módulos
+  - Mocks reutilizáveis para serviços comuns (Supabase, API, etc.)
+  - Dados de teste consistentes e realistas
 
 ## Próximos Passos
 
@@ -248,36 +255,7 @@ O monorepo inclui configurações compartilhadas para garantir consistência ent
 - **`packages/config-base/eslint`**: Configuração base do ESLint para todos os módulos
 - **`packages/config-base/prettier`**: Configuração base do Prettier para todos os módulos  
 - **`packages/tailwind-config`**: Configuração base do Tailwind CSS para todos os módulos
-
-Cada módulo deve estender essas configurações conforme necessário. Consulte o [README do config-base](./packages/config-base/README.md) para mais detalhes.
-
-## Divisão entre packages/core e apps/core
-
-Para manter a organização e evitar duplicação de código, definimos a seguinte separação de responsabilidades:
-
-### packages/core
-
-- **Definição**: Biblioteca compartilhada com tipos, interfaces e constantes fundamentais
-- **Escopo**: Definições globais do sistema que não dependem de UI
-- **Exemplos**: Tipos de usuário, funções utilitárias puras, helpers de formatação
-- **Dependências**: Mínimas, sem dependências de React ou UI
-- **Uso**: Importado por todos os módulos e outros pacotes
-
-### apps/core
-
-- **Definição**: Módulo contendo componentes React e lógica compartilhada
-- **Escopo**: Implementações de UI, layouts, providers e componentes reutilizáveis
-- **Exemplos**: Layouts, Providers (Auth, Theme), componentes de dashboard
-- **Dependências**: React, ui-components e outras bibliotecas de UI
-- **Uso**: Importado apenas pelos módulos de aplicação
-
-Esta separação clara permite:
-1. Melhor gerenciamento de dependências
-2. Código mais limpo e focado
-3. Evitar dependências circulares
-4. Melhor performance de build
-
-> **Importante**: Qualquer código que não dependa de React ou UI deve ser movido para `packages/core`. Componentes, hooks e contextos devem permanecer em `apps/core`.
+- **`packages/test-config`**: Configuração centralizada de testes e utilitários
 
 ## Testes Automatizados
 
@@ -298,12 +276,14 @@ pnpm --filter @edunexia/[nome-do-pacote] test:watch
 
 ### Cobertura de testes
 
-Os relatórios de cobertura são gerados automaticamente durante a execução do CI e enviados para o Codecov.
+O monorepo visa manter uma cobertura de código adequada para garantir a qualidade. Utilize o pacote `@edunexia/test-config` para manter a padronização dos testes.
 
 ### Configuração de testes
 
 Cada pacote contém sua própria configuração de testes, mas seguimos convenções comuns:
 
 - Testes unitários em `__tests__/*.test.{ts,tsx,js,jsx}`
-- Configuração via `vite.config.js` ou `jest.config.js`
+- Configuração via `vitest.config.ts` (recomendado) ou `jest.config.js`
 - Cobertura de código adequada, especialmente para funções críticas
+
+Para mais detalhes sobre o uso da configuração de testes centralizada, consulte a documentação em `/docs/using-test-config.md`.
