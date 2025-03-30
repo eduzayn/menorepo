@@ -190,6 +190,50 @@ export const MOCK_MENU_ITEMS: SiteMenuItem[] = [
     updated_at: new Date().toISOString()
   },
   {
+    id: '9',
+    parent_id: '4',
+    title: 'Material Didático',
+    link: '/pagina/material-didatico',
+    order_index: 3,
+    is_active: true,
+    open_in_new_tab: false,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  },
+  {
+    id: '10',
+    parent_id: '4',
+    title: 'Comunicação',
+    link: '/pagina/comunicacao',
+    order_index: 4,
+    is_active: true,
+    open_in_new_tab: false,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  },
+  {
+    id: '11',
+    parent_id: '4',
+    title: 'Portal do Polo',
+    link: '/pagina/portal-polo',
+    order_index: 5,
+    is_active: true,
+    open_in_new_tab: false,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  },
+  {
+    id: '12',
+    parent_id: '4',
+    title: 'Portal do Parceiro',
+    link: '/pagina/portal-parceiro',
+    order_index: 6,
+    is_active: true,
+    open_in_new_tab: false,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  },
+  {
     id: '8',
     parent_id: null,
     title: 'Contato',

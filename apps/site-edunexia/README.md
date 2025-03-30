@@ -21,6 +21,7 @@ Módulo responsável pelo site institucional e blog da plataforma Edunéxia. Est
 - Configurações personalizáveis do site
 - Showcases de cursos
 - Menu dinâmico
+- **Sistema de vendas self-service**
 
 ## Instalação e Execução
 
@@ -90,6 +91,7 @@ Este módulo utiliza o Supabase como backend. O esquema do banco de dados inclui
 - `site_sections`: Seções e banners personalizáveis
 - `site_featured_courses`: Cursos em destaque
 - `site_menu_items`: Itens do menu do site
+- `site_subscriptions`: Assinaturas e testes gratuitos gerados pelo sistema self-service
 
 Para mais detalhes sobre o esquema, consulte a [documentação completa do esquema](/docs/site-edunexia-schema.md).
 
@@ -147,6 +149,16 @@ const renderPage = (page: SitePage) => {
 2. Lead é salvo no Supabase
 3. Administrador pode visualizar e gerenciar leads na área administrativa
 
+### Sistema de Vendas Self-Service
+
+1. Visitante visualiza planos disponíveis na página de planos
+2. Escolhe um plano para assinatura imediata ou período de teste gratuito
+3. Preenche dados da instituição
+4. Para assinatura: fornece dados de pagamento e finaliza compra
+5. Para teste gratuito: recebe acesso temporário sem fornecer cartão de crédito
+6. Recebe credenciais de acesso por email e pode acessar a plataforma imediatamente
+7. Após teste gratuito (14 dias), pode optar por contratar um plano
+
 ## Integração com Outros Módulos
 
 - **Módulo de Matrículas**: Encaminhamento de leads para matrícula
@@ -183,3 +195,88 @@ Para contribuir com este módulo, siga as [diretrizes gerais do monorepo](/docs/
 - [Guia de Contribuição do Monorepo](/docs/guia-contribuicao.md)
 - [Documentação do Design System](/docs/design-system.md)
 - [Gerenciamento de Pacotes](/docs/gerenciamento-pacotes.md)
+
+# Edunéxia - Site Institucional
+
+Este módulo contém o site institucional da Edunéxia, desenvolvido para apresentar a plataforma educacional, seus recursos e pacotes oferecidos.
+
+## Visão Geral
+
+O site institucional da Edunéxia apresenta a empresa, seus produtos, serviços e direciona potenciais clientes para os canais de vendas e contato. Ele serve como porta de entrada para o ecossistema Edunéxia.
+
+## Estrutura do Módulo
+
+```
+site-edunexia/
+├── src/
+│   ├── components/      # Componentes reutilizáveis
+│   ├── pages/           # Páginas principais do site
+│   ├── routes.js        # Configuração de rotas
+│   └── assets/          # Recursos estáticos
+├── public/              # Arquivos públicos
+└── README.md            # Esta documentação
+```
+
+## Páginas Principais
+
+- **Home**: Apresenta a visão geral da plataforma com call-to-action para demonstração e conhecer planos
+- **Sobre**: Página institucional com informações sobre a empresa, missão e valores
+- **Blog**: Artigos de conteúdo sobre educação e tecnologia
+- **Contato**: Formulário para contato e lead generation
+- **Planos**: Apresenta os três pacotes de módulos disponíveis com seus respectivos preços
+- **Checkout**: Fluxo de checkout para assinatura direta dos planos
+- **Trial**: Iniciar período de teste gratuito sem necessidade de cartão de crédito
+
+## Página de Planos
+
+A página de planos detalha as opções de pacotes disponíveis para contratação:
+
+1. **Plano Básico** (R$ 1.499/mês)
+   - Inclui os módulos essenciais: Matrículas, Portal do Aluno e Gestão Financeira Básica
+   - Ideal para pequenas instituições iniciando sua digitalização
+
+2. **Plano Padrão** (R$ 2.899/mês)
+   - Inclui os módulos do plano básico mais: Comunicação Institucional e Material Didático
+   - Recomendado para instituições de médio porte
+
+3. **Plano Premium** (R$ 4.799/mês)
+   - Acesso a todos os módulos da plataforma
+   - Inclui recursos avançados como: Gestão de RH, Portal do Parceiro, Portal do Polo e Contabilidade
+
+Cada plano inclui diferentes níveis de suporte e recursos, com opções para personalização mediante consultoria.
+
+## Sistema de Vendas Self-Service
+
+Conforme planejado no README principal do monorepo, o módulo implementa um sistema de vendas autoatendimento com as seguintes funcionalidades:
+
+1. **Catálogo de planos** - Exibição clara dos três planos disponíveis com recursos e preços
+2. **Checkout online** - Fluxo de pagamento integrado para assinatura imediata dos planos
+3. **Teste gratuito** - Opção de iniciar período de 14 dias sem fornecer cartão de crédito
+4. **Cadastro automático** - Criação automática de conta para a instituição após checkout ou teste
+5. **Email transacional** - Envio automático de credenciais de acesso por email
+
+O fluxo de vendas segue estas etapas:
+1. Cliente visualiza planos na página `/planos`
+2. Escolhe "Assinar agora" ou "Teste grátis por 14 dias"
+3. Fornece dados da instituição e do responsável
+4. Para assinatura, fornece dados de pagamento
+5. Recebe confirmação e credenciais de acesso
+6. Acessa a plataforma imediatamente
+
+## Componentes Principais
+
+- `Layout.tsx`: Layout principal do site (cabeçalho e rodapé)
+- `AdminLayout.tsx`: Layout da área administrativa
+- `ProtectedRoute.tsx`: Componente para proteger rotas administrativas
+- `ErrorBoundary.tsx`: Componente para captura e tratamento de erros
+
+## Dependências
+
+- React + TypeScript
+- React Router para navegação
+- TailwindCSS para estilização
+- Supabase para backend e API
+
+## Scripts Disponíveis
+
+- `pnpm dev`: Executa o site em modo de desenvolvimento

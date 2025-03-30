@@ -2,10 +2,9 @@ import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 
 /**
- * Componente que automaticamente rola a página para o topo
- * quando a rota muda. Deve ser usado próximo ao Router.
+ * Componente que faz scroll para o topo da página quando a rota muda
  */
-export function ScrollToTop() {
+const ScrollToTop: React.FC = () => {
   const { pathname } = useLocation();
 
   useEffect(() => {
@@ -13,6 +12,6 @@ export function ScrollToTop() {
   }, [pathname]);
 
   return null;
-}
+};
 
 export default ScrollToTop; 

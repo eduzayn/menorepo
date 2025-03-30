@@ -11,18 +11,18 @@ export function useAllMenuItems() {
   const { client } = useApi();
   
   return useQuery({
-    queryKey: ['menu-items'],
+    queryKey: ['site', 'menu'],
     queryFn: async () => {
-      // Durante o desenvolvimento, usar dados mockados
-      if (process.env.NODE_ENV === 'development') {
+      // Em desenvolvimento, forçamos dados mockados para agilizar
+      if (import.meta.env.DEV) {
         return MenuService.getMockMenuItems();
       }
-      
       const { items, error } = await MenuService.getAllMenuItems(client);
       if (error) throw error;
       return items;
     },
-    staleTime: 5 * 60 * 1000, // 5 minutos
+    staleTime: 0, // Antes estava em 5 minutos (300000)
+    refetchInterval: 5000, // Recarrega a cada 5 segundos em desenvolvimento
   });
 }
 

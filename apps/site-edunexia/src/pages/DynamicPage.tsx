@@ -1,167 +1,211 @@
-import { useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { usePageBySlug } from '../hooks/usePages';
+import React from 'react';
+import { useParams, Link } from 'react-router-dom';
 
-export function DynamicPage() {
-  const { slug = '' } = useParams<{ slug: string }>();
-  const navigate = useNavigate();
+interface PageContent {
+  title: string;
+  description: string;
+  features: string[];
+  benefits: string[];
+  image: string;
+  cta: {
+    text: string;
+    link: string;
+  };
+}
+
+interface PageContentMap {
+  [key: string]: PageContent;
+}
+
+const DynamicPage: React.FC = () => {
+  const { slug } = useParams<{ slug: string }>();
   
-  // Buscar página pelo slug
-  const { data: page, isLoading, error } = usePageBySlug(slug);
-
-  // Redirecionar para home se página não for encontrada
-  useEffect(() => {
-    if (!isLoading && !page && !error) {
-      navigate('/', { replace: true });
-    }
-  }, [page, isLoading, error, navigate]);
-
-  if (isLoading) {
-    return (
-      <div className="container mx-auto py-12 px-4">
-        <div className="animate-pulse">
-          <div className="h-10 bg-gray-200 rounded w-3/4 mb-6"></div>
-          <div className="h-4 bg-gray-200 rounded mb-2.5 w-full"></div>
-          <div className="h-4 bg-gray-200 rounded mb-2.5 w-11/12"></div>
-          <div className="h-4 bg-gray-200 rounded mb-2.5 w-4/5"></div>
-          <div className="h-64 bg-gray-200 rounded my-6"></div>
-          <div className="h-4 bg-gray-200 rounded mb-2.5 w-full"></div>
-          <div className="h-4 bg-gray-200 rounded mb-2.5 w-full"></div>
-          <div className="h-4 bg-gray-200 rounded mb-2.5 w-3/4"></div>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="container mx-auto py-12 px-4">
-        <div className="bg-red-50 p-6 rounded-lg text-center">
-          <h1 className="text-2xl font-bold text-red-800 mb-4">Erro ao carregar página</h1>
-          <p className="text-red-600 mb-6">
-            Não foi possível carregar o conteúdo desta página. Por favor, tente novamente mais tarde.
-          </p>
-          <button 
-            onClick={() => navigate('/')}
-            className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition"
-          >
-            Voltar ao início
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  if (!page) {
-    return (
-      <div className="container mx-auto py-12 px-4">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-800 mb-4">Página não encontrada</h1>
-          <p className="text-gray-600 mb-6">
-            A página que você está procurando não existe ou foi removida.
-          </p>
-          <button 
-            onClick={() => navigate('/')}
-            className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition"
-          >
-            Voltar ao início
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  // Renderizar SEO
-  const metaDescription = page.meta_description || `${page.title} - Edunéxia`;
-  const metaKeywords = page.meta_keywords || 'edunexia, educação, tecnologia';
-
-  // Helper para renderizar conteúdo estruturado
-  const renderContent = () => {
-    // Se for JSON estruturado, renderizar conforme tipo de cada bloco
-    if (page.content) {
-      try {
-        // Exemplo simples - na prática você precisaria de um parser mais robusto
-        // para lidar com diferentes tipos de blocos (texto, imagem, vídeo, etc)
-        if (typeof page.content === 'string') {
-          return <div dangerouslySetInnerHTML={{ __html: page.content }} />;
-        }
-        
-        // Renderizar conteúdo estruturado (blocos)
-        if (Array.isArray(page.content.blocks)) {
-          return (
-            <div className="space-y-8">
-              {page.content.blocks.map((block: any, index: number) => {
-                if (block.type === 'paragraph') {
-                  return <p key={index} className="text-gray-700">{block.content}</p>;
-                }
-                if (block.type === 'heading') {
-                  return <h2 key={index} className="text-2xl font-bold text-primary-800 mt-8 mb-4">{block.content}</h2>;
-                }
-                if (block.type === 'image' && block.url) {
-                  return (
-                    <figure key={index} className="my-6">
-                      <img 
-                        src={block.url.replace('via.placeholder.com', 'placehold.co')} 
-                        alt={block.alt || ''} 
-                        className="rounded-lg w-full" 
-                      />
-                      {block.caption && <figcaption className="text-sm text-gray-500 mt-2">{block.caption}</figcaption>}
-                    </figure>
-                  );
-                }
-                return null;
-              })}
-            </div>
-          );
-        }
-        
-        // Fallback para objeto simples
-        return <pre className="p-4 bg-gray-100 rounded overflow-auto">{JSON.stringify(page.content, null, 2)}</pre>;
-      } catch (e) {
-        console.error("Erro ao renderizar conteúdo:", e);
-        return <p className="text-red-600">Erro ao renderizar conteúdo da página.</p>;
+  const pageContents: PageContentMap = {
+    'sistema-matriculas': {
+      title: 'Sistema de Matrículas',
+      description: 'Simplifique todo o processo de matrículas da sua instituição de ensino, desde a captação de leads até a efetivação e documentação, com nossa solução completa.',
+      features: [
+        'Processo de inscrição online simplificado',
+        'Gestão de documentos digitais',
+        'Automação de e-mails de confirmação',
+        'Integração com sistema financeiro',
+        'Dashboard de acompanhamento de matrículas',
+        'Relatórios personalizados',
+        'Gestão de vagas e turmas',
+        'Suporte a múltiplas unidades'
+      ],
+      benefits: [
+        'Redução de 70% no tempo de matrícula',
+        'Eliminação de erros de preenchimento',
+        'Melhor experiência para pais e alunos',
+        'Aumento da taxa de conversão de leads',
+        'Redução de custos operacionais'
+      ],
+      image: '/images/matriculas-preview.jpg',
+      cta: {
+        text: 'Agende uma demonstração',
+        link: '/contato'
+      }
+    },
+    'portal-aluno': {
+      title: 'Portal do Aluno',
+      description: 'Ofereça uma experiência digital completa para alunos acessarem notas, frequência, material didático e informações financeiras em uma interface intuitiva e moderna.',
+      features: [
+        'Acesso a notas e boletins',
+        'Controle de frequência',
+        'Conteúdo didático online',
+        'Calendário acadêmico',
+        'Comunicação direta com professores',
+        'Visualização de mensalidades',
+        'Emissão de boletos',
+        'Aplicativo mobile disponível'
+      ],
+      benefits: [
+        'Autonomia para o aluno gerenciar sua vida acadêmica',
+        'Comunicação mais eficiente entre alunos e instituição',
+        'Redução de atendimentos presenciais',
+        'Maior engajamento dos alunos',
+        'Modernização da imagem institucional'
+      ],
+      image: '/images/portal-aluno-preview.jpg',
+      cta: {
+        text: 'Conheça nossos planos',
+        link: '/planos'
+      }
+    },
+    'gestao-financeira': {
+      title: 'Gestão Financeira',
+      description: 'Controle completo sobre mensalidades, boletos, acordos, inadimplência e relatórios financeiros para otimizar a saúde financeira da sua instituição.',
+      features: [
+        'Gestão de mensalidades e boletos',
+        'Controle de inadimplência',
+        'Acordos e negociações',
+        'Integração com sistemas bancários',
+        'Gestão de bolsas e descontos',
+        'Relatórios financeiros detalhados',
+        'Previsão de fluxo de caixa',
+        'Dashboard financeiro em tempo real'
+      ],
+      benefits: [
+        'Redução de até 40% na inadimplência',
+        'Automatização de cobranças',
+        'Visão consolidada da saúde financeira',
+        'Tomada de decisões estratégicas baseadas em dados',
+        'Redução de erros em processos financeiros'
+      ],
+      image: '/images/gestao-financeira-preview.jpg',
+      cta: {
+        text: 'Fale com um consultor',
+        link: '/contato'
       }
     }
-    
-    return <p className="text-gray-600">Esta página não possui conteúdo.</p>;
   };
 
+  // Conteúdo padrão caso o slug não exista
+  const defaultContent: PageContent = {
+    title: 'Página não encontrada',
+    description: 'O conteúdo que você está procurando não está disponível.',
+    features: [],
+    benefits: [],
+    image: '/images/default-preview.jpg',
+    cta: {
+      text: 'Voltar para a página inicial',
+      link: '/'
+    }
+  };
+
+  // Obter o conteúdo com base no slug ou usar o padrão
+  const content = pageContents[slug || ''] || defaultContent;
+
   return (
-    <>
-      {/* SEO */}
-      <div className="hidden">
-        <title>{page.title} - Edunéxia</title>
-        <meta name="description" content={metaDescription} />
-        <meta name="keywords" content={metaKeywords} />
-      </div>
-      
-      <div className="container mx-auto py-12 px-4">
-        {/* Imagem de destaque */}
-        {page.featured_image_url && (
-          <div className="mb-8">
-            <img 
-              src={page.featured_image_url.replace('via.placeholder.com', 'placehold.co')} 
-              alt={page.title} 
-              className="w-full h-64 md:h-96 object-cover rounded-lg shadow-md"
-            />
-          </div>
-        )}
-        
-        {/* Título e meta */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-primary-800 mb-4">{page.title}</h1>
-          {page.published_at && (
-            <p className="text-gray-500">
-              Publicado em: {new Date(page.published_at).toLocaleDateString('pt-BR')}
+    <div className="bg-white">
+      {/* Hero Section */}
+      <div className="bg-gradient-to-r from-indigo-700 to-blue-700 text-white">
+        <div className="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl">
+              {content.title}
+            </h1>
+            <p className="mt-6 max-w-3xl mx-auto text-xl">
+              {content.description}
             </p>
-          )}
-        </div>
-        
-        {/* Conteúdo */}
-        <div className="prose prose-lg max-w-none">
-          {renderContent()}
+          </div>
         </div>
       </div>
-    </>
+
+      {/* Main content */}
+      <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:py-16 lg:px-8">
+        <div className="lg:grid lg:grid-cols-2 lg:gap-8 lg:items-center">
+          <div>
+            <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
+              Recursos principais
+            </h2>
+            <p className="mt-3 max-w-3xl text-lg text-gray-500">
+              Nosso módulo de {content.title} oferece todas as ferramentas necessárias para otimizar este processo em sua instituição.
+            </p>
+            <div className="mt-8 space-y-4">
+              {content.features.map((feature, index) => (
+                <div key={index} className="flex items-start">
+                  <div className="flex-shrink-0">
+                    <svg className="h-6 w-6 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <p className="ml-3 text-base text-gray-700">{feature}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="mt-8 lg:mt-0">
+            <div className="aspect-w-5 aspect-h-3 rounded-lg overflow-hidden shadow-lg">
+              <img 
+                className="object-cover" 
+                src={content.image}
+                alt={content.title} 
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.src = "https://via.placeholder.com/800x500?text=Edunexia";
+                }}
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-16">
+          <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
+            Benefícios
+          </h2>
+          <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {content.benefits.map((benefit, index) => (
+              <div key={index} className="bg-gray-50 p-6 rounded-lg shadow-sm">
+                <div className="text-indigo-600 mb-2">
+                  <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                  </svg>
+                </div>
+                <p className="text-base text-gray-700">{benefit}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-16 text-center">
+          <h2 className="text-2xl font-bold text-gray-900">Pronto para transformar sua instituição?</h2>
+          <p className="mt-4 text-lg text-gray-600">
+            Implemente o {content.title} e otimize sua operação educacional.
+          </p>
+          <div className="mt-8">
+            <Link
+              to={content.cta.link}
+              className="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
+            >
+              {content.cta.text}
+            </Link>
+          </div>
+        </div>
+      </div>
+    </div>
   );
-} 
+};
+
+export default DynamicPage; 

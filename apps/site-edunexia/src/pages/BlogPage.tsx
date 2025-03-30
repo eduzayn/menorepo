@@ -1,233 +1,224 @@
 import { useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
-import Layout from '../components/Layout';
-import BlogPostCard from '../components/BlogPostCard';
-import { usePublishedBlogPosts, useBlogCategories } from '../hooks/useBlog';
+import { Link } from 'react-router-dom';
 
-export function BlogPage() {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const currentPage = parseInt(searchParams.get('pagina') || '1', 10);
-  const selectedCategorySlug = searchParams.get('categoria') || '';
-  
-  // Recuperar todas as categorias
-  const { data: categories } = useBlogCategories();
-  
-  // Encontrar ID da categoria se houver um slug selecionado
-  const selectedCategory = categories?.find(cat => cat.slug === selectedCategorySlug);
-  
-  // Buscar posts publicados com paginação
-  const { data, isLoading, error } = usePublishedBlogPosts({
-    page: currentPage,
-    limit: 9,
-    categoryId: selectedCategory?.id
+// Tipos para os artigos do blog
+interface BlogPost {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  cover_image: string;
+  published_at: string;
+  category: string;
+  author: {
+    name: string;
+    avatar: string;
+  };
+}
+
+// Dados simulados para demonstração
+const MOCK_POSTS: BlogPost[] = [
+  {
+    id: '1',
+    title: 'Como implementar ensino híbrido em sua instituição',
+    slug: 'como-implementar-ensino-hibrido',
+    excerpt: 'Descubra as melhores estratégias para implementar um modelo de ensino híbrido eficiente e que atenda às necessidades dos alunos.',
+    cover_image: 'https://placehold.co/600x400/e2e8f0/1e40af?text=Ensino+Hibrido',
+    published_at: '2023-11-15',
+    category: 'Metodologias',
+    author: {
+      name: 'Ana Silva',
+      avatar: 'https://placehold.co/150/4f46e5/ffffff?text=AS',
+    },
+  },
+  {
+    id: '2',
+    title: 'Tendências tecnológicas na educação para 2023',
+    slug: 'tendencias-tecnologicas-educacao-2023',
+    excerpt: 'Conheça as principais tendências tecnológicas que estão transformando o cenário educacional e como aproveitá-las.',
+    cover_image: 'https://placehold.co/600x400/e2e8f0/1e40af?text=Tendências+Tech',
+    published_at: '2023-10-28',
+    category: 'Tecnologia',
+    author: {
+      name: 'Pedro Costa',
+      avatar: 'https://placehold.co/150/4f46e5/ffffff?text=PC',
+    },
+  },
+  {
+    id: '3',
+    title: 'Gestão financeira eficiente para instituições de ensino',
+    slug: 'gestao-financeira-instituicoes-ensino',
+    excerpt: 'Aprenda estratégias para otimizar a gestão financeira da sua instituição de ensino e garantir a sustentabilidade a longo prazo.',
+    cover_image: 'https://placehold.co/600x400/e2e8f0/1e40af?text=Gestão+Financeira',
+    published_at: '2023-10-15',
+    category: 'Gestão',
+    author: {
+      name: 'Márcia Oliveira',
+      avatar: 'https://placehold.co/150/4f46e5/ffffff?text=MO',
+    },
+  },
+  {
+    id: '4',
+    title: 'Como melhorar a experiência do aluno com tecnologia',
+    slug: 'melhorar-experiencia-aluno-tecnologia',
+    excerpt: 'Descubra como utilizar a tecnologia para proporcionar uma experiência educacional mais engajadora e efetiva para os alunos.',
+    cover_image: 'https://placehold.co/600x400/e2e8f0/1e40af?text=UX+Educacional',
+    published_at: '2023-09-30',
+    category: 'Experiência do Aluno',
+    author: {
+      name: 'Rafael Mendes',
+      avatar: 'https://placehold.co/150/4f46e5/ffffff?text=RM',
+    },
+  },
+  {
+    id: '5',
+    title: 'Desafios da educação a distância e como superá-los',
+    slug: 'desafios-educacao-distancia',
+    excerpt: 'Analise os principais desafios enfrentados na educação a distância e conheça estratégias eficazes para superá-los.',
+    cover_image: 'https://placehold.co/600x400/e2e8f0/1e40af?text=EAD+Desafios',
+    published_at: '2023-09-15',
+    category: 'Educação a Distância',
+    author: {
+      name: 'Juliana Santos',
+      avatar: 'https://placehold.co/150/4f46e5/ffffff?text=JS',
+    },
+  },
+  {
+    id: '6',
+    title: 'Inteligência artificial na educação: possibilidades e limites',
+    slug: 'inteligencia-artificial-educacao',
+    excerpt: 'Explore as aplicações da inteligência artificial no contexto educacional, suas possibilidades e limites éticos.',
+    cover_image: 'https://placehold.co/600x400/e2e8f0/1e40af?text=IA+Educação',
+    published_at: '2023-09-05',
+    category: 'Tecnologia',
+    author: {
+      name: 'Carlos Andrade',
+      avatar: 'https://placehold.co/150/4f46e5/ffffff?text=CA',
+    },
+  },
+];
+
+// Categorias extraídas dos posts
+const ALL_CATEGORIES = Array.from(new Set(MOCK_POSTS.map(post => post.category)));
+
+export default function BlogPage() {
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  // Filtragem de posts por categoria e termo de busca
+  const filteredPosts = MOCK_POSTS.filter(post => {
+    const matchesCategory = selectedCategory ? post.category === selectedCategory : true;
+    const matchesSearch = searchTerm
+      ? post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        post.excerpt.toLowerCase().includes(searchTerm.toLowerCase())
+      : true;
+    return matchesCategory && matchesSearch;
   });
-  
-  // Função para trocar de página
-  const handlePageChange = (newPage: number) => {
-    const params = new URLSearchParams(searchParams);
-    params.set('pagina', newPage.toString());
-    setSearchParams(params);
-    window.scrollTo(0, 0);
-  };
-  
-  // Função para filtrar por categoria
-  const handleCategoryFilter = (categorySlug: string) => {
-    const params = new URLSearchParams(searchParams);
-    if (categorySlug) {
-      params.set('categoria', categorySlug);
-    } else {
-      params.delete('categoria');
-    }
-    params.delete('pagina'); // Reset página ao mudar categoria
-    setSearchParams(params);
-  };
-  
-  // Extrair post em destaque (primeiro post)
-  const featuredPost = data?.posts[0];
-  const regularPosts = data?.posts.slice(1);
-  
+
   return (
-    <Layout>
-      <div className="container mx-auto px-4 py-12">
-        {/* Header do Blog */}
-        <div className="mb-12 text-center">
-          <h1 className="text-4xl font-bold text-primary-800 mb-4">Blog da Edunéxia</h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Artigos, tutoriais e cases de sucesso sobre tecnologia educacional e gestão de instituições de ensino.
+    <div>
+      {/* Hero Section */}
+      <section className="py-16 bg-primary-50">
+        <div className="container mx-auto px-4 text-center">
+          <h1 className="text-4xl md:text-5xl font-bold text-primary-800 mb-4">
+            Blog Edunéxia
+          </h1>
+          <p className="text-lg text-gray-700 max-w-3xl mx-auto">
+            Conteúdos exclusivos sobre tecnologia educacional e gestão de instituições de ensino
           </p>
         </div>
-        
-        {/* Categorias */}
-        {categories && categories.length > 0 && (
-          <div className="mb-10">
-            <div className="flex flex-wrap items-center justify-center gap-2">
-              <button 
-                onClick={() => handleCategoryFilter('')}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition ${
-                  !selectedCategorySlug 
-                    ? 'bg-primary-600 text-white' 
+      </section>
+
+      {/* Filtros e Busca */}
+      <section className="py-8 bg-white border-b">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col md:flex-row justify-between items-center">
+            <div className="flex flex-wrap gap-2 mb-4 md:mb-0">
+              <button
+                onClick={() => setSelectedCategory(null)}
+                className={`px-4 py-2 rounded-full text-sm font-medium ${
+                  selectedCategory === null
+                    ? 'bg-primary-600 text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
                 Todos
               </button>
-              
-              {categories.map(category => (
-                <button 
-                  key={category.id}
-                  onClick={() => handleCategoryFilter(category.slug)}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition ${
-                    selectedCategorySlug === category.slug 
-                      ? 'bg-primary-600 text-white' 
+              {ALL_CATEGORIES.map((category) => (
+                <button
+                  key={category}
+                  onClick={() => setSelectedCategory(category)}
+                  className={`px-4 py-2 rounded-full text-sm font-medium ${
+                    selectedCategory === category
+                      ? 'bg-primary-600 text-white'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
-                  {category.name}
+                  {category}
                 </button>
               ))}
             </div>
-          </div>
-        )}
-        
-        {/* Loading state */}
-        {isLoading && (
-          <div className="py-12">
-            <div className="max-w-3xl mx-auto">
-              <div className="animate-pulse space-y-8">
-                <div className="h-64 bg-gray-200 rounded-lg"></div>
-                <div className="h-8 bg-gray-200 rounded w-3/4"></div>
-                <div className="h-4 bg-gray-200 rounded"></div>
-                <div className="h-4 bg-gray-200 rounded"></div>
-                <div className="h-4 bg-gray-200 rounded w-5/6"></div>
-              </div>
+            <div className="w-full md:w-auto">
+              <input
+                type="text"
+                placeholder="Buscar artigos..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full md:w-64 px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+              />
             </div>
-          </div>
-        )}
-        
-        {/* Error state */}
-        {error && (
-          <div className="py-12">
-            <div className="max-w-md mx-auto bg-red-50 p-6 rounded-lg text-center">
-              <h2 className="text-xl font-semibold text-red-800 mb-2">Erro ao carregar posts</h2>
-              <p className="text-red-600 mb-4">
-                Não foi possível carregar os artigos do blog. Por favor, tente novamente mais tarde.
-              </p>
-              <button 
-                onClick={() => window.location.reload()}
-                className="bg-primary-600 text-white px-4 py-2 rounded-md hover:bg-primary-700 transition"
-              >
-                Tentar novamente
-              </button>
-            </div>
-          </div>
-        )}
-        
-        {/* Posts do blog */}
-        {!isLoading && !error && data && (
-          <>
-            {/* Post em destaque */}
-            {featuredPost && (
-              <div className="mb-12">
-                <BlogPostCard post={featuredPost} variant="featured" />
-              </div>
-            )}
-            
-            {/* Posts regulares (grid) */}
-            {regularPosts && regularPosts.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-                {regularPosts.map(post => (
-                  <BlogPostCard key={post.id} post={post} />
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-10 bg-gray-50 rounded-lg">
-                <h3 className="text-xl font-medium text-gray-700 mb-2">Nenhum post encontrado</h3>
-                <p className="text-gray-500">
-                  {selectedCategorySlug 
-                    ? `Não encontramos posts na categoria selecionada.` 
-                    : `Ainda não há posts publicados no blog.`}
-                </p>
-                {selectedCategorySlug && (
-                  <button 
-                    onClick={() => handleCategoryFilter('')}
-                    className="mt-4 text-primary-600 hover:text-primary-800 font-medium"
-                  >
-                    Ver todos os posts
-                  </button>
-                )}
-              </div>
-            )}
-            
-            {/* Paginação */}
-            {data.pagination.totalPages > 1 && (
-              <div className="flex justify-center mt-12">
-                <div className="flex space-x-1">
-                  <button
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    disabled={currentPage === 1}
-                    className={`px-4 py-2 rounded-md ${
-                      currentPage === 1
-                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    }`}
-                  >
-                    Anterior
-                  </button>
-                  
-                  {Array.from({ length: data.pagination.totalPages }, (_, i) => i + 1).map(page => (
-                    <button
-                      key={page}
-                      onClick={() => handlePageChange(page)}
-                      className={`w-10 h-10 rounded-md ${
-                        currentPage === page
-                          ? 'bg-primary-600 text-white'
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                      }`}
-                    >
-                      {page}
-                    </button>
-                  ))}
-                  
-                  <button
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    disabled={currentPage === data.pagination.totalPages}
-                    className={`px-4 py-2 rounded-md ${
-                      currentPage === data.pagination.totalPages
-                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    }`}
-                  >
-                    Próxima
-                  </button>
-                </div>
-              </div>
-            )}
-          </>
-        )}
-        
-        {/* CTA */}
-        <div className="mt-16 bg-primary-50 rounded-lg p-8 text-center">
-          <h2 className="text-2xl font-bold text-primary-800 mb-4">
-            Quer receber nossos artigos em primeira mão?
-          </h2>
-          <p className="text-primary-700 mb-6 max-w-2xl mx-auto">
-            Assine nossa newsletter e receba conteúdos exclusivos sobre tecnologia educacional, 
-            gestão escolar e as últimas tendências em educação.
-          </p>
-          <div className="max-w-md mx-auto flex flex-col sm:flex-row gap-2">
-            <input 
-              type="email" 
-              placeholder="Seu melhor e-mail" 
-              className="flex-grow px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-            />
-            <button className="sm:flex-shrink-0 px-6 py-2 bg-primary-600 text-white font-medium rounded-md hover:bg-primary-700 transition">
-              Assinar
-            </button>
           </div>
         </div>
-      </div>
-    </Layout>
-  );
-}
+      </section>
 
-export default BlogPage; 
+      {/* Lista de Posts */}
+      <section className="py-12 bg-white">
+        <div className="container mx-auto px-4">
+          {filteredPosts.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {filteredPosts.map((post) => (
+                <article key={post.id} className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-100">
+                  <Link to={`/blog/${post.slug}`}>
+                    <img
+                      src={post.cover_image}
+                      alt={post.title}
+                      className="w-full h-48 object-cover"
+                    />
+                  </Link>
+                  <div className="p-6">
+                    <div className="flex items-center mb-4">
+                      <span className="text-xs font-medium bg-primary-100 text-primary-800 px-2 py-1 rounded">
+                        {post.category}
+                      </span>
+                      <span className="text-gray-500 text-sm ml-3">
+                        {new Date(post.published_at).toLocaleDateString('pt-BR')}
+                      </span>
+                    </div>
+                    <Link to={`/blog/${post.slug}`}>
+                      <h2 className="text-xl font-bold text-gray-900 mb-2 hover:text-primary-600">
+                        {post.title}
+                      </h2>
+                    </Link>
+                    <p className="text-gray-600 mb-4 line-clamp-3">{post.excerpt}</p>
+                    <div className="flex items-center">
+                      <img
+                        src={post.author.avatar}
+                        alt={post.author.name}
+                        className="w-8 h-8 rounded-full mr-2"
+                      />
+                      <span className="text-sm text-gray-700">{post.author.name}</span>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <p className="text-gray-600">Nenhum artigo encontrado para os filtros selecionados.</p>
+            </div>
+          )}
+        </div>
+      </section>
+    </div>
+  );
+} 

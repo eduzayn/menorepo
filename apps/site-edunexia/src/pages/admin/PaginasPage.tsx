@@ -1,274 +1,195 @@
-import React, { useState, useMemo } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { SitePage } from '@edunexia/database-schema/src/site-edunexia';
-import { DataTable, Column } from '../../components/admin/DataTable';
-import { useAllPages, useDeletePage } from '../../hooks/usePages';
-import { FormSection } from '../../components/admin/FormSection';
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 
-type StatusFilter = 'all' | 'published' | 'draft' | 'archived';
+// Dados simulados para as páginas
+const MOCK_PAGES = [
+  { id: 1, titulo: 'Home', slug: 'home', status: 'Publicada', dataAtualizacao: '30/03/2024' },
+  { id: 2, titulo: 'Sobre Nós', slug: 'sobre', status: 'Publicada', dataAtualizacao: '28/03/2024' },
+  { id: 3, titulo: 'Contato', slug: 'contato', status: 'Publicada', dataAtualizacao: '25/03/2024' },
+  { id: 4, titulo: 'Serviços', slug: 'servicos', status: 'Rascunho', dataAtualizacao: '22/03/2024' },
+  { id: 5, titulo: 'FAQ', slug: 'faq', status: 'Publicada', dataAtualizacao: '20/03/2024' },
+  { id: 6, titulo: 'Política de Privacidade', slug: 'politica-privacidade', status: 'Publicada', dataAtualizacao: '15/03/2024' },
+  { id: 7, titulo: 'Termos de Uso', slug: 'termos-uso', status: 'Publicada', dataAtualizacao: '15/03/2024' },
+  { id: 8, titulo: 'Novidades', slug: 'novidades', status: 'Rascunho', dataAtualizacao: '10/03/2024' },
+];
 
 const PaginasPage: React.FC = () => {
-  const navigate = useNavigate();
-  const { data: pages, isLoading, error } = useAllPages();
-  const deletePage = useDeletePage();
-  const [searchParams, setSearchParams] = useSearchParams();
   const [searchTerm, setSearchTerm] = useState('');
+  const [pages, setPages] = useState(MOCK_PAGES);
+  const [selectedRows, setSelectedRows] = useState<number[]>([]);
 
-  // Obter filtro de status da URL
-  const statusFilter = (searchParams.get('status') || 'all') as StatusFilter;
+  // Filtrar páginas com base no termo de pesquisa
+  const filteredPages = pages.filter(
+    (page) =>
+      page.titulo.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      page.slug.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
-  // Filtragem por status e pesquisa
-  const filteredPages = useMemo(() => {
-    if (!pages) return [];
-
-    let filtered = pages;
-
-    // Aplicar filtro por status
-    if (statusFilter !== 'all') {
-      filtered = filtered.filter(
-        (page) => page.status === statusFilter
-      );
+  // Manipular seleção de linhas
+  const toggleRowSelection = (id: number) => {
+    if (selectedRows.includes(id)) {
+      setSelectedRows(selectedRows.filter((rowId) => rowId !== id));
+    } else {
+      setSelectedRows([...selectedRows, id]);
     }
-
-    // Aplicar pesquisa
-    if (searchTerm) {
-      const searchLower = searchTerm.toLowerCase();
-      filtered = filtered.filter(
-        (page) =>
-          page.title.toLowerCase().includes(searchLower) ||
-          page.slug.toLowerCase().includes(searchLower)
-      );
-    }
-
-    return filtered;
-  }, [pages, statusFilter, searchTerm]);
-
-  // Formatador de datas
-  const formatDate = (dateString: string) => {
-    if (!dateString) return '-';
-    const date = new Date(dateString);
-    return new Intl.DateTimeFormat('pt-BR', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-    }).format(date);
   };
 
-  // Status formatado com cor
-  const StatusBadge = ({ status }: { status: string }) => {
-    const styles = {
-      published: 'bg-green-100 text-green-800',
-      draft: 'bg-yellow-100 text-yellow-800',
-      archived: 'bg-gray-100 text-gray-800',
-    };
-
-    const labels = {
-      published: 'Publicado',
-      draft: 'Rascunho',
-      archived: 'Arquivado',
-    };
-
-    const style = styles[status as keyof typeof styles] || 'bg-gray-100 text-gray-800';
-    const label = labels[status as keyof typeof labels] || status;
-
-    return (
-      <span className={`px-2 py-1 rounded-full text-xs font-medium ${style}`}>
-        {label}
-      </span>
+  // Manipular exclusão simulada
+  const handleDelete = () => {
+    if (selectedRows.length === 0) return;
+    
+    const confirmed = window.confirm(
+      `Tem certeza que deseja excluir ${selectedRows.length} página(s)?`
     );
-  };
-
-  // Colunas da tabela
-  const columns: Column<SitePage>[] = [
-    {
-      header: 'Título',
-      accessor: (page) => (
-        <div>
-          <div className="font-medium text-gray-900">{page.title}</div>
-          <div className="text-xs text-gray-500">/{page.slug}</div>
-        </div>
-      ),
-    },
-    {
-      header: 'Status',
-      accessor: (page) => <StatusBadge status={page.status} />,
-      className: 'text-center',
-    },
-    {
-      header: 'Atualização',
-      accessor: (page) => formatDate(page.updated_at),
-      className: 'text-center',
-    },
-    {
-      header: 'Publicação',
-      accessor: (page) => formatDate(page.published_at || ''),
-      className: 'text-center',
-    },
-    {
-      header: 'Ações',
-      accessor: (page) => (
-        <div className="flex justify-end space-x-2">
-          <Link
-            to={`/pagina/${page.slug}`}
-            target="_blank"
-            className="text-gray-500 hover:text-blue-600"
-            title="Visualizar"
-          >
-            <span className="material-icons text-sm">visibility</span>
-          </Link>
-          <Link
-            to={`/admin/paginas/editar/${page.id}`}
-            className="text-gray-500 hover:text-blue-600"
-            title="Editar"
-          >
-            <span className="material-icons text-sm">edit</span>
-          </Link>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              if (window.confirm(`Deseja realmente excluir a página "${page.title}"?`)) {
-                deletePage.mutate(page.id);
-              }
-            }}
-            className="text-gray-500 hover:text-red-600"
-            title="Excluir"
-          >
-            <span className="material-icons text-sm">delete</span>
-          </button>
-        </div>
-      ),
-      className: 'w-24',
-    },
-  ];
-
-  // Alternar filtro de status
-  const handleStatusFilterChange = (status: StatusFilter) => {
-    setSearchParams(status === 'all' ? {} : { status });
-  };
-
-  // Navegar para a página de edição quando clicar na linha
-  const handleRowClick = (page: SitePage) => {
-    navigate(`/admin/paginas/editar/${page.id}`);
+    
+    if (confirmed) {
+      setPages(pages.filter((page) => !selectedRows.includes(page.id)));
+      setSelectedRows([]);
+    }
   };
 
   return (
-    <>
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Páginas</h1>
-          <p className="text-gray-600 mt-1">
-            Gerencie as páginas estáticas do site
-          </p>
-        </div>
-        <div className="mt-4 md:mt-0">
-          <Link
-            to="/admin/paginas/nova"
-            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-          >
-            <span className="material-icons text-sm mr-2">add</span>
-            Nova Página
-          </Link>
+    <div className="py-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+        <h1 className="text-2xl font-semibold text-gray-900">Gerenciamento de Páginas</h1>
+      </div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+        <div className="py-4">
+          {/* Barra de ferramentas */}
+          <div className="bg-white shadow-sm rounded-lg p-4 mb-6">
+            <div className="flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
+              <div className="w-full sm:w-auto flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+                <input
+                  type="text"
+                  placeholder="Buscar páginas..."
+                  className="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+              <div className="w-full sm:w-auto flex space-x-2">
+                <Link
+                  to="/admin/paginas/nova"
+                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                >
+                  Nova Página
+                </Link>
+                <button
+                  onClick={handleDelete}
+                  disabled={selectedRows.length === 0}
+                  className={`inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                    selectedRows.length === 0
+                      ? 'bg-gray-300 cursor-not-allowed'
+                      : 'bg-red-600 hover:bg-red-700 focus:ring-red-500'
+                  }`}
+                >
+                  Excluir
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Tabela */}
+          <div className="bg-white shadow overflow-hidden rounded-lg">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <input
+                      type="checkbox"
+                      className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setSelectedRows(filteredPages.map((page) => page.id));
+                        } else {
+                          setSelectedRows([]);
+                        }
+                      }}
+                      checked={selectedRows.length === filteredPages.length && filteredPages.length > 0}
+                    />
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Título
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Slug
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Data de Atualização
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Ações
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {filteredPages.length > 0 ? (
+                  filteredPages.map((page) => (
+                    <tr key={page.id} className={selectedRows.includes(page.id) ? 'bg-gray-50' : ''}>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <input
+                          type="checkbox"
+                          className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                          checked={selectedRows.includes(page.id)}
+                          onChange={() => toggleRowSelection(page.id)}
+                        />
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-medium text-gray-900">{page.titulo}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-500">{page.slug}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span
+                          className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                            page.status === 'Publicada'
+                              ? 'bg-green-100 text-green-800'
+                              : 'bg-yellow-100 text-yellow-800'
+                          }`}
+                        >
+                          {page.status}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {page.dataAtualizacao}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <div className="flex space-x-2">
+                          <Link
+                            to={`/admin/paginas/editar/${page.id}`}
+                            className="text-indigo-600 hover:text-indigo-900 font-medium"
+                          >
+                            Editar
+                          </Link>
+                          <a
+                            href={`/pagina/${page.slug}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-gray-600 hover:text-gray-900 font-medium"
+                          >
+                            Visualizar
+                          </a>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={6} className="px-6 py-4 text-center text-sm text-gray-500">
+                      Nenhuma página encontrada.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
-
-      <FormSection title="Gerenciamento de Páginas">
-        <div className="mb-6 flex flex-col sm:flex-row justify-between space-y-4 sm:space-y-0">
-          {/* Filtros por status */}
-          <div className="flex space-x-2">
-            <button
-              onClick={() => handleStatusFilterChange('all')}
-              className={`px-3 py-2 text-sm font-medium rounded-md ${
-                statusFilter === 'all'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              Todas
-            </button>
-            <button
-              onClick={() => handleStatusFilterChange('published')}
-              className={`px-3 py-2 text-sm font-medium rounded-md ${
-                statusFilter === 'published'
-                  ? 'bg-green-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              Publicadas
-            </button>
-            <button
-              onClick={() => handleStatusFilterChange('draft')}
-              className={`px-3 py-2 text-sm font-medium rounded-md ${
-                statusFilter === 'draft'
-                  ? 'bg-yellow-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              Rascunhos
-            </button>
-            <button
-              onClick={() => handleStatusFilterChange('archived')}
-              className={`px-3 py-2 text-sm font-medium rounded-md ${
-                statusFilter === 'archived'
-                  ? 'bg-gray-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              Arquivadas
-            </button>
-          </div>
-
-          {/* Campo de pesquisa */}
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <span className="material-icons text-gray-400 text-sm">search</span>
-            </div>
-            <input
-              type="text"
-              placeholder="Pesquisar por título ou slug..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-            />
-          </div>
-        </div>
-
-        {error ? (
-          <div className="bg-red-50 border-l-4 border-red-500 p-4">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <span className="material-icons text-red-500">error</span>
-              </div>
-              <div className="ml-3">
-                <p className="text-sm text-red-700">
-                  Erro ao carregar páginas. Tente novamente mais tarde.
-                </p>
-              </div>
-            </div>
-          </div>
-        ) : (
-          <DataTable<SitePage>
-            columns={columns}
-            data={filteredPages}
-            keyExtractor={(page) => page.id}
-            isLoading={isLoading}
-            emptyMessage={
-              searchTerm
-                ? "Nenhuma página encontrada para a pesquisa."
-                : "Nenhuma página encontrada."
-            }
-            onRowClick={handleRowClick}
-          />
-        )}
-
-        {filteredPages && filteredPages.length > 0 && (
-          <div className="mt-4 text-right text-gray-500 text-sm">
-            Mostrando {filteredPages.length} {filteredPages.length === 1 ? 'página' : 'páginas'}
-            {statusFilter !== 'all' && ` com status "${statusFilter}"`}
-            {searchTerm && ` para pesquisa "${searchTerm}"`}
-          </div>
-        )}
-      </FormSection>
-    </>
+    </div>
   );
 };
 

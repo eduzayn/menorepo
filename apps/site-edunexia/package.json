@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "@edunexia/api-client": "workspace:*",
+    "@edunexia/auth": "workspace:*",
     "@edunexia/database-schema": "workspace:*",
     "@edunexia/shared-types": "*",
     "@edunexia/ui-components": "workspace:*",
