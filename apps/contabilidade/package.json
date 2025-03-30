@@ -9,7 +9,9 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@edunexia/api-client": "workspace:*",
@@ -46,6 +48,7 @@
   },
   "devDependencies": {
     "@edunexia/eslint-config": "workspace:*",
+    "@edunexia/test-config": "workspace:*",
     "@edunexia/typescript-config": "workspace:*",
     "@types/node": "^20.11.16",
     "@types/react": "^18.2.43",

@@ -1,40 +1,23 @@
 {
   "extends": "../../packages/typescript-config/vite.json",
   "compilerOptions": {
-    "composite": true,
+    "composite": false,
     "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "./src/*"
-      ],
-      "@components/*": [
-        "./src/components/*"
-      ],
-      "@hooks/*": [
-        "./src/hooks/*"
-      ],
-      "@pages/*": [
-        "./src/pages/*"
-      ],
-      "@services/*": [
-        "./src/services/*"
-      ],
-      "@contexts/*": [
-        "./src/contexts/*"
-      ],
-      "@types/*": [
-        "./src/types/*"
-      ],
-      "@styles/*": [
-        "./src/styles/*"
-      ],
-      "@lib/*": [
-        "./src/lib/*"
-      ]
+      "@components/*": ["src/components/*"],
+      "@hooks/*": ["src/hooks/*"],
+      "@pages/*": ["src/pages/*"],
+      "@services/*": ["src/services/*"],
+      "@contexts/*": ["src/contexts/*"],
+      "@utils/*": ["src/utils/*"],
+      "@assets/*": ["src/assets/*"],
+      "@/*": ["src/*"]
     }
   },
   "include": [
     "src",
-    "vite.config.ts"
+    "vite.config.ts",
+    "vitest.config.ts",
+    "src/setupTests.ts"
   ]
 }
