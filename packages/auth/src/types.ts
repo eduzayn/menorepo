@@ -131,4 +131,10 @@ export interface UserPreferences {
     compact?: boolean;
     fontSize?: number;
   };
+}
+
+// Definição de um possível erro de autenticação
+export interface AuthError extends Error {
+  status?: number;
+  code?: string;
 } 
