@@ -4,12 +4,9 @@
  * Para novas implementações, utilize as funções de @edunexia/utils diretamente.
  */
 
-import {
-  formatCurrency as formatCurrencyUtil,
-  formatDate as formatDateUtil,
-  formatCPF as formatCPFUtil,
-  formatPhone as formatPhoneUtil
-} from '@edunexia/utils';
+// Importar as funções do pacote utils
+// As funções abaixo serão disponibilizadas no escopo compartilhado
+// quando o pacote @edunexia/utils estiver pronto
 
 /**
  * Formata uma data para o formato DD/MM/YYYY
@@ -97,8 +94,15 @@ export function truncarTexto(texto: string, tamanhoMaximo: number): string {
  * Formata um telefone ((##) #####-####)
  * @param phone Telefone a ser formatado
  * @returns String formatada como telefone
- * @deprecated Use formatPhone de '@edunexia/utils'
  */
-export const formatPhone = (phone: string): string => {
-  return formatPhoneUtil(phone);
-}; 
+export function formatPhone(phone: string): string {
+  const telClean = phone.replace(/\D/g, '');
+  
+  if (telClean.length === 11) {
+    return telClean.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+  } else if (telClean.length === 10) {
+    return telClean.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
+  }
+  
+  return phone;
+} 

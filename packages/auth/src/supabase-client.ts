@@ -1,14 +1,15 @@
 import type { Database } from '@edunexia/database-schema';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
-// Tipagem para variáveis de ambiente
-declare global {
-  interface ImportMeta {
-    env: {
-      VITE_SUPABASE_URL?: string;
-      VITE_SUPABASE_ANON_KEY?: string;
-    }
-  }
+// Tipagem para variáveis de ambiente do Vite
+interface ImportMetaEnv {
+  readonly VITE_SUPABASE_URL?: string;
+  readonly VITE_SUPABASE_ANON_KEY?: string;
+  // mais variáveis de ambiente...
+}
+
+interface ImportMeta {
+  readonly env: ImportMetaEnv;
 }
 
 /**

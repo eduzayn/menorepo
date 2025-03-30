@@ -4,11 +4,11 @@
  * Utilitários compartilhados para a plataforma Edunéxia
  */
 
-// Exporta todas as funções do arquivo utils/index.ts
-export * from './utils';
+// Exporta todas as funções essenciais 
+export * from './utils/index';
 
-// Exporta todas as funções específicas de formatação
-export * from './formatters';
+// Comentado para evitar conflitos de exportação
+// export * from './formatters';
 
 // Exporta todas as funções específicas de validação
 export * from './validators';
