@@ -1,6 +1,6 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from '@edunexia/database-schema';
-import { ApiError, ApiErrorType } from './types';
+import { ApiError } from './types';
 
 export interface ApiClientOptions {
   /**
@@ -16,7 +16,7 @@ export interface ApiClientOptions {
   /**
    * Função para tratamento de logs de erros (opcional)
    */
-  onError?: (error: ApiErrorType) => void;
+  onError?: (error: ApiError) => void;
   
   /**
    * Ativar logs para depuração
@@ -54,14 +54,10 @@ export class ApiClient {
   /**
    * Gerencia o tratamento de erros de forma consistente
    */
-  handleError(error: unknown, operation: string): ApiErrorType {
-    const apiError: ApiErrorType = {
-      message: error instanceof Error ? error.message : 'Erro desconhecido',
-      operation,
-      timestamp: new Date(),
-      originalError: error
-    };
-
+  handleError(error: unknown, operation: string): ApiError {
+    const message = error instanceof Error ? error.message : 'Erro desconhecido';
+    const apiError = new ApiError(message, error, operation);
+    
     if (this.options.onError) {
       this.options.onError(apiError);
     }
@@ -69,7 +65,7 @@ export class ApiClient {
     if (this.options.enableLogging) {
       console.error(`[API Error] ${operation}:`, apiError);
     }
-
+    
     return apiError;
   }
 

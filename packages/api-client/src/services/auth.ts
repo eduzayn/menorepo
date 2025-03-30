@@ -1,5 +1,5 @@
 import { ApiClient } from '../client';
-import { ApiErrorType } from '../types';
+import { ApiError } from '../types';
 
 export interface AuthCredentials {
   email: string;
@@ -17,7 +17,7 @@ export interface AuthResponse {
     refreshToken: string;
     expiresAt: number | undefined;
   } | null;
-  error: ApiErrorType | null;
+  error: ApiError | null;
 }
 
 /**
@@ -71,7 +71,7 @@ export async function signIn(
  * @param client Cliente de API
  * @returns Confirmação de sucesso ou erro
  */
-export async function signOut(client: ApiClient): Promise<{ success: boolean; error: ApiErrorType | null }> {
+export async function signOut(client: ApiClient): Promise<{ success: boolean; error: ApiError | null }> {
   try {
     const { error } = await client.auth.signOut();
 

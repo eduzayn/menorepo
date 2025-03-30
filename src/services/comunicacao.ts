@@ -1,5 +1,5 @@
 import { ApiClient } from '../client';
-import { ApiErrorType } from '../types';
+import { ApiError } from '../types';
 
 export interface Mensagem {
   id: string;
@@ -42,7 +42,7 @@ export interface EnviarMensagemParams {
 export async function enviarMensagem(
   client: ApiClient,
   params: EnviarMensagemParams
-): Promise<{ mensagem: Mensagem | null; error: ApiErrorType | null }> {
+): Promise<{ mensagem: Mensagem | null; error: ApiError | null }> {
   try {
     // Upload de anexos (se houver)
     const anexosIds: string[] = [];
@@ -128,7 +128,7 @@ export async function enviarMensagem(
 export async function listarMensagensRecebidas(
   client: ApiClient,
   userId: string
-): Promise<{ mensagens: Mensagem[]; error: ApiErrorType | null }> {
+): Promise<{ mensagens: Mensagem[]; error: ApiError | null }> {
   try {
     const { data, error } = await client.from('comunicacao.mensagens')
       .select(`
@@ -182,7 +182,7 @@ export async function listarMensagensRecebidas(
 export async function listarMensagensEnviadas(
   client: ApiClient,
   userId: string
-): Promise<{ mensagens: Mensagem[]; error: ApiErrorType | null }> {
+): Promise<{ mensagens: Mensagem[]; error: ApiError | null }> {
   try {
     const { data, error } = await client.from('comunicacao.mensagens')
       .select(`
@@ -236,7 +236,7 @@ export async function listarMensagensEnviadas(
 export async function marcarComoLida(
   client: ApiClient,
   mensagemId: string
-): Promise<{ success: boolean; error: ApiErrorType | null }> {
+): Promise<{ success: boolean; error: ApiError | null }> {
   try {
     const { error } = await client.from('comunicacao.mensagens')
       .update({ lida: true })

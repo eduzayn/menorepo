@@ -1,5 +1,5 @@
 import { ApiClient } from '../client';
-import { ApiErrorType } from '../types';
+import { ApiError } from '../types';
 
 export interface Disciplina {
   id: string;
@@ -28,7 +28,7 @@ export interface DisciplinaInput {
  */
 export async function listarDisciplinas(
   client: ApiClient
-): Promise<{ disciplinas: Disciplina[]; error: ApiErrorType | null }> {
+): Promise<{ disciplinas: Disciplina[]; error: ApiError | null }> {
   try {
     const { data, error } = await client.from('disciplinas')
       .select('*')
@@ -54,7 +54,7 @@ export async function listarDisciplinas(
 export async function obterDisciplina(
   client: ApiClient,
   id: string
-): Promise<{ disciplina: Disciplina | null; error: ApiErrorType | null }> {
+): Promise<{ disciplina: Disciplina | null; error: ApiError | null }> {
   try {
     const { data, error } = await client.from('disciplinas')
       .select('*')
@@ -81,7 +81,7 @@ export async function obterDisciplina(
 export async function criarDisciplina(
   client: ApiClient,
   data: DisciplinaInput
-): Promise<{ disciplina: Disciplina | null; error: ApiErrorType | null }> {
+): Promise<{ disciplina: Disciplina | null; error: ApiError | null }> {
   try {
     const { data: disciplina, error } = await client.from('disciplinas')
       .insert({
@@ -113,7 +113,7 @@ export async function atualizarDisciplina(
   client: ApiClient,
   id: string,
   data: Partial<DisciplinaInput>
-): Promise<{ success: boolean; error: ApiErrorType | null }> {
+): Promise<{ success: boolean; error: ApiError | null }> {
   try {
     const { error } = await client.from('disciplinas')
       .update({
@@ -142,7 +142,7 @@ export async function atualizarDisciplina(
 export async function removerDisciplina(
   client: ApiClient,
   id: string
-): Promise<{ success: boolean; error: ApiErrorType | null }> {
+): Promise<{ success: boolean; error: ApiError | null }> {
   try {
     const { error } = await client.from('disciplinas')
       .delete()

@@ -87,7 +87,7 @@ export interface ApiResponse<T> {
   /**
    * Erro da operação (se houver)
    */
-  error: ApiErrorType | null;
+  error: ApiError | null;
 
   /**
    * Status da requisição
@@ -112,7 +112,7 @@ export type ApiClient = {
   /**
    * Função para tratar erros de forma consistente
    */
-  handleError: (error: unknown, operation: string) => ApiErrorType;
+  handleError: (error: unknown, operation: string) => ApiError;
 
   /**
    * Executa operações com tratamento de erros padronizado
@@ -138,4 +138,20 @@ export type ApiClient = {
    * Acesso ao módulo de funções
    */
   functions: SupabaseClient<Database>['functions'];
-}; 
+
+  /**
+   * Função para tratamento de logs de erros (opcional)
+   */
+  onError?: (error: ApiError) => void;
+};
+
+export interface ApiClientOptions {
+  // ... existing code ...
+  
+  /**
+   * Função para tratamento de logs de erros (opcional)
+   */
+  onError?: (error: ApiError) => void;
+  
+  // ... existing code ...
+} 
