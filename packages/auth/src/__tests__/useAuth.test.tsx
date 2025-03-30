@@ -1,7 +1,8 @@
 import { renderHook, act, waitFor } from '@testing-library/react';
 import React from 'react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { useAuth, AuthProvider } from '../useAuth';
+import { useAuth } from '../hooks/useAuth';
+import { AuthProvider } from '../AuthProvider';
 import { createClient } from '@supabase/supabase-js';
 
 // Mock para o Supabase
@@ -82,10 +83,10 @@ describe('useAuth', () => {
     vi.resetAllMocks();
   });
 
-  it('deve iniciar com o estado de autenticação não carregado', () => {
+  it('deve iniciar com o estado de autenticação carregando', () => {
     const { result } = renderHook(() => useAuth(), { wrapper });
     
-    expect(result.current.isLoaded).toBe(false);
+    expect(result.current.loading).toBe(true);
     expect(result.current.isAuthenticated).toBe(false);
     expect(result.current.user).toBeNull();
   });
@@ -100,11 +101,11 @@ describe('useAuth', () => {
     const { result } = renderHook(() => useAuth(), { wrapper });
     
     // Verificar o estado inicial (carregando)
-    expect(result.current.isLoaded).toBe(false);
+    expect(result.current.loading).toBe(true);
     
     // Aguardar a autenticação ser processada
     await waitFor(() => {
-      expect(result.current.isLoaded).toBe(true);
+      expect(result.current.loading).toBe(false);
     });
     
     // Verificar o estado final (autenticado)
@@ -126,7 +127,7 @@ describe('useAuth', () => {
     
     // Aguardar a autenticação ser processada
     await waitFor(() => {
-      expect(result.current.isLoaded).toBe(true);
+      expect(result.current.loading).toBe(false);
     });
     
     // Verificar o estado final (não autenticado devido ao erro)
@@ -153,7 +154,7 @@ describe('useAuth', () => {
     
     // Aguardar a verificação inicial de sessão
     await waitFor(() => {
-      expect(result.current.isLoaded).toBe(true);
+      expect(result.current.loading).toBe(false);
     });
     
     // Realizar o login
@@ -193,7 +194,7 @@ describe('useAuth', () => {
     
     // Aguardar a verificação inicial de sessão
     await waitFor(() => {
-      expect(result.current.isLoaded).toBe(true);
+      expect(result.current.loading).toBe(false);
     });
     
     // Realizar o login com credenciais inválidas
@@ -305,7 +306,7 @@ describe('useAuth', () => {
     
     // Aguardar a verificação inicial de sessão
     await waitFor(() => {
-      expect(result.current.isLoaded).toBe(true);
+      expect(result.current.loading).toBe(true);
     });
     expect(result.current.isAuthenticated).toBe(false);
     
