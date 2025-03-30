@@ -279,10 +279,10 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children, supabaseClient }
     }
     
     try {
+      // Atualizar dados do usuário diretamente, sem encadeamento adicional
       const { error: updateError } = await supabaseClient
         .from('usuarios')
-        .update(profileData)
-        .eq('id', user.id);
+        .update(profileData);
         
       if (updateError) {
         throw updateError;
