@@ -556,6 +556,9 @@ importers:
       '@edunexia/eslint-config':
         specifier: '*'
         version: link:../../packages/eslint-config
+      '@edunexia/test-config':
+        specifier: ^0.1.0
+        version: link:../../packages/test-config
       '@edunexia/typescript-config':
         specifier: '*'
         version: link:../../packages/typescript-config

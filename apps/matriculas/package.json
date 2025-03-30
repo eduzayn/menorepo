@@ -15,9 +15,9 @@
   "dependencies": {
     "@edunexia/api-client": "workspace:*",
     "@edunexia/auth": "workspace:*",
+    "@edunexia/navigation": "workspace:*",
     "@edunexia/ui-components": "workspace:*",
     "@edunexia/utils": "workspace:*",
-    "@edunexia/navigation": "workspace:*",
     "@hookform/resolvers": "^3.3.4",
     "@tanstack/react-query": "^5.24.1",
     "@tanstack/react-query-devtools": "^5.24.1",
@@ -33,7 +33,7 @@
   },
   "devDependencies": {
     "@edunexia/eslint-config": "*",
-    "@edunexia/test-config": "workspace:*",
+    "@edunexia/test-config": "^0.1.0",
     "@edunexia/typescript-config": "*",
     "@types/node": "^20",
     "@types/react": "^18",

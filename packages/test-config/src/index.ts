@@ -5,7 +5,7 @@ export * from './jest.config';
 // Re-exporta os utilitários
 export * from './test-utils';
 export * from './mock-helpers';
-export * from './test-data';
+// export * from './test-data'; // Removido para evitar conflito com generateTestId
 
 // Exporta os arquivos de setup
 import * as vitestSetupModule from './vitest.setup';

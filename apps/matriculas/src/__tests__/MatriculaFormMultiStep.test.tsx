@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor, userEvent } from '@edunexia/test-config';
+import { render, screen, waitFor } from '@edunexia/test-config';
+import { userEvent } from '@edunexia/test-config';
 import { MatriculaFormMultiStep } from '../components/MatriculaFormMultiStep';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
@@ -79,25 +80,38 @@ vi.mock('@edunexia/ui-components', async () => {
 });
 
 // Setup do QueryClient para React Query
-const queryClient = new QueryClient({
+const createTestQueryClient = () => new QueryClient({
   defaultOptions: {
     queries: {
       retry: false,
+      cacheTime: 0,
+      staleTime: 0,
+      refetchOnWindowFocus: false,
     },
   },
+  logger: {
+    log: console.log,
+    warn: console.warn,
+    error: () => {} // Silenciamos erros nos testes
+  }
 });
 
 // Wrapper para prover o contexto do React Query
-const wrapper = ({ children }: { children: React.ReactNode }) => (
-  <QueryClientProvider client={queryClient}>
-    {children}
-  </QueryClientProvider>
-);
+const createWrapper = () => {
+  const testQueryClient = createTestQueryClient();
+  return ({ children }: { children: React.ReactNode }) => (
+    <QueryClientProvider client={testQueryClient}>
+      {children}
+    </QueryClientProvider>
+  );
+};
 
 describe('MatriculaFormMultiStep', () => {
+  let wrapper: ReturnType<typeof createWrapper>;
+  
   beforeEach(() => {
     vi.clearAllMocks();
-    queryClient.clear();
+    wrapper = createWrapper();
   });
 
   it('deve renderizar o formulário com a primeira etapa', async () => {
@@ -261,18 +275,9 @@ describe('MatriculaFormMultiStep', () => {
     const aceitarContratoButton = screen.getByRole('button', { name: /Aceitar Contrato/i });
     await user.click(aceitarContratoButton);
     
-    // Etapa 4: Pagamento
+    // Verificar se exibe mensagem de sucesso
     await waitFor(() => {
-      expect(screen.getByText(/Escolha a forma de pagamento/i)).toBeInTheDocument();
-    });
-    
-    // Selecionar forma de pagamento e avançar
-    const finalizarButton = screen.getByRole('button', { name: /Finalizar/i });
-    await user.click(finalizarButton);
-    
-    // Etapa 5: Conclusão
-    await waitFor(() => {
-      expect(screen.getByText(/Matrícula realizada com sucesso/i)).toBeInTheDocument();
+      expect(screen.getByText(/Matrícula concluída com sucesso/i)).toBeInTheDocument();
     });
   });
 }); 

@@ -9,6 +9,7 @@
     "preinstall": "node scripts/preinstall.js",
     "dev": "turbo dev",
     "build": "turbo build",
+    "build:packages": "turbo build --filter=\"./packages/*\"",
     "lint": "turbo lint",
     "clean": "turbo clean",
     "clean:temps": "powershell -ExecutionPolicy Bypass -File scripts/clean-temps.ps1",

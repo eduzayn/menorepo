@@ -11,7 +11,7 @@ afterEach(() => {
   cleanup();
 });
 
-// Previne vazamento de memória do mock de timer
+// Restaura todos os mocks depois de cada teste
 afterEach(() => {
   vi.restoreAllMocks();
   vi.resetAllMocks();
@@ -22,19 +22,7 @@ afterEach(() => {
   }
 });
 
-// Configura o console.error para não exibir erros dos testes mas capturá-los
-const originalConsoleError = console.error;
-console.error = (...args) => {
-  if (args[0]?.includes?.('Warning: ReactDOM.render')) {
-    return;
-  }
-  if (args[0]?.includes?.('Warning: An update to')) {
-    return;
-  }
-  originalConsoleError(...args);
-};
-
-// Mock de APIs do navegador frequentemente usadas
+// Mock para o localStorage
 Object.defineProperty(window, 'localStorage', {
   value: {
     getItem: vi.fn(() => null),
@@ -45,21 +33,18 @@ Object.defineProperty(window, 'localStorage', {
   writable: true
 });
 
-// Configuração global para o ResizeObserver
+// Mock para o ResizeObserver
 window.ResizeObserver = vi.fn().mockImplementation(() => ({
   observe: vi.fn(),
   unobserve: vi.fn(),
   disconnect: vi.fn(),
 }));
 
-// Mock para IntersectionObserver
+// Mock para o IntersectionObserver
 window.IntersectionObserver = vi.fn().mockImplementation(() => ({
   observe: vi.fn(),
   unobserve: vi.fn(),
   disconnect: vi.fn(),
-  root: null,
-  rootMargin: '',
-  thresholds: []
 }));
 
 // Mock para matchMedia
@@ -67,27 +52,9 @@ window.matchMedia = vi.fn().mockImplementation(query => ({
   matches: false,
   media: query,
   onchange: null,
-  addListener: vi.fn(), // Obsoleto, mas ainda usado em alguns códigos
-  removeListener: vi.fn(), // Obsoleto
+  addListener: vi.fn(),
+  removeListener: vi.fn(),
   addEventListener: vi.fn(),
   removeEventListener: vi.fn(),
   dispatchEvent: vi.fn(),
-}));
-
-// Mock para document.createRange
-document.createRange = () => {
-  const range = new Range();
-  range.getBoundingClientRect = vi.fn();
-  
-  // @ts-expect-error - Simplificação do mock para DOMRectList
-  range.getClientRects = vi.fn(() => {
-    return {
-      item: () => null,
-      length: 0,
-      // Adicionando a implementação mínima necessária para DOMRectList
-      [Symbol.iterator]: function* () { yield null; }
-    };
-  });
-  
-  return range;
-}; 
+})); 

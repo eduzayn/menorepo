@@ -1,5 +1,5 @@
 import React, { ReactElement } from 'react';
-import { render, RenderOptions } from '@testing-library/react';
+import { render, RenderOptions, RenderResult } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 // Importações de utilitários
@@ -13,6 +13,11 @@ export { vi } from 'vitest';
 // Interface para definir provedores personalizados
 interface CustomRenderOptions extends Omit<RenderOptions, 'wrapper'> {
   wrapper?: React.ComponentType<{ children: React.ReactNode }>;
+}
+
+// Tipo para o resultado da renderização customizada
+interface CustomRenderResult extends RenderResult {
+  user: ReturnType<typeof userEvent.setup>;
 }
 
 // Função para envolver componentes em provedores de contexto
@@ -34,7 +39,7 @@ export function combineProviders(...providers: React.ComponentType<{ children: R
 export function customRender(
   ui: ReactElement,
   options: CustomRenderOptions = {}
-) {
+): CustomRenderResult {
   const { wrapper: Wrapper, ...restOptions } = options;
   
   return {

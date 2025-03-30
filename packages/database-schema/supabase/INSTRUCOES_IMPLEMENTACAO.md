@@ -17,7 +17,7 @@
 
 2. Instale as dependências:
    ```bash
-   yarn install
+   pnpm install
    ```
 
 3. Configure suas variáveis locais do Supabase:

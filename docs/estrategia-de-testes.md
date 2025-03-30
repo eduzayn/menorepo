@@ -169,24 +169,24 @@ Focamos nossos esforços de teste nos fluxos mais críticos da plataforma:
 ```bash
 # Executa os testes para um módulo específico
 cd apps/matriculas
-yarn test
+pnpm test
 
 # Executa em modo de observação
-yarn test:watch
+pnpm test:watch
 
 # Verifica cobertura
-yarn test:coverage
+pnpm test:coverage
 ```
 
 ### Testes E2E
 
 ```bash
 # Inicia o ambiente de desenvolvimento
-yarn dev
+pnpm dev
 
 # Em outro terminal, executa os testes E2E
 cd apps/matriculas
-yarn test:e2e
+pnpm test:e2e
 ```
 
 ### Todos os Testes
@@ -194,8 +194,7 @@ yarn test:e2e
 Para executar todos os testes do monorepo:
 
 ```bash
-cd packages/test-config
-yarn run-all-tests
+pnpm test
 ```
 
 ## Cobertura de Testes
@@ -226,8 +225,7 @@ Os relatórios de cobertura são gerados em formatos diversos:
 Para gerar um relatório de cobertura consolidado para todo o monorepo:
 
 ```bash
-cd packages/test-config
-yarn coverage
+pnpm --filter @edunexia/test-config coverage
 ```
 
 Este comando irá:

@@ -14,6 +14,21 @@
       "require": "./dist/index.js",
       "import": "./dist/index.mjs",
       "types": "./dist/index.d.ts"
+    },
+    "./setup": {
+      "require": "./dist/setup.js",
+      "import": "./dist/setup.mjs",
+      "types": "./dist/setup.d.ts"
+    },
+    "./vitest.setup": {
+      "require": "./dist/vitest.setup.js",
+      "import": "./dist/vitest.setup.mjs",
+      "types": "./dist/vitest.setup.d.ts"
+    },
+    "./jest.setup": {
+      "require": "./dist/jest.setup.js",
+      "import": "./dist/jest.setup.mjs",
+      "types": "./dist/jest.setup.d.ts"
     }
   },
   "scripts": {

@@ -85,8 +85,8 @@ A integração com o módulo de RH permite:
 
 ### Pré-requisitos
 
-- Node.js 16+
-- Yarn 
+- Node.js 23.10.0
+- PNPM 8.9.0
 - Instalação do monorepo da Edunéxia
 
 ### Instalação
@@ -94,7 +94,7 @@ A integração com o módulo de RH permite:
 Como este módulo faz parte do monorepo, ele é instalado automaticamente ao executar:
 
 ```bash
-yarn install
+pnpm install
 ```
 
 Na raiz do projeto.
@@ -104,13 +104,13 @@ Na raiz do projeto.
 Para executar apenas este módulo:
 
 ```bash
-yarn workspace @edunexia/contabilidade dev
+pnpm --filter @edunexia/contabilidade dev
 ```
 
 ### Testes
 
 ```bash
-yarn workspace @edunexia/contabilidade test
+pnpm --filter @edunexia/contabilidade test
 ```
 
 ## Dependências Principais

@@ -1,1 +1,7 @@
-module.exports = require('@edunexia/tailwind-config/postcss.config.js'); 
+module.exports = {
+  plugins: {
+    'tailwindcss/nesting': {},
+    tailwindcss: {},
+    autoprefixer: {},
+  },
+}; 
