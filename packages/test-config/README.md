@@ -93,6 +93,8 @@ Para adicionar novas funcionalidades ao pacote:
 2. Exporte a funcionalidade no arquivo `src/index.ts`
 3. Atualize a documentação no README.md
 
+Consulte também o documento [DIRETRIZES-DE-TESTE.md](./docs/DIRETRIZES-DE-TESTE.md) para entender as práticas e padrões de teste recomendados em todo o projeto Edunéxia.
+
 ## Testes
 
 O próprio pacote inclui testes para garantir que os utilitários funcionem corretamente:
