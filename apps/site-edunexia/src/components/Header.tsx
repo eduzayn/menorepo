@@ -1,8 +1,17 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { DynamicMenu } from './DynamicMenu';
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const handleMobileMenuToggle = () => {
+    setMobileMenuOpen(!mobileMenuOpen);
+  };
+  
+  const handleMobileMenuClose = () => {
+    setMobileMenuOpen(false);
+  };
 
   return (
     <header className="bg-primary-600 text-white py-4 sticky top-0 z-50 shadow-md">
@@ -20,51 +29,15 @@ export function Header() {
 
         {/* Versão desktop do menu */}
         <nav className="hidden md:block">
-          <ul className="flex space-x-8">
-            <li>
-              <Link to="/" className="hover:text-primary-200 transition-colors font-medium">Início</Link>
-            </li>
-            <li>
-              <Link to="/sobre" className="hover:text-primary-200 transition-colors font-medium">Sobre</Link>
-            </li>
-            <li>
-              <Link to="/blog" className="hover:text-primary-200 transition-colors font-medium">Blog</Link>
-            </li>
-            <li>
-              <Link to="/contato" className="hover:text-primary-200 transition-colors font-medium">Contato</Link>
-            </li>
-            <li className="relative group">
-              <span className="hover:text-primary-200 transition-colors font-medium cursor-pointer flex items-center">
-                Soluções
-                <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                </svg>
-              </span>
-              <ul className="absolute left-0 mt-2 w-48 bg-white shadow-lg rounded-md py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
-                <li>
-                  <Link to="/pagina/sistema-matriculas" className="block px-4 py-2 text-gray-800 hover:bg-primary-50 hover:text-primary-600">
-                    Sistema de Matrículas
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/pagina/portal-aluno" className="block px-4 py-2 text-gray-800 hover:bg-primary-50 hover:text-primary-600">
-                    Portal do Aluno
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/pagina/gestao-financeira" className="block px-4 py-2 text-gray-800 hover:bg-primary-50 hover:text-primary-600">
-                    Gestão Financeira
-                  </Link>
-                </li>
-              </ul>
-            </li>
-          </ul>
+          <DynamicMenu />
         </nav>
 
         {/* Botão de menu móvel */}
         <button 
           className="md:hidden text-white focus:outline-none"
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          onClick={handleMobileMenuToggle}
+          aria-label={mobileMenuOpen ? "Fechar menu" : "Abrir menu"}
+          aria-expanded={mobileMenuOpen}
         >
           {mobileMenuOpen ? (
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -81,76 +54,7 @@ export function Header() {
       {/* Menu móvel */}
       {mobileMenuOpen && (
         <div className="md:hidden bg-primary-700 px-4 pt-2 pb-4">
-          <ul className="space-y-2">
-            <li>
-              <Link 
-                to="/" 
-                className="block py-2 text-primary-100 hover:text-white"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Início
-              </Link>
-            </li>
-            <li>
-              <Link 
-                to="/sobre" 
-                className="block py-2 text-primary-100 hover:text-white"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Sobre
-              </Link>
-            </li>
-            <li>
-              <Link 
-                to="/blog" 
-                className="block py-2 text-primary-100 hover:text-white"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Blog
-              </Link>
-            </li>
-            <li>
-              <Link 
-                to="/contato" 
-                className="block py-2 text-primary-100 hover:text-white"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Contato
-              </Link>
-            </li>
-            <li className="py-2">
-              <div className="text-primary-100 mb-1 font-medium">Soluções</div>
-              <ul className="pl-4 space-y-2 border-l border-primary-500">
-                <li>
-                  <Link 
-                    to="/pagina/sistema-matriculas" 
-                    className="block py-1 text-primary-200 hover:text-white"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    Sistema de Matrículas
-                  </Link>
-                </li>
-                <li>
-                  <Link 
-                    to="/pagina/portal-aluno" 
-                    className="block py-1 text-primary-200 hover:text-white"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    Portal do Aluno
-                  </Link>
-                </li>
-                <li>
-                  <Link 
-                    to="/pagina/gestao-financeira" 
-                    className="block py-1 text-primary-200 hover:text-white"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    Gestão Financeira
-                  </Link>
-                </li>
-              </ul>
-            </li>
-          </ul>
+          <DynamicMenu isMobile onItemClick={handleMobileMenuClose} />
         </div>
       )}
     </header>

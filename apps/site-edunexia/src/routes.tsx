@@ -23,6 +23,7 @@ const NewPagePage = lazy(() => import('./pages/admin/NewPagePage'));
 const EditPagePage = lazy(() => import('./pages/admin/EditPagePage'));
 const LeadsPage = lazy(() => import('./pages/admin/LeadsPage'));
 const ConfiguracoesPage = lazy(() => import('./pages/admin/ConfiguracoesPage'));
+const MenuPage = lazy(() => import('./pages/admin/MenuPage'));
 
 // Componente de loading para Suspense
 const PageLoading = () => (
@@ -98,6 +99,9 @@ function AppRoutes() {
         {/* Configurações do site */}
         <Route path="configuracoes" element={<SuspenseWrapper><ConfiguracoesPage /></SuspenseWrapper>} />
         
+        {/* Gerenciamento do Menu */}
+        <Route path="menu" element={<SuspenseWrapper><MenuPage /></SuspenseWrapper>} />
+        
         {/* Rotas temporárias para outras seções */}
         <Route path="blog" element={
           <SuspenseWrapper>
@@ -123,11 +127,6 @@ function AppRoutes() {
         <Route path="depoimentos" element={
           <SuspenseWrapper>
             <div className="p-4">Gerenciamento de Depoimentos - Em desenvolvimento</div>
-          </SuspenseWrapper>
-        } />
-        <Route path="menu" element={
-          <SuspenseWrapper>
-            <div className="p-4">Gerenciamento de Menu - Em desenvolvimento</div>
           </SuspenseWrapper>
         } />
         
