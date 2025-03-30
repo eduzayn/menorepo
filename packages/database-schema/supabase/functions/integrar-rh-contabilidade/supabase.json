@@ -1,0 +1,10 @@
+{
+  "name": "integrar-rh-contabilidade",
+  "version": "1.0.0",
+  "description": "Função para integração entre módulos RH e Contabilidade",
+  "runtime": "deno",
+  "entrypoint": "index.ts",
+  "verify_jwt": true,
+  "max_scale": 1,
+  "min_scale": 0
+} 

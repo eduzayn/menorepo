@@ -11,6 +11,7 @@ import ImpostosFiscais from './pages/ImpostosFiscais';
 import IntegracaoFinanceira from './pages/IntegracaoFinanceira';
 import IntegracaoRh from './pages/IntegracaoRh';
 import AuditoriaFiscal from './pages/AuditoriaFiscal';
+import TesteIntegracoes from './pages/TesteIntegracoes';
 import NotFoundPage from './pages/NotFoundPage';
 
 /**
@@ -76,6 +77,12 @@ export function ContabilidadeRoutes({ basePath = '' }: ContabilidadeRoutesProps)
         element={<AuditoriaFiscal />} 
       />
       
+      {/* Testes de Integração */}
+      <Route 
+        path={`${basePath}/teste-integracoes`} 
+        element={<TesteIntegracoes />} 
+      />
+      
       {/* Rota para capturar URLs inválidas dentro do módulo */}
       <Route 
         path={`${basePath}/*`} 
@@ -136,6 +143,12 @@ export const CONTABILIDADE_ROUTES = {
     path: '/auditoria-fiscal',
     label: 'Auditoria Fiscal',
     icon: 'search',
+    permissions: ['contador', 'super_admin'] as UserRole[]
+  },
+  testeIntegracoes: {
+    path: '/teste-integracoes',
+    label: 'Testes de Integração',
+    icon: 'activity',
     permissions: ['contador', 'super_admin'] as UserRole[]
   }
 }; 
