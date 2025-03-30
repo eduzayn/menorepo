@@ -173,6 +173,7 @@ O cumprimento desta estrutura garante consistência e facilita a navegação ent
 - Reuse componentes do **ui-components** sempre que possível
 - Utilize o cliente **api-client** para todas as chamadas ao backend
 - Implemente testes para todos os novos componentes e lógica de negócio
+- **Siga as diretrizes de teste** documentadas em `packages/test-config/docs/DIRETRIZES-DE-TESTE.md`
 - **Verificação ortográfica**: Para documentação em português, utilize o script `scripts/fix-spelling.bat` para garantir que o verificador ortográfico esteja configurado corretamente. Mais detalhes em `docs/configuracao-ortografia.md`.
 
 ## Estratégia de Integração

@@ -81,6 +81,9 @@ importers:
         specifier: ^3.22.4
         version: 3.24.2
     devDependencies:
+      '@edunexia/test-config':
+        specifier: workspace:*
+        version: link:../../packages/test-config
       '@types/node':
         specifier: ^20.6.3
         version: 20.17.28
@@ -229,6 +232,9 @@ importers:
       '@edunexia/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint-config
+      '@edunexia/test-config':
+        specifier: workspace:*
+        version: link:../../packages/test-config
       '@edunexia/typescript-config':
         specifier: workspace:*
         version: link:../../packages/typescript-config
@@ -374,6 +380,9 @@ importers:
       '@edunexia/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint-config
+      '@edunexia/test-config':
+        specifier: workspace:*
+        version: link:../../packages/test-config
       '@edunexia/typescript-config':
         specifier: workspace:*
         version: link:../../packages/typescript-config
@@ -419,6 +428,9 @@ importers:
       vite:
         specifier: ^5.0.8
         version: 5.4.15(@types/node@20.17.28)
+      vitest:
+        specifier: ^0.34.6
+        version: 0.34.6(jsdom@22.1.0)
 
   apps/material-didatico:
     dependencies:
@@ -480,6 +492,9 @@ importers:
         specifier: ^3.22.4
         version: 3.24.2
     devDependencies:
+      '@edunexia/test-config':
+        specifier: workspace:*
+        version: link:../../packages/test-config
       '@types/node':
         specifier: ^20.11.16
         version: 20.17.28
@@ -522,6 +537,9 @@ importers:
       vite:
         specifier: ^5.0.8
         version: 5.4.15(@types/node@20.17.28)
+      vitest:
+        specifier: ^0.34.6
+        version: 0.34.6(jsdom@22.1.0)
 
   apps/matriculas:
     dependencies:
@@ -662,6 +680,9 @@ importers:
         specifier: ^6.18.0
         version: 6.30.0(react-dom@18.3.1)(react@18.3.1)
     devDependencies:
+      '@edunexia/test-config':
+        specifier: workspace:*
+        version: link:../../packages/test-config
       '@types/node':
         specifier: ^20.6.3
         version: 20.17.28
@@ -750,6 +771,9 @@ importers:
       '@edunexia/eslint-config':
         specifier: '*'
         version: link:../../packages/eslint-config
+      '@edunexia/test-config':
+        specifier: workspace:*
+        version: link:../../packages/test-config
       '@edunexia/typescript-config':
         specifier: '*'
         version: link:../../packages/typescript-config
@@ -798,6 +822,9 @@ importers:
       vite:
         specifier: ^4.5.0
         version: 4.5.10(@types/node@20.17.28)
+      vitest:
+        specifier: ^0.34.6
+        version: 0.34.6(jsdom@22.1.0)
 
   apps/portal-parceiro:
     dependencies:
@@ -841,6 +868,15 @@ importers:
         specifier: ^2.8.0
         version: 2.15.1(react-dom@18.3.1)(react@18.3.1)
     devDependencies:
+      '@edunexia/eslint-config':
+        specifier: workspace:*
+        version: link:../../packages/eslint-config
+      '@edunexia/test-config':
+        specifier: workspace:*
+        version: link:../../packages/test-config
+      '@edunexia/typescript-config':
+        specifier: workspace:*
+        version: link:../../packages/typescript-config
       '@types/react':
         specifier: ^18.2.15
         version: 18.3.20
@@ -868,6 +904,9 @@ importers:
       vite:
         specifier: ^4.4.5
         version: 4.5.10(@types/node@20.17.28)
+      vitest:
+        specifier: ^0.34.6
+        version: 0.34.6(jsdom@22.1.0)
 
   apps/portal-polo:
     dependencies:
@@ -896,6 +935,15 @@ importers:
         specifier: ^6.22.3
         version: 6.30.0(react-dom@18.3.1)(react@18.3.1)
     devDependencies:
+      '@edunexia/eslint-config':
+        specifier: workspace:*
+        version: link:../../packages/eslint-config
+      '@edunexia/test-config':
+        specifier: workspace:*
+        version: link:../../packages/test-config
+      '@edunexia/typescript-config':
+        specifier: workspace:*
+        version: link:../../packages/typescript-config
       '@types/node':
         specifier: ^20.11.16
         version: 20.17.28
@@ -938,6 +986,9 @@ importers:
       vite:
         specifier: ^5.1.0
         version: 5.4.15(@types/node@20.17.28)
+      vitest:
+        specifier: ^0.34.6
+        version: 0.34.6(jsdom@22.1.0)
 
   apps/rh:
     dependencies:
@@ -990,6 +1041,9 @@ importers:
       '@edunexia/tailwind-config':
         specifier: workspace:^
         version: link:../../packages/tailwind-config
+      '@edunexia/test-config':
+        specifier: workspace:^
+        version: link:../../packages/test-config
       '@edunexia/typescript-config':
         specifier: workspace:^
         version: link:../../packages/typescript-config
@@ -1069,6 +1123,9 @@ importers:
       '@edunexia/tailwind-config':
         specifier: '*'
         version: link:../../packages/tailwind-config
+      '@edunexia/test-config':
+        specifier: workspace:*
+        version: link:../../packages/test-config
       '@edunexia/typescript-config':
         specifier: '*'
         version: link:../../packages/typescript-config
@@ -1185,9 +1242,21 @@ importers:
       '@edunexia/eslint-config':
         specifier: workspace:*
         version: link:../eslint-config
+      '@edunexia/test-config':
+        specifier: workspace:*
+        version: link:../test-config
       '@edunexia/typescript-config':
         specifier: workspace:*
         version: link:../typescript-config
+      '@testing-library/jest-dom':
+        specifier: ^6.6.3
+        version: 6.6.3
+      '@testing-library/react':
+        specifier: ^14.0.0
+        version: 14.3.1(@types/react@18.3.20)(react-dom@18.3.1)(react@18.3.1)
+      '@testing-library/react-hooks':
+        specifier: ^8.0.1
+        version: 8.0.1(@types/react@18.3.20)(react-dom@18.3.1)(react@18.3.1)
       '@types/react':
         specifier: ^18.2.15
         version: 18.3.20
@@ -1203,6 +1272,9 @@ importers:
       typescript:
         specifier: ^5.0.2
         version: 5.8.2
+      vitest:
+        specifier: ^0.34.6
+        version: 0.34.6(jsdom@22.1.0)
 
   packages/core:
     dependencies:
@@ -4109,6 +4181,29 @@ packages:
       dom-accessibility-api: 0.6.3
       lodash: 4.17.21
       redent: 3.0.0
+
+  /@testing-library/react-hooks@8.0.1(@types/react@18.3.20)(react-dom@18.3.1)(react@18.3.1):
+    resolution: {integrity: sha512-Aqhl2IVmLt8IovEVarNDFuJDVWVvhnr9/GCU6UUnrYXwgDFF9h2L2o2P9KBni1AST5sT6riAyoukFLyjQUgD/g==}
+    engines: {node: '>=12'}
+    peerDependencies:
+      '@types/react': ^16.9.0 || ^17.0.0
+      react: ^16.9.0 || ^17.0.0
+      react-dom: ^16.9.0 || ^17.0.0
+      react-test-renderer: ^16.9.0 || ^17.0.0
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+      react-dom:
+        optional: true
+      react-test-renderer:
+        optional: true
+    dependencies:
+      '@babel/runtime': 7.27.0
+      '@types/react': 18.3.20
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+      react-error-boundary: 3.1.4(react@18.3.1)
+    dev: true
 
   /@testing-library/react@14.3.1(@types/react@18.3.20)(react-dom@18.3.1)(react@18.3.1):
     resolution: {integrity: sha512-H99XjUhWQw0lTgyMN05W3xQG1Nh4lq574D8keFf1dDoNTJgp66VbJozRaczoF+wsiaPJNt/TcnfpLGufGxSrZQ==}
@@ -9241,6 +9336,16 @@ packages:
       loose-envify: 1.4.0
       react: 18.3.1
       scheduler: 0.23.2
+
+  /react-error-boundary@3.1.4(react@18.3.1):
+    resolution: {integrity: sha512-uM9uPzZJTF6wRQORmSrvOIgt4lJ9MC1sNgEOj2XGsDTRE4kmpWxg7ENK9EWNKJRMAOY9z0MuF4yIfl6gp4sotA==}
+    engines: {node: '>=10', npm: '>=6'}
+    peerDependencies:
+      react: '>=16.13.1'
+    dependencies:
+      '@babel/runtime': 7.27.0
+      react: 18.3.1
+    dev: true
 
   /react-hook-form@7.55.0(react@18.3.1):
     resolution: {integrity: sha512-XRnjsH3GVMQz1moZTW53MxfoWN7aDpUg/GpVNc4A3eXRVNdGXfbzJ4vM4aLQ8g6XCUh1nIbx70aaNCl7kxnjog==}
