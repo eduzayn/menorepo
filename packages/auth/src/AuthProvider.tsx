@@ -1,186 +1,328 @@
-import { SupabaseClient, User } from '@supabase/supabase-js';
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { FC, ReactNode, useCallback, useEffect, useState } from 'react';
+import { SupabaseClient } from '@supabase/supabase-js';
+import { 
+  User, 
+  UserSession, 
+  AuthCredentials, 
+  AuthResponse 
+} from './types';
+import { AuthContext } from './hooks/AuthContext';
 
-import { createSupabaseClient } from './supabase-client';
-// Usar tipos internos enquanto não resolvemos a dependência circular
-type ModuleName = 'MATRICULAS' | 'PORTAL_ALUNO' | 'COMUNICACAO' | 'FINANCEIRO' | 'PORTAL_PARCEIRO';
-
-// Constantes para rotas
-const ROUTE_PREFIXES = {
-  MATRICULAS: '/matriculas',
-  PORTAL_ALUNO: '/aluno',
-  COMUNICACAO: '/comunicacao',
-  FINANCEIRO: '/financeiro',
-  PORTAL_PARCEIRO: '/parceiro',
-  AUTH: '/auth'
-};
-
-export interface AuthContextType {
-  user: User | null;
-  session: any | null;
-  loading: boolean;
-  isAuthenticated: boolean;
-  hasRole: (role: string | string[]) => boolean;
-  hasPermission: (permission: string | string[]) => boolean;
-  loginWithEmailAndPassword: (email: string, password: string) => Promise<any>;
-  loginWithOAuth: (provider: string) => Promise<any>;
-  logout: () => Promise<any>;
-  getCurrentUser: () => Promise<User | null>;
-  forgotPassword: (email: string) => Promise<any>;
-  resetPassword: (password: string) => Promise<any>;
-  loginPath: string;
-  moduleName: ModuleName;
+// Propriedades do AuthProvider
+interface AuthProviderProps {
+  children: ReactNode;
+  supabaseClient: SupabaseClient;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-export interface AuthProviderProps {
-  children: React.ReactNode;
-  supabaseClient?: SupabaseClient;
-  moduleName?: ModuleName;
-}
-
-export const AuthProvider: React.FC<AuthProviderProps> = ({
-  children,
-  supabaseClient,
-  moduleName = 'MATRICULAS'
-}) => {
-  const client = supabaseClient || createSupabaseClient();
+/**
+ * Provider de autenticação que encapsula toda a lógica de auth e gerenciamento de sessão
+ */
+export const AuthProvider: FC<AuthProviderProps> = ({ children, supabaseClient }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<any | null>(null);
+  const [session, setSession] = useState<UserSession | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  
-  // Gerar path de login baseado no módulo atual
-  const loginPath = `${ROUTE_PREFIXES[moduleName]}${ROUTE_PREFIXES.AUTH}/login`;
+  const [error, setError] = useState<Error | null>(null);
 
+  /**
+   * Verifica se há sessão ativa ao carregar o componente
+   */
   useEffect(() => {
-    const fetchSession = async () => {
+    const checkSession = async () => {
+      setLoading(true);
+      
       try {
-        const { data, error } = await client.auth.getSession();
-        if (error) {
-          console.error('Erro ao obter sessão:', error);
-          return;
+        // Verificar sessão atual
+        const { data, error: sessionError } = await supabaseClient.auth.getSession();
+        
+        if (sessionError) {
+          throw sessionError;
         }
+        
+        const currentSession = data.session;
+        
+        if (currentSession) {
+          // Buscar dados do usuário se há sessão
+          const { data: userData, error: userError } = await supabaseClient
+            .from('usuarios')
+            .select('*, perfil_detalhes:perfis(*)')
+            .eq('id', currentSession.user.id)
+            .single();
+            
+          if (userError) {
+            throw userError;
+          }
 
-        if (data?.session) {
-          setSession(data.session);
-          setUser(data.session.user);
+          // Se há dados do usuário, atualiza o estado
+          if (userData) {
+            setUser(userData as User);
+            
+            // Armazenar sessão
+            const userSession: UserSession = {
+              user: userData as User,
+              token: {
+                access_token: currentSession.access_token,
+                refresh_token: currentSession.refresh_token || '',
+                expires_at: new Date(currentSession.expires_at || 0).getTime(),
+                token_type: currentSession.token_type
+              },
+              expires_at: new Date(currentSession.expires_at || 0).getTime()
+            };
+            
+            setSession(userSession);
+          }
         }
-      } catch (error) {
-        console.error('Erro ao verificar autenticação:', error);
+      } catch (err) {
+        console.error('Erro ao verificar autenticação:', err);
+        setError(err instanceof Error ? err : new Error('Erro desconhecido ao verificar sessão'));
       } finally {
         setLoading(false);
       }
     };
 
-    fetchSession();
-
-    // Configurar listener para mudanças de autenticação
-    const { data: authListener } = client.auth.onAuthStateChange(
-      async (event, session) => {
-        if (session) {
-          setSession(session);
-          setUser(session.user);
-        } else {
-          setSession(null);
+    checkSession();
+    
+    // Configurar listener para alterações de autenticação
+    const { data: authListener } = supabaseClient.auth.onAuthStateChange(
+      async (event, currentSession) => {
+        if (event === 'SIGNED_IN' && currentSession) {
+          // Atualizar usuário e sessão quando há login
+          const { data: userData, error: userError } = await supabaseClient
+            .from('usuarios')
+            .select('*, perfil_detalhes:perfis(*)')
+            .eq('id', currentSession.user.id)
+            .single();
+            
+          if (userError) {
+            console.error('Erro ao buscar dados do usuário:', userError);
+            return;
+          }
+            
+          if (userData) {
+            setUser(userData as User);
+            
+            const userSession: UserSession = {
+              user: userData as User,
+              token: {
+                access_token: currentSession.access_token,
+                refresh_token: currentSession.refresh_token || '',
+                expires_at: new Date(currentSession.expires_at || 0).getTime(),
+                token_type: currentSession.token_type
+              },
+              expires_at: new Date(currentSession.expires_at || 0).getTime()
+            };
+            
+            setSession(userSession);
+          }
+        } else if (event === 'SIGNED_OUT') {
+          // Limpar usuário e sessão quando há logout
           setUser(null);
+          setSession(null);
         }
-        setLoading(false);
       }
     );
 
+    // Cleanup do listener
     return () => {
-      authListener?.subscription.unsubscribe();
+      authListener?.subscription?.unsubscribe();
     };
-  }, [client]);
+  }, [supabaseClient]);
 
-  // Função para verificar funções do usuário
-  const hasRole = (role: string | string[]): boolean => {
-    if (!user) return false;
+  /**
+   * Realiza login com email e senha
+   */
+  const signIn = useCallback(async (credentials: AuthCredentials): Promise<AuthResponse> => {
+    setLoading(true);
+    setError(null);
     
-    // Implementação simulada - na prática, isso verificaria as funções do usuário no JWT
-    const userRoles = user.app_metadata?.roles || [];
+    try {
+      // Autenticar com email e senha
+      const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({
+        email: credentials.email,
+        password: credentials.password
+      });
+      
+      if (authError) {
+        throw authError;
+      }
+      
+      if (!authData?.session) {
+        throw new Error('Sessão inválida após login');
+      }
+      
+      // Buscar dados completos do usuário
+      const { data: userData, error: userError } = await supabaseClient
+        .from('usuarios')
+        .select('*, perfil_detalhes:perfis(*)')
+        .eq('id', authData.user.id)
+        .single();
+        
+      if (userError) {
+        throw userError;
+      }
+      
+      if (!userData) {
+        throw new Error('Dados do usuário não encontrados');
+      }
+      
+      // Criar sessão e atualizar estado
+      const user = userData as User;
+      const userSession: UserSession = {
+        user,
+        token: {
+          access_token: authData.session.access_token,
+          refresh_token: authData.session.refresh_token,
+          expires_at: new Date(authData.session.expires_at || 0).getTime(),
+          token_type: authData.session.token_type
+        },
+        expires_at: new Date(authData.session.expires_at || 0).getTime()
+      };
+      
+      setUser(user);
+      setSession(userSession);
+      
+      return {
+        user,
+        session: userSession,
+        error: null
+      };
+    } catch (err) {
+      console.error('Erro ao realizar login:', err);
+      const errorObj = err instanceof Error ? err : new Error('Erro desconhecido ao realizar login');
+      setError(errorObj);
+      
+      throw errorObj;
+    } finally {
+      setLoading(false);
+    }
+  }, [supabaseClient]);
+
+  /**
+   * Realiza logout do usuário
+   */
+  const signOut = useCallback(async (): Promise<{ success: boolean, error: Error | null }> => {
+    setLoading(true);
     
-    if (Array.isArray(role)) {
-      return role.some(r => userRoles.includes(r));
+    try {
+      const { error: signOutError } = await supabaseClient.auth.signOut();
+      
+      if (signOutError) {
+        throw signOutError;
+      }
+      
+      // Limpar estados
+      setUser(null);
+      setSession(null);
+      
+      return {
+        success: true,
+        error: null
+      };
+    } catch (err) {
+      console.error('Erro ao realizar logout:', err);
+      const errorObj = err instanceof Error ? err : new Error('Erro desconhecido ao realizar logout');
+      setError(errorObj);
+      
+      throw errorObj;
+    } finally {
+      setLoading(false);
+    }
+  }, [supabaseClient]);
+
+  /**
+   * Verifica se o usuário tem uma permissão específica
+   */
+  const hasPermission = useCallback((permission: string): boolean => {
+    if (!user || !user.permissoes) {
+      return false;
     }
     
-    return userRoles.includes(role);
-  };
+    return user.permissoes.includes(permission);
+  }, [user]);
 
-  // Função para verificar permissões do usuário
-  const hasPermission = (permission: string | string[]): boolean => {
-    if (!user) return false;
-    
-    // Implementação simulada - na prática, isso verificaria as permissões do usuário no JWT
-    const userPermissions = user.app_metadata?.permissions || [];
-    
-    if (Array.isArray(permission)) {
-      return permission.some(p => userPermissions.includes(p));
+  /**
+   * Verifica se o usuário tem um perfil específico
+   */
+  const hasRole = useCallback((role: string): boolean => {
+    if (!user) {
+      return false;
     }
     
-    return userPermissions.includes(permission);
-  };
+    // Mapeamento de hierarquia de papéis
+    const roles: Record<string, string[]> = {
+      admin: ['admin'],
+      gestor: ['admin', 'gestor'],
+      coordenador: ['admin', 'gestor', 'coordenador'],
+      professor: ['admin', 'gestor', 'coordenador', 'professor'],
+      tutor: ['admin', 'gestor', 'coordenador', 'professor', 'tutor'],
+      secretaria: ['admin', 'gestor', 'secretaria'],
+      financeiro: ['admin', 'gestor', 'financeiro'],
+      aluno: ['aluno'],
+      parceiro: ['parceiro'],
+      visitante: ['admin', 'gestor', 'coordenador', 'professor', 'tutor', 'secretaria', 'financeiro', 'aluno', 'parceiro', 'visitante']
+    };
+    
+    // Verificar se o perfil do usuário está na lista de perfis permitidos
+    return roles[role]?.includes(user.perfil) || false;
+  }, [user]);
 
-  // Login com e-mail e senha
-  const loginWithEmailAndPassword = async (email: string, password: string) => {
-    return client.auth.signInWithPassword({ email, password });
-  };
+  /**
+   * Atualiza dados do perfil do usuário
+   */
+  const updateProfile = useCallback(async (
+    profileData: Partial<User>
+  ): Promise<{ success: boolean, error: Error | null }> => {
+    if (!user) {
+      return {
+        success: false,
+        error: new Error('Usuário não autenticado')
+      };
+    }
+    
+    try {
+      const { error: updateError } = await supabaseClient
+        .from('usuarios')
+        .update(profileData)
+        .eq('id', user.id);
+        
+      if (updateError) {
+        throw updateError;
+      }
+      
+      // Atualizar estado do usuário com novos dados
+      setUser(currentUser => {
+        if (!currentUser) return null;
+        return { ...currentUser, ...profileData };
+      });
+      
+      return {
+        success: true,
+        error: null
+      };
+    } catch (err) {
+      console.error('Erro ao atualizar perfil:', err);
+      const errorObj = err instanceof Error ? err : new Error('Erro desconhecido ao atualizar perfil');
+      
+      throw errorObj;
+    }
+  }, [supabaseClient, user]);
 
-  // Login com OAuth
-  const loginWithOAuth = async (provider: string) => {
-    return client.auth.signInWithOAuth({ provider: provider as any });
-  };
-
-  // Logout
-  const logout = async () => {
-    return client.auth.signOut();
-  };
-
-  // Recuperação de senha
-  const forgotPassword = async (email: string) => {
-    return client.auth.resetPasswordForEmail(email);
-  };
-
-  // Redefinição de senha
-  const resetPassword = async (password: string) => {
-    return client.auth.updateUser({ password });
-  };
-
-  // Obter usuário atual
-  const getCurrentUser = async () => {
-    const { data } = await client.auth.getUser();
-    return data?.user || null;
-  };
-
-  const value = {
+  // Valor do contexto de autenticação
+  const authContextValue = {
     user,
     session,
     loading,
+    error,
     isAuthenticated: !!user,
-    hasRole,
+    signIn,
+    signOut,
     hasPermission,
-    loginWithEmailAndPassword,
-    loginWithOAuth,
-    logout,
-    getCurrentUser,
-    forgotPassword,
-    resetPassword,
-    loginPath,
-    moduleName
+    hasRole,
+    updateProfile
   };
 
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider value={authContextValue}>
       {children}
     </AuthContext.Provider>
   );
-};
-
-export const useAuth = (): AuthContextType => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
 }; 
