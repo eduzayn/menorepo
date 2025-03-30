@@ -4,14 +4,31 @@
  * Utilitários compartilhados para a plataforma Edunéxia
  */
 
-// Exporta todas as funções essenciais 
-export * from './utils/index';
+// Exportações de utils/index com nomes específicos para evitar ambiguidade
+export {
+  // Funções essenciais que não conflitam 
+  cn,
+  generateId,
+  delay,
+  slugify,
+  removeNullValues,
+  groupBy,
+  sortBy,
+  deepMerge,
+  debounce,
+  throttle,
+  shuffle,
+  uniqueArray,
+  removeAccents
+} from './utils/index';
 
-// Comentado para evitar conflitos de exportação
-// export * from './formatters';
+// Exportar formatters individualmente ou como namespace
+import * as formattersModule from './formatters';
+export const formatters = formattersModule;
 
-// Exporta todas as funções específicas de validação
-export * from './validators';
+// Exportar validators individualmente ou como namespace
+import * as validatorsModule from './validators';
+export const validators = validatorsModule;
 
 // Função de exemplo
 export function formatarData(data: Date): string {
@@ -45,5 +62,7 @@ export function gerarSlug(texto: string): string {
 export default {
   formatarData,
   formatarMoeda,
-  gerarSlug
+  gerarSlug,
+  formatters,
+  validators
 }; 
