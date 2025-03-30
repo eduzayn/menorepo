@@ -1,16 +1,8 @@
-import React, { createContext, useContext, useMemo } from 'react'
+import React, { useContext, useMemo } from 'react'
 import { createClient } from '@supabase/supabase-js'
-import { ApiContextValue, ApiProviderProps, TypedSupabaseClient } from './types'
+import { ApiProviderProps, TypedSupabaseClient } from './types'
+import { ApiContext } from './context'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-
-/**
- * Contexto da API
- */
-const ApiContext = createContext<ApiContextValue>({
-  supabase: null,
-  supabaseUrl: '',
-  supabaseKey: ''
-})
 
 /**
  * Hook para acessar o cliente da API
@@ -46,7 +38,7 @@ export const ApiProvider: React.FC<ApiProviderProps> = ({
   }, [queryClient])
   
   // Criar o valor do contexto
-  const value = useMemo<ApiContextValue>(() => ({
+  const value = useMemo(() => ({
     supabase,
     supabaseUrl,
     supabaseKey

@@ -1,6 +1,6 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from '@edunexia/database-schema';
-import { ApiError } from './types';
+import { ApiError, ApiErrorType } from './types';
 
 export interface ApiClientOptions {
   /**
@@ -16,7 +16,7 @@ export interface ApiClientOptions {
   /**
    * Função para tratamento de logs de erros (opcional)
    */
-  onError?: (error: ApiError) => void;
+  onError?: (error: ApiErrorType) => void;
   
   /**
    * Ativar logs para depuração
@@ -30,6 +30,11 @@ export interface ApiClientOptions {
 export class ApiClient {
   private client: SupabaseClient<Database>;
   private options: ApiClientOptions;
+  
+  /**
+   * Instância global para uso interno
+   */
+  static instance: ApiClient;
 
   constructor(options: ApiClientOptions) {
     this.options = options;
@@ -49,8 +54,8 @@ export class ApiClient {
   /**
    * Gerencia o tratamento de erros de forma consistente
    */
-  handleError(error: unknown, operation: string): ApiError {
-    const apiError: ApiError = {
+  handleError(error: unknown, operation: string): ApiErrorType {
+    const apiError: ApiErrorType = {
       message: error instanceof Error ? error.message : 'Erro desconhecido',
       operation,
       timestamp: new Date(),
@@ -105,7 +110,7 @@ export class ApiClient {
    * 
    * Substituto do db, evitando problemas de tipagem
    */
-  from<T extends keyof Database['public']['Tables']>(
+  from<T extends string>(
     table: T
   ) {
     return this.client.from(table);
@@ -133,11 +138,20 @@ export class ApiClient {
   get functions() {
     return this.client.functions;
   }
+
+  /**
+   * Wrapper para funções RPC do Supabase
+   */
+  rpc(fnName: string, params?: Record<string, any>) {
+    return this.client.rpc(fnName, params);
+  }
 }
 
 /**
  * Cria uma instância do cliente de API
  */
 export function createApiClient(options: ApiClientOptions): ApiClient {
-  return new ApiClient(options);
+  const client = new ApiClient(options);
+  ApiClient.instance = client; // Define a instância global
+  return client;
 } 

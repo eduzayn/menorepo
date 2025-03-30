@@ -2,7 +2,7 @@
  * Hooks para o cliente API
  */
 
-import { useState, useEffect, useContext } from 'react'
+import { useContext } from 'react'
 import { useQuery, useMutation } from '@tanstack/react-query'
 import { ApiContext } from '../providers/context'
 import { SupabaseClient } from '@supabase/supabase-js'

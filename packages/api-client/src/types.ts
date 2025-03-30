@@ -4,7 +4,7 @@ import type { Database } from '@edunexia/database-schema';
 /**
  * Erro padrão da API para tratamento consistente
  */
-export interface ApiError {
+export interface ApiErrorType {
   /**
    * Mensagem de erro legível
    */
@@ -37,6 +37,30 @@ export interface ApiError {
 }
 
 /**
+ * Classe de erro da API para tratamento consistente
+ */
+export class ApiError extends Error implements ApiErrorType {
+  operation: string;
+  timestamp: Date;
+  originalError?: unknown;
+  code?: string;
+  details?: Record<string, unknown>;
+
+  constructor(message: string, originalError?: unknown, operation: string = 'unknown') {
+    super(message);
+    this.name = 'ApiError';
+    this.operation = operation;
+    this.timestamp = new Date();
+    this.originalError = originalError;
+    
+    // Mantém a stack trace correta no Node.js
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, ApiError);
+    }
+  }
+}
+
+/**
  * Status de uma requisição para controle de estado
  */
 export type RequestStatus = 'idle' | 'loading' | 'success' | 'error';
@@ -63,7 +87,7 @@ export interface ApiResponse<T> {
   /**
    * Erro da operação (se houver)
    */
-  error: ApiError | null;
+  error: ApiErrorType | null;
 
   /**
    * Status da requisição
@@ -88,7 +112,7 @@ export type ApiClient = {
   /**
    * Função para tratar erros de forma consistente
    */
-  handleError: (error: unknown, operation: string) => ApiError;
+  handleError: (error: unknown, operation: string) => ApiErrorType;
 
   /**
    * Executa operações com tratamento de erros padronizado

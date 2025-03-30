@@ -33,8 +33,8 @@ describe('ApiClient', () => {
   };
 
   let client: ApiClient;
-  let mockConsoleError: ReturnType<typeof vi.fn>;
-  let mockConsoleInfo: ReturnType<typeof vi.fn>;
+  let mockConsoleError: any;
+  let mockConsoleInfo: any;
   let mockOnError: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
@@ -73,7 +73,7 @@ describe('ApiClient', () => {
   });
 
   it('deve fornecer método from para acesso às tabelas', () => {
-    const query = client.from('users');
+    const query = client.from('matriculas');
     expect(query).toBeDefined();
   });
 
