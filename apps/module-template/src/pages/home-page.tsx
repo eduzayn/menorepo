@@ -1,14 +1,20 @@
 import React from 'react';
-import { 
-  DashboardLayout, 
-  PageHeader, 
-  useAuth,
-  useNavigation,
-  Loader 
-} from '@edunexia/core';
 import { Link } from 'react-router-dom';
 import { Button } from '@edunexia/ui-components';
+import { useAuth } from '@edunexia/auth';
+import { DashboardLayout, PageHeader, Loader } from '@edunexia/ui-components';
 import { useListItems } from '../hooks/use-list-items';
+
+/**
+ * Hook simulado para substituir a dependência inexistente
+ */
+const useNavigation = () => {
+  return {
+    navigateToModule: (module: string) => {
+      window.location.href = `/${module}`;
+    }
+  };
+};
 
 /**
  * Página inicial do módulo, exibe a listagem dos itens

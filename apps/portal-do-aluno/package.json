@@ -13,7 +13,6 @@
   "dependencies": {
     "@edunexia/api-client": "workspace:*",
     "@edunexia/auth": "*",
-    "@edunexia/core": "*",
     "@edunexia/core-types": "*",
     "@edunexia/database-schema": "workspace:*",
     "@edunexia/ui-components": "workspace:*",

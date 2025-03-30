@@ -13,7 +13,6 @@
   },
   "dependencies": {
     "@edunexia/api-client": "*",
-    "@edunexia/core": "*",
     "@edunexia/core-types": "*",
     "@edunexia/ui-components": "*",
     "@edunexia/utils": "*",
