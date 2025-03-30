@@ -1,7 +1,8 @@
 import { describe, it, expect } from 'vitest';
+import { render, screen } from '@edunexia/test-config';
 
-describe('Teste de exemplo', () => {
-  it('deve somar 2 + 2 corretamente', () => {
-    expect(2 + 2).toBe(4);
+describe('Exemplo', () => {
+  it('deve funcionar corretamente', () => {
+    expect(1 + 1).toBe(2);
   });
 }); 

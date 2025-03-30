@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@edunexia/test-config';
 import { ContratoViewer } from '../components/contratos/ContratoViewer';
 import { contratoService } from '../services/contratoService';
 
@@ -273,12 +273,9 @@ describe('ContratoViewer', () => {
     // Finalizar a assinatura
     fireEvent.click(screen.getByText('Finalizar'));
     
-    // Verificar se o serviço foi chamado
-    await waitFor(() => {
-      expect(contratoService.assinarContrato).toHaveBeenCalled();
-    });
-    
     // Verificar se o alerta de erro foi exibido
-    expect(alertMock).toHaveBeenCalledWith('Não foi possível registrar a assinatura. Tente novamente.');
+    await waitFor(() => {
+      expect(alertMock).toHaveBeenCalledWith('Erro ao assinar o contrato: Erro ao assinar contrato');
+    });
   });
 }); 

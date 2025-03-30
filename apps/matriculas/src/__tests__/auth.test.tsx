@@ -1,38 +1,52 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, mockSupabaseClient, testUser, testSession } from '@edunexia/test-config';
-import React from 'react';
+import { describe, it, expect, vi } from 'vitest';
+import { render, screen, waitFor } from '@edunexia/test-config';
+import { AuthProvider, useAuth } from '@edunexia/auth';
 
-// Componente de exemplo para teste
-const PerfilUsuario = ({ usuarioId }: { usuarioId: string }) => {
-  // Este é apenas um componente de exemplo
+// Mock do componente de autenticação
+const TestAuthComponent = () => {
+  const { user, signIn, signOut } = useAuth();
+  
   return (
     <div>
-      <h1>Perfil do Usuário</h1>
-      <p data-testid="usuario-id">ID: {usuarioId}</p>
-      <button>Editar Perfil</button>
+      {user ? (
+        <>
+          <p>Usuário logado: {user.email}</p>
+          <button onClick={signOut}>Sair</button>
+        </>
+      ) : (
+        <>
+          <p>Usuário não logado</p>
+          <button onClick={() => signIn({ email: 'teste@exemplo.com', password: '123456' })}>
+            Entrar
+          </button>
+        </>
+      )}
     </div>
   );
 };
 
-// Mock do módulo de API
-vi.mock('@edunexia/api-client', () => ({
-  useSupabaseClient: () => mockSupabaseClient({
-    authSession: testSession,
-    userData: testUser,
-  }),
-}));
+// Mock da biblioteca de autenticação
+vi.mock('@edunexia/auth', async () => {
+  const actual = await vi.importActual('@edunexia/auth');
+  
+  return {
+    ...actual,
+    useAuth: vi.fn().mockReturnValue({
+      user: null,
+      signIn: vi.fn(),
+      signOut: vi.fn()
+    })
+  };
+});
 
 describe('Autenticação', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it('deve renderizar o perfil do usuário com dados de mock', () => {
-    render(<PerfilUsuario usuarioId={testUser.id} />);
+  it('deve renderizar o componente com usuário não logado', () => {
+    render(
+      <AuthProvider>
+        <TestAuthComponent />
+      </AuthProvider>
+    );
     
-    // Verificar se os elementos foram renderizados
-    expect(screen.getByText('Perfil do Usuário')).toBeInTheDocument();
-    expect(screen.getByTestId('usuario-id').textContent).toContain(testUser.id);
-    expect(screen.getByRole('button', { name: 'Editar Perfil' })).toBeInTheDocument();
+    expect(screen.getByText('Usuário não logado')).toBeInTheDocument();
   });
 }); 
