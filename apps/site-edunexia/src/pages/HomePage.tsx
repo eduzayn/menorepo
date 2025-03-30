@@ -3,7 +3,7 @@ import { usePublishedPages } from '../hooks/usePages';
 import { usePublishedBlogPosts } from '../hooks/useBlog';
 import BlogPostCard from '../components/BlogPostCard';
 
-export function HomePage() {
+export default function HomePage() {
   const { data: pagesData } = usePublishedPages();
   const { data: blogData } = usePublishedBlogPosts({ limit: 3 });
   
@@ -31,7 +31,7 @@ export function HomePage() {
           </div>
           <div className="flex justify-center">
             <img 
-              src="https://via.placeholder.com/600x400?text=Edunexia+Platform" 
+              src="https://placehold.co/600x400?text=Edunexia+Platform" 
               alt="Plataforma Edunéxia" 
               className="w-full max-w-lg rounded-lg shadow-md"
             />
@@ -167,7 +167,7 @@ export function HomePage() {
                 {page.featured_image_url && (
                   <div className="mb-4 overflow-hidden rounded-lg">
                     <img 
-                      src={page.featured_image_url} 
+                      src={page.featured_image_url.replace('via.placeholder.com', 'placehold.co')} 
                       alt={page.title} 
                       className="w-full h-48 object-cover group-hover:scale-105 transition duration-300"
                     />
@@ -198,16 +198,16 @@ export function HomePage() {
           <p className="text-xl mb-8 max-w-2xl mx-auto">
             Agende uma demonstração e descubra como a Edunéxia pode otimizar seus processos educacionais.
           </p>
-          <Link 
-            to="/contato" 
-            className="inline-block px-8 py-4 bg-white text-primary-600 font-medium rounded-md hover:bg-gray-100 transition"
-          >
-            Fale com um especialista
-          </Link>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link to="/contato" className="px-6 py-3 bg-white text-primary-600 font-medium rounded-md hover:bg-gray-100 transition text-center">
+              Agende uma demonstração
+            </Link>
+            <Link to="/planos" className="px-6 py-3 border border-white text-white font-medium rounded-md hover:bg-primary-700 transition text-center">
+              Conheça nossos planos
+            </Link>
+          </div>
         </div>
       </section>
     </div>
   );
-}
-
-export default HomePage; 
+} 

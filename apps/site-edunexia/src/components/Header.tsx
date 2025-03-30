@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { DynamicMenu } from './DynamicMenu';
+import DynamicMenu from './DynamicMenu';
 
-export function Header() {
+export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
+  
   const handleMobileMenuToggle = () => {
     setMobileMenuOpen(!mobileMenuOpen);
   };
@@ -33,7 +33,7 @@ export function Header() {
         </nav>
 
         {/* Botão de menu móvel */}
-        <button 
+        <button
           className="md:hidden text-white focus:outline-none"
           onClick={handleMobileMenuToggle}
           aria-label={mobileMenuOpen ? "Fechar menu" : "Abrir menu"}
@@ -49,16 +49,16 @@ export function Header() {
             </svg>
           )}
         </button>
+        
+        {/* Menu móvel */}
+        {mobileMenuOpen && (
+          <div className="md:hidden absolute top-full left-0 w-full bg-white shadow-md rounded-b-lg mt-1">
+            <div className="p-4">
+              <DynamicMenu mobile onClose={handleMobileMenuClose} />
+            </div>
+          </div>
+        )}
       </div>
-
-      {/* Menu móvel */}
-      {mobileMenuOpen && (
-        <div className="md:hidden bg-primary-700 px-4 pt-2 pb-4">
-          <DynamicMenu isMobile onItemClick={handleMobileMenuClose} />
-        </div>
-      )}
     </header>
   );
-}
-
-export default Header; 
+} 
