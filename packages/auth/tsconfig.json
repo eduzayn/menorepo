@@ -7,13 +7,24 @@
     "paths": {
       "@/*": [
         "./src/*"
+      ],
+      "@hooks/*": [
+        "./src/hooks/*"
+      ],
+      "@components/*": [
+        "./src/components/*"
+      ],
+      "@types/*": [
+        "./src/types/*"
       ]
     },
     "outDir": "./dist",
     "rootDir": "./src"
   },
   "include": [
-    "src/**/*"
+    "src/**/*",
+    "vitest.config.ts",
+    "src/setupTests.ts"
   ],
   "exclude": [
     "node_modules",

@@ -32,11 +32,15 @@
   },
   "devDependencies": {
     "@edunexia/eslint-config": "workspace:*",
+    "@edunexia/test-config": "workspace:*",
     "@edunexia/typescript-config": "workspace:*",
+    "@testing-library/react": "^14.0.0",
+    "@testing-library/react-hooks": "^8.0.1",
     "@types/react": "^18.2.15",
     "@types/react-dom": "^18.2.7",
     "eslint": "^8.45.0",
     "tsup": "^8.0.2",
-    "typescript": "^5.0.2"
+    "typescript": "^5.0.2",
+    "vitest": "^0.34.6"
   }
 } 
