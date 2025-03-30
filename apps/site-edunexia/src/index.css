@@ -68,7 +68,7 @@
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border-solid border-[color:var(--border-color,hsl(var(--border)))];
   }
   body {
     @apply bg-background text-foreground;

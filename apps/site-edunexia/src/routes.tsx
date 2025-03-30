@@ -9,6 +9,7 @@ import { ProtectedRoute } from './components/ProtectedRoute';
 const HomePage = lazy(() => import('./pages/HomePage'));
 const AboutPage = lazy(() => import('./pages/AboutPage'));
 const ContactPage = lazy(() => import('./pages/ContactPage'));
+const PlanosPage = lazy(() => import('./pages/PlanosPage'));
 const HomeTest = lazy(() => import('./pages/Home').then(module => ({ default: module.HomePage })));
 const DynamicPage = lazy(() => import('./pages/DynamicPage'));
 const BlogPage = lazy(() => import('./pages/BlogPage'));
@@ -59,6 +60,7 @@ function AppRoutes() {
         <Route path="/" element={<SuspenseWrapper><HomePage /></SuspenseWrapper>} />
         <Route path="/sobre" element={<SuspenseWrapper><AboutPage /></SuspenseWrapper>} />
         <Route path="/contato" element={<SuspenseWrapper><ContactPage /></SuspenseWrapper>} />
+        <Route path="/planos" element={<SuspenseWrapper><PlanosPage /></SuspenseWrapper>} />
         
         {/* Página dinâmica baseada em slug */}
         <Route path="/pagina/:slug" element={<SuspenseWrapper><DynamicPage /></SuspenseWrapper>} />

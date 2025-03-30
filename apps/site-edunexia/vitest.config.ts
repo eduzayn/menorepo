@@ -19,6 +19,10 @@ export default createVitestConfig('./', {
     }
   },
   test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: ['./src/setupTests.ts'],
+    include: ['**/__tests__/**/*.{test,spec}.{js,jsx,ts,tsx}'],
     coverage: {
       include: [
         'src/components/**',

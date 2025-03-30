@@ -24,9 +24,9 @@ export function HomePage() {
               <Link to="/contato" className="px-6 py-3 bg-primary-600 text-white font-medium rounded-md hover:bg-primary-700 transition text-center">
                 Agende uma demonstração
               </Link>
-              <a href="#planos" className="px-6 py-3 border border-primary-600 text-primary-600 font-medium rounded-md hover:bg-primary-50 transition text-center">
+              <Link to="/planos" className="px-6 py-3 border border-primary-600 text-primary-600 font-medium rounded-md hover:bg-primary-50 transition text-center">
                 Conheça nossos planos
-              </a>
+              </Link>
             </div>
           </div>
           <div className="flex justify-center">
