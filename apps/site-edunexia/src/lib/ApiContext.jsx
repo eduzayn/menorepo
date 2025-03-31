@@ -1,5 +1,5 @@
 import { createContext, useContext, useMemo } from 'react';
-import { createApiClient } from '@edunexia/api-client/src/client';
+import { createApiClient } from '@edunexia/api-client';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 // Configuração da URL e chave anônima do Supabase

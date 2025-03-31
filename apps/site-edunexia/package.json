@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "build:dev": "vite build --mode development",
     "build:full": "tsc && vite build",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
@@ -20,6 +21,7 @@
     "@edunexia/api-client": "workspace:*",
     "@edunexia/auth": "workspace:*",
     "@edunexia/database-schema": "workspace:*",
+    "@edunexia/navigation": "workspace:*",
     "@edunexia/shared-types": "*",
     "@edunexia/ui-components": "workspace:*",
     "@edunexia/utils": "workspace:*",

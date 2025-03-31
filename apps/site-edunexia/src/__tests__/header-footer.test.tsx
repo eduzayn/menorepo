@@ -65,9 +65,29 @@ describe('Navegação - Header & Footer', () => {
     });
     
     it('deve renderizar o menu dinâmico com todos os itens', () => {
+      const menuItems = [
+        { id: '1', title: 'Início', link: '/', order_index: 0, is_active: true, open_in_new_tab: false },
+        { id: '2', title: 'Sobre', link: '/sobre', order_index: 1, is_active: true, open_in_new_tab: false },
+        { id: '3', title: 'Blog', link: '/blog', order_index: 2, is_active: true, open_in_new_tab: false },
+        { 
+          id: '4', 
+          title: 'Soluções', 
+          link: '#', 
+          order_index: 3, 
+          is_active: true, 
+          open_in_new_tab: false,
+          children: [
+            { id: '5', title: 'Sistema de Matrículas', link: '/pagina/sistema-matriculas', order_index: 0, is_active: true, open_in_new_tab: false, parent_id: '4' },
+            { id: '6', title: 'Portal do Aluno', link: '/pagina/portal-aluno', order_index: 1, is_active: true, open_in_new_tab: false, parent_id: '4' },
+            { id: '7', title: 'Gestão Financeira', link: '/pagina/gestao-financeira', order_index: 2, is_active: true, open_in_new_tab: false, parent_id: '4' },
+          ]
+        },
+        { id: '8', title: 'Contato', link: '/contato', order_index: 4, is_active: true, open_in_new_tab: false },
+      ];
+
       render(
         <MemoryRouter>
-          <DynamicMenu />
+          <DynamicMenu items={menuItems} />
         </MemoryRouter>
       );
       
@@ -127,8 +147,8 @@ describe('Navegação - Header & Footer', () => {
 describe('Header and Footer', () => {
   it('should render DynamicMenu with items', () => {
     const items = [
-      { id: '1', title: 'Home', url: '/' },
-      { id: '2', title: 'About', url: '/about' }
+      { id: '1', title: 'Home', link: '/' },
+      { id: '2', title: 'About', link: '/about' }
     ];
     render(<DynamicMenu items={items} />);
   });

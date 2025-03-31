@@ -1,4 +1,18 @@
 import { RoleLevel, ModulePermissions } from '../types';
+import { User } from '@supabase/supabase-js';
+import { ModulePermission } from '../types';
+
+export type Permission = 'read' | 'write' | 'delete' | 'admin';
+
+export type ModulePermissions = {
+  [module: string]: {
+    [action in Permission]: boolean;
+  };
+};
+
+export type ExtendedUser = User & {
+  permissions: ModulePermissions;
+};
 
 /**
  * Retorna as permissões padrão para um papel específico
@@ -117,12 +131,8 @@ export function getDefaultPermissionsForRole(role: RoleLevel): ModulePermissions
 /**
  * Verifica se o usuário tem permissão para uma ação específica em um módulo
  */
-export function hasPermission(
-  permissions: ModulePermissions,
-  module: keyof ModulePermissions,
-  action: 'read' | 'write' | 'delete'
-): boolean {
-  return permissions[module]?.[action] || false;
+export function hasPermission(user: ExtendedUser, module: string, permission: Permission): boolean {
+  return user?.permissions?.[module]?.[permission] || false;
 }
 
 /**
@@ -164,6 +174,59 @@ export function combinePermissions(...permissionsList: ModulePermissions[]): Mod
         delete: result[module].delete || actions.delete
       };
     });
+  });
+
+  return result;
+}
+
+export async function getUserPermissions(userId: string): Promise<ExtendedUser> {
+  // TODO: Implementar busca de permissões no banco
+  return {
+    id: userId,
+    app_metadata: {},
+    user_metadata: {},
+    aud: '',
+    created_at: '',
+    role: 'authenticated',
+    permissions: {
+      matriculas: {
+        read: true,
+        write: true,
+        delete: false,
+        admin: false
+      },
+      'portal-aluno': {
+        read: true,
+        write: false,
+        delete: false,
+        admin: false
+      }
+    }
+  };
+}
+
+export function mergePermissions(base: ModulePermissions, override: ModulePermissions): ModulePermissions {
+  const result: ModulePermissions = { ...base };
+
+  Object.keys(override).forEach((module: string) => {
+    if (!result[module]) {
+      result[module] = {
+        read: false,
+        write: false,
+        delete: false,
+        admin: false
+      };
+    }
+
+    const actions = override[module] as { [key in Permission]: boolean };
+    if (actions) {
+      result[module] = {
+        read: result[module].read || actions.read || false,
+        write: result[module].write || actions.write || false,
+        delete: result[module].delete || actions.delete || false,
+        admin: result[module].admin || actions.admin || false
+      };
+    }
   });
 
   return result;

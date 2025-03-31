@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { AppModule, ModuleNavigation } from '../types';
 import { MODULE_CONFIGS } from '../routes';
+import { ModuleConfig, UserRole } from '@edunexia/auth';
 
 /**
  * Hook para gerenciar navegação entre módulos de forma consistente
@@ -43,7 +44,7 @@ export function useNavigation() {
    * @param role Papel do usuário
    * @returns Objeto com as rotas disponíveis por módulo
    */
-  const getAvailableRoutes = useCallback((role: string) => {
+  const getAvailableRoutes = useCallback((role: UserRole) => {
     const availableModules: Record<string, ModuleNavigation> = {};
     
     Object.entries(MODULE_CONFIGS).forEach(([key, config]) => {
@@ -147,7 +148,7 @@ export function useNavigation() {
    * @param role Papel do usuário
    * @returns Array com os módulos disponíveis para o usuário
    */
-  const getMainMenuModules = useCallback((role: string) => {
+  const getMainMenuModules = useCallback((role: UserRole) => {
     const availableModules = getAvailableRoutes(role);
     
     return Object.entries(availableModules)

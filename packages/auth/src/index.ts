@@ -14,15 +14,16 @@ export type { UserData } from './supabase';
 export { AuthError } from '@supabase/supabase-js';
 
 // Exportar componentes principais
-export { AuthContext, useAuthContext } from './hooks/AuthContext';
+export { AuthContext } from './hooks/AuthContext';
 export { RouteGuard } from './components/RouteGuard';
 
 // Exportar tipos
 export type { 
   User,
-  UserSession,
-  AuthCredentials,
-  AuthResponse
+  ModulePermission,
+  UserRole,
+  AuthContextValue,
+  AuthProviderProps
 } from './types';
 
 // Exporta o cliente Supabase

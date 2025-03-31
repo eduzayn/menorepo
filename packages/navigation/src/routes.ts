@@ -1,4 +1,5 @@
 import { AppModule, ModuleNavigation } from './types';
+import { ModulePermission, UserRole } from '@edunexia/auth';
 
 /**
  * Mapeamento de configurações de navegação por módulo
@@ -11,8 +12,19 @@ export const MODULE_CONFIGS: Record<AppModule, ModuleNavigation> = {
     showInMainMenu: true,
     order: 1,
     routes: [
-      { path: '', label: 'Visão Geral', icon: 'home', roles: ['guest', 'aluno', 'professor', 'admin'], isIndex: true },
-      { path: '/perfil', label: 'Meu Perfil', icon: 'user', roles: ['guest', 'aluno', 'professor', 'admin'] }
+      { 
+        path: '', 
+        label: 'Visão Geral', 
+        icon: 'home', 
+        roles: ['student', 'teacher', 'institution_admin', 'super_admin'], 
+        isIndex: true 
+      },
+      { 
+        path: '/perfil', 
+        label: 'Meu Perfil', 
+        icon: 'user', 
+        roles: ['student', 'teacher', 'institution_admin', 'super_admin'] 
+      }
     ]
   },
   'material-didatico': {
@@ -21,10 +33,36 @@ export const MODULE_CONFIGS: Record<AppModule, ModuleNavigation> = {
     icon: 'book',
     showInMainMenu: true,
     order: 3,
+    requiredPermission: 'material-didatico.view',
+    permissions: {
+      'material-didatico.view': true,
+      'material-didatico.create': true,
+      'material-didatico.edit': true,
+      'material-didatico.delete': true
+    },
     routes: [
-      { path: '', label: 'Disciplinas', icon: 'book', roles: ['aluno', 'professor', 'admin'], isIndex: true },
-      { path: '/criar', label: 'Nova Disciplina', icon: 'plus', roles: ['professor', 'admin'] },
-      { path: '/editor', label: 'Editor de Conteúdo', icon: 'edit', roles: ['professor', 'admin'] }
+      { 
+        path: '', 
+        label: 'Disciplinas', 
+        icon: 'book', 
+        roles: ['student', 'teacher', 'institution_admin', 'super_admin'], 
+        isIndex: true,
+        requiredPermission: 'material-didatico.view'
+      },
+      { 
+        path: '/criar', 
+        label: 'Nova Disciplina', 
+        icon: 'plus', 
+        roles: ['teacher', 'institution_admin', 'super_admin'],
+        requiredPermission: 'material-didatico.create'
+      },
+      { 
+        path: '/editor', 
+        label: 'Editor de Conteúdo', 
+        icon: 'edit', 
+        roles: ['teacher', 'institution_admin', 'super_admin'],
+        requiredPermission: 'material-didatico.edit'
+      }
     ]
   },
   matriculas: {
@@ -33,10 +71,35 @@ export const MODULE_CONFIGS: Record<AppModule, ModuleNavigation> = {
     icon: 'clipboard-list',
     showInMainMenu: true,
     order: 2,
+    requiredPermission: 'matriculas.view',
+    permissions: {
+      'matriculas.view': true,
+      'matriculas.manage': true,
+      'matriculas.delete': true
+    },
     routes: [
-      { path: '', label: 'Minhas Matrículas', icon: 'list', roles: ['aluno'], isIndex: true },
-      { path: '/alunos', label: 'Alunos Matriculados', icon: 'users', roles: ['professor', 'admin'] },
-      { path: '/nova', label: 'Nova Matrícula', icon: 'plus', roles: ['admin'] }
+      { 
+        path: '', 
+        label: 'Minhas Matrículas', 
+        icon: 'list', 
+        roles: ['student'], 
+        isIndex: true,
+        requiredPermission: 'matriculas.view'
+      },
+      { 
+        path: '/alunos', 
+        label: 'Alunos Matriculados', 
+        icon: 'users', 
+        roles: ['teacher', 'institution_admin', 'super_admin'],
+        requiredPermission: 'matriculas.manage'
+      },
+      { 
+        path: '/nova', 
+        label: 'Nova Matrícula', 
+        icon: 'plus', 
+        roles: ['institution_admin', 'super_admin'],
+        requiredPermission: 'matriculas.manage'
+      }
     ]
   },
   'portal-do-aluno': {
@@ -45,10 +108,34 @@ export const MODULE_CONFIGS: Record<AppModule, ModuleNavigation> = {
     icon: 'graduation-cap',
     showInMainMenu: true,
     order: 4,
+    requiredPermission: 'portal-aluno.view',
+    permissions: {
+      'portal-aluno.view': true,
+      'portal-aluno.manage': true
+    },
     routes: [
-      { path: '', label: 'Meus Cursos', icon: 'graduation-cap', roles: ['aluno', 'admin'], isIndex: true },
-      { path: '/notas', label: 'Notas e Frequência', icon: 'chart-bar', roles: ['aluno', 'admin'] },
-      { path: '/documentos', label: 'Documentos', icon: 'file', roles: ['aluno', 'admin'] }
+      { 
+        path: '', 
+        label: 'Meus Cursos', 
+        icon: 'graduation-cap', 
+        roles: ['student', 'institution_admin', 'super_admin'], 
+        isIndex: true,
+        requiredPermission: 'portal-aluno.view'
+      },
+      { 
+        path: '/notas', 
+        label: 'Notas e Frequência', 
+        icon: 'chart-bar', 
+        roles: ['student', 'institution_admin', 'super_admin'],
+        requiredPermission: 'portal-aluno.view'
+      },
+      { 
+        path: '/documentos', 
+        label: 'Documentos', 
+        icon: 'file', 
+        roles: ['student', 'institution_admin', 'super_admin'],
+        requiredPermission: 'portal-aluno.view'
+      }
     ]
   },
   comunicacao: {
@@ -57,10 +144,35 @@ export const MODULE_CONFIGS: Record<AppModule, ModuleNavigation> = {
     icon: 'message-circle',
     showInMainMenu: true,
     order: 5,
+    requiredPermission: 'comunicacao.view',
+    permissions: {
+      'comunicacao.view': true,
+      'comunicacao.manage': true,
+      'comunicacao.delete': true
+    },
     routes: [
-      { path: '', label: 'Mensagens', icon: 'envelope', roles: ['aluno', 'professor', 'admin'], isIndex: true },
-      { path: '/nova', label: 'Nova Mensagem', icon: 'plus', roles: ['aluno', 'professor', 'admin'] },
-      { path: '/notificacoes', label: 'Notificações', icon: 'bell', roles: ['aluno', 'professor', 'admin'] }
+      { 
+        path: '', 
+        label: 'Mensagens', 
+        icon: 'envelope', 
+        roles: ['student', 'teacher', 'institution_admin', 'super_admin'], 
+        isIndex: true,
+        requiredPermission: 'comunicacao.view'
+      },
+      { 
+        path: '/nova', 
+        label: 'Nova Mensagem', 
+        icon: 'plus', 
+        roles: ['student', 'teacher', 'institution_admin', 'super_admin'],
+        requiredPermission: 'comunicacao.manage'
+      },
+      { 
+        path: '/notificacoes', 
+        label: 'Notificações', 
+        icon: 'bell', 
+        roles: ['student', 'teacher', 'institution_admin', 'super_admin'],
+        requiredPermission: 'comunicacao.view'
+      }
     ]
   },
   'financeiro-empresarial': {
@@ -69,10 +181,35 @@ export const MODULE_CONFIGS: Record<AppModule, ModuleNavigation> = {
     icon: 'dollar-sign',
     showInMainMenu: true,
     order: 6,
+    requiredPermission: 'financeiro.view',
+    permissions: {
+      'financeiro.view': true,
+      'financeiro.manage': true,
+      'financeiro.delete': true
+    },
     routes: [
-      { path: '', label: 'Resumo', icon: 'money-bill', roles: ['admin'], isIndex: true },
-      { path: '/pagamentos', label: 'Meus Pagamentos', icon: 'credit-card', roles: ['aluno'] },
-      { path: '/faturamento', label: 'Faturamento', icon: 'file-invoice-dollar', roles: ['admin'] }
+      { 
+        path: '', 
+        label: 'Resumo', 
+        icon: 'money-bill', 
+        roles: ['institution_admin', 'super_admin', 'financial'], 
+        isIndex: true,
+        requiredPermission: 'financeiro.view'
+      },
+      { 
+        path: '/pagamentos', 
+        label: 'Meus Pagamentos', 
+        icon: 'credit-card', 
+        roles: ['student'],
+        requiredPermission: 'financeiro.view'
+      },
+      { 
+        path: '/faturamento', 
+        label: 'Faturamento', 
+        icon: 'file-invoice-dollar', 
+        roles: ['institution_admin', 'super_admin', 'financial'],
+        requiredPermission: 'financeiro.manage'
+      }
     ]
   },
   'portal-parceiro': {
@@ -81,9 +218,25 @@ export const MODULE_CONFIGS: Record<AppModule, ModuleNavigation> = {
     icon: 'handshake',
     showInMainMenu: false,
     routes: [
-      { path: '', label: 'Dashboard', icon: 'tachometer-alt', roles: ['admin', 'parceiro'], isIndex: true },
-      { path: '/alunos', label: 'Meus Alunos', icon: 'users', roles: ['admin', 'parceiro'] },
-      { path: '/comissoes', label: 'Comissões', icon: 'percentage', roles: ['admin', 'parceiro'] }
+      { 
+        path: '', 
+        label: 'Dashboard', 
+        icon: 'tachometer-alt', 
+        roles: ['institution_admin', 'super_admin'], 
+        isIndex: true 
+      },
+      { 
+        path: '/alunos', 
+        label: 'Meus Alunos', 
+        icon: 'users', 
+        roles: ['institution_admin', 'super_admin'] 
+      },
+      { 
+        path: '/comissoes', 
+        label: 'Comissões', 
+        icon: 'percentage', 
+        roles: ['institution_admin', 'super_admin'] 
+      }
     ]
   },
   'portal-polo': {
@@ -92,9 +245,25 @@ export const MODULE_CONFIGS: Record<AppModule, ModuleNavigation> = {
     icon: 'map-pin',
     showInMainMenu: false,
     routes: [
-      { path: '', label: 'Dashboard', icon: 'tachometer-alt', roles: ['admin', 'polo'], isIndex: true },
-      { path: '/alunos', label: 'Alunos', icon: 'users', roles: ['admin', 'polo'] },
-      { path: '/eventos', label: 'Eventos', icon: 'calendar', roles: ['admin', 'polo'] }
+      { 
+        path: '', 
+        label: 'Dashboard', 
+        icon: 'tachometer-alt', 
+        roles: ['institution_admin', 'super_admin'], 
+        isIndex: true 
+      },
+      { 
+        path: '/alunos', 
+        label: 'Alunos', 
+        icon: 'users', 
+        roles: ['institution_admin', 'super_admin'] 
+      },
+      { 
+        path: '/eventos', 
+        label: 'Eventos', 
+        icon: 'calendar', 
+        roles: ['institution_admin', 'super_admin'] 
+      }
     ]
   },
   rh: {
@@ -103,9 +272,25 @@ export const MODULE_CONFIGS: Record<AppModule, ModuleNavigation> = {
     icon: 'users',
     showInMainMenu: false,
     routes: [
-      { path: '', label: 'Colaboradores', icon: 'id-badge', roles: ['admin'], isIndex: true },
-      { path: '/folha', label: 'Folha de Pagamento', icon: 'file-invoice-dollar', roles: ['admin'] },
-      { path: '/desempenho', label: 'Avaliações', icon: 'chart-line', roles: ['admin'] }
+      { 
+        path: '', 
+        label: 'Colaboradores', 
+        icon: 'id-badge', 
+        roles: ['institution_admin', 'super_admin'], 
+        isIndex: true 
+      },
+      { 
+        path: '/folha', 
+        label: 'Folha de Pagamento', 
+        icon: 'file-invoice-dollar', 
+        roles: ['institution_admin', 'super_admin'] 
+      },
+      { 
+        path: '/desempenho', 
+        label: 'Avaliações', 
+        icon: 'chart-line', 
+        roles: ['institution_admin', 'super_admin'] 
+      }
     ]
   },
   contabilidade: {
@@ -114,9 +299,25 @@ export const MODULE_CONFIGS: Record<AppModule, ModuleNavigation> = {
     icon: 'calculator',
     showInMainMenu: false,
     routes: [
-      { path: '', label: 'Relatórios', icon: 'chart-pie', roles: ['admin'], isIndex: true },
-      { path: '/balancos', label: 'Balanços', icon: 'balance-scale', roles: ['admin'] },
-      { path: '/fiscal', label: 'Obrigações Fiscais', icon: 'file-contract', roles: ['admin'] }
+      { 
+        path: '', 
+        label: 'Relatórios', 
+        icon: 'chart-pie', 
+        roles: ['institution_admin', 'super_admin'], 
+        isIndex: true 
+      },
+      { 
+        path: '/balancos', 
+        label: 'Balanços', 
+        icon: 'balance-scale', 
+        roles: ['institution_admin', 'super_admin'] 
+      },
+      { 
+        path: '/fiscal', 
+        label: 'Obrigações Fiscais', 
+        icon: 'file-contract', 
+        roles: ['institution_admin', 'super_admin'] 
+      }
     ]
   },
   'site-edunexia': {
@@ -125,9 +326,25 @@ export const MODULE_CONFIGS: Record<AppModule, ModuleNavigation> = {
     icon: 'globe',
     showInMainMenu: false,
     routes: [
-      { path: '', label: 'Configurações', icon: 'cog', roles: ['admin'], isIndex: true },
-      { path: '/leads', label: 'Leads', icon: 'funnel-dollar', roles: ['admin'] },
-      { path: '/vendas', label: 'Conversões', icon: 'shopping-cart', roles: ['admin'] }
+      { 
+        path: '', 
+        label: 'Configurações', 
+        icon: 'cog', 
+        roles: ['institution_admin', 'super_admin'], 
+        isIndex: true 
+      },
+      { 
+        path: '/leads', 
+        label: 'Leads', 
+        icon: 'funnel-dollar', 
+        roles: ['institution_admin', 'super_admin'] 
+      },
+      { 
+        path: '/vendas', 
+        label: 'Conversões', 
+        icon: 'shopping-cart', 
+        roles: ['institution_admin', 'super_admin'] 
+      }
     ]
   }
 };

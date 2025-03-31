@@ -1,92 +1,88 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { supabase } from '../lib/supabaseClient';
-import type { User, AuthContextValue, AuthProviderProps } from '../types';
-import { TEST_USERS, TEST_USER_PASSWORD, ENABLE_TEST_BYPASS } from '../../site-edunexia/src/config/test-users';
+import { Session, User, SupabaseClient, AuthChangeEvent } from '@supabase/supabase-js';
 
-const AuthContext = createContext<AuthContextValue | null>(null);
+import React, { createContext, useContext, useEffect, useState } from 'react';
 
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+import { AuthContextType, AuthProviderProps, AuthError, AuthCredentials, UserSession } from '../types';
+import { getUserPermissions } from '../utils/permissions';
+
+export const AuthContext = createContext<AuthContextType | null>(null);
+
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children, supabaseClient }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [session, setSession] = useState<Session | null>(null);
+  const [error, setError] = useState<AuthError | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Verificar sessão ao carregar
-    const checkSession = async () => {
-      setIsLoading(true);
-      
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (session) {
-        const userData = await fetchUserWithPermissions(session.user.id);
-        setUser(userData);
-      }
-      
-      setIsLoading(false);
-    };
-    
-    checkSession();
-    
-    // Configurar listener para mudanças de auth
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        if (event === 'SIGNED_IN' && session) {
-          const userData = await fetchUserWithPermissions(session.user.id);
+    const setupAuth = async () => {
+      try {
+        const { data: { session }, error } = await supabaseClient.auth.getSession();
+        if (error) throw error;
+        
+        if (session?.user) {
+          const userData = await getUserPermissions(session.user.id);
           setUser(userData);
-        } else if (event === 'SIGNED_OUT') {
-          setUser(null);
+          setSession(session);
         }
+      } catch (err) {
+        setError(err as AuthError);
+      } finally {
+        setLoading(false);
       }
-    );
-    
-    return () => {
-      subscription.unsubscribe();
     };
-  }, []);
 
-  const signIn = async (email: string, password: string): Promise<void> => {
-    setIsLoading(true);
-    
-    try {
-      // Verificar se é um usuário de teste com bypass ativo
-      if (ENABLE_TEST_BYPASS && email === 'ana.diretoria@eduzayn.com.br' && password === TEST_USER_PASSWORD) {
-        const testUser = TEST_USERS[email];
-        if (testUser) {
-          setUser(testUser);
-          return;
-        }
+    setupAuth();
+
+    const { data: { subscription } } = supabaseClient.auth.onAuthStateChange(async (event: AuthChangeEvent, session: Session | null) => {
+      if (session?.user) {
+        const userData = await getUserPermissions(session.user.id);
+        setUser(userData);
+        setSession(session);
+      } else {
+        setUser(null);
+        setSession(null);
       }
+    });
 
-      // Caso contrário, fazer login normal
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      });
-      
+    return () => {
+      subscription?.unsubscribe();
+    };
+  }, [supabaseClient]);
+
+  const signIn = async (credentials: AuthCredentials): Promise<UserSession> => {
+    try {
+      const { data, error } = await supabaseClient.auth.signInWithPassword(credentials);
       if (error) throw error;
-      
-      const userData = await fetchUserWithPermissions(data.user.id);
-      setUser(userData);
-    } finally {
-      setIsLoading(false);
+
+      const userData = await getUserPermissions(data.user.id);
+      return { user: userData, session: data.session, error: null };
+    } catch (err) {
+      return { user: null, session: null, error: err as Error };
     }
   };
 
-  const signOut = async (): Promise<void> => {
-    await supabase.auth.signOut();
-    setUser(null);
+  const signOut = async () => {
+    try {
+      const { error } = await supabaseClient.auth.signOut();
+      if (error) throw error;
+      
+      setUser(null);
+      setSession(null);
+    } catch (err) {
+      setError(err as AuthError);
+    }
   };
 
-  return (
-    <AuthContext.Provider value={{ 
-      user, 
-      isAuthenticated: !!user, 
-      isLoading, 
-      signIn, 
-      signOut 
-    }}>
-      {children}
-    </AuthContext.Provider>
-  );
+  const value = {
+    user,
+    session,
+    error,
+    signIn,
+    signOut,
+    loading
+  };
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = () => {

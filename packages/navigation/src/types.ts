@@ -2,6 +2,8 @@
  * Tipos para navegação na plataforma Edunéxia
  */
 
+import { ModulePermission, UserRole } from '@edunexia/auth';
+
 /**
  * Tipo dos módulos disponíveis no sistema
  */
@@ -62,6 +64,12 @@ export interface ModuleNavigation {
   
   /** Metadados adicionais (opcional) */
   metadata?: Record<string, any>;
+
+  /** Permissões necessárias para acessar o módulo */
+  permissions?: Partial<Record<ModulePermission, boolean>>;
+
+  /** Permissão mínima necessária para acessar o módulo */
+  requiredPermission?: ModulePermission;
 }
 
 /**
@@ -78,7 +86,7 @@ export interface ModuleRoute {
   icon?: string;
   
   /** Papéis que têm permissão para acessar */
-  roles: string[];
+  roles: UserRole[];
   
   /** Determina se a rota é a página inicial do módulo */
   isIndex?: boolean;
@@ -88,4 +96,10 @@ export interface ModuleRoute {
   
   /** Metadados adicionais (opcional) */
   metadata?: Record<string, any>;
+
+  /** Permissões necessárias para acessar a rota */
+  permissions?: Partial<Record<ModulePermission, boolean>>;
+
+  /** Permissão mínima necessária para acessar a rota */
+  requiredPermission?: ModulePermission;
 } 

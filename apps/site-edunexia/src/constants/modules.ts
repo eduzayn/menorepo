@@ -1,4 +1,6 @@
-import { ModuleConfig, ModulePermissionKey } from '@/types/modules';
+import { ModuleConfig } from '@/types/modules';
+import { ModulePermission } from '@edunexia/auth';
+import { AppModule } from '@edunexia/navigation';
 
 export const MODULES: ModuleConfig[] = [
   {
@@ -8,21 +10,21 @@ export const MODULES: ModuleConfig[] = [
     icon: 'school',
     route: '/matriculas',
     permissions: {
-      'matriculas.view': { read: true, write: false, delete: false },
-      'matriculas.manage': { read: true, write: true, delete: false },
-      'matriculas.delete': { read: true, write: true, delete: true }
+      'matriculas.view': true,
+      'matriculas.manage': true,
+      'matriculas.delete': true
     },
     requiredPermission: 'matriculas.view'
   },
   {
-    id: 'portal-aluno',
+    id: 'portal-do-aluno',
     name: 'Portal do Aluno',
     description: 'Acesso ao portal do aluno com informações acadêmicas',
     icon: 'person',
     route: '/portal-aluno',
     permissions: {
-      'portal-aluno.view': { read: true, write: false, delete: false },
-      'portal-aluno.manage': { read: true, write: true, delete: true }
+      'portal-aluno.view': true,
+      'portal-aluno.manage': true
     },
     requiredPermission: 'portal-aluno.view'
   },
@@ -33,70 +35,70 @@ export const MODULES: ModuleConfig[] = [
     icon: 'book',
     route: '/material-didatico',
     permissions: {
-      'material-didatico.view': { read: true, write: false, delete: false },
-      'material-didatico.create': { read: true, write: true, delete: false },
-      'material-didatico.edit': { read: true, write: true, delete: false },
-      'material-didatico.delete': { read: true, write: true, delete: true }
+      'material-didatico.view': true,
+      'material-didatico.create': true,
+      'material-didatico.edit': true,
+      'material-didatico.delete': true
     },
     requiredPermission: 'material-didatico.view'
   },
   {
     id: 'comunicacao',
     name: 'Comunicação',
-    description: 'Sistema de comunicação entre alunos, professores e responsáveis',
+    description: 'Sistema de comunicação com alunos e responsáveis',
     icon: 'chat',
     route: '/comunicacao',
     permissions: {
-      'comunicacao.view': { read: true, write: false, delete: false },
-      'comunicacao.manage': { read: true, write: true, delete: false },
-      'comunicacao.delete': { read: true, write: true, delete: true }
+      'comunicacao.view': true,
+      'comunicacao.manage': true,
+      'comunicacao.delete': true
     },
     requiredPermission: 'comunicacao.view'
   },
   {
-    id: 'financeiro',
+    id: 'financeiro-empresarial',
     name: 'Financeiro',
-    description: 'Gestão financeira e controle de mensalidades',
+    description: 'Gestão financeira da instituição',
     icon: 'payments',
     route: '/financeiro',
     permissions: {
-      'financeiro.view': { read: true, write: false, delete: false },
-      'financeiro.manage': { read: true, write: true, delete: false },
-      'financeiro.delete': { read: true, write: true, delete: true }
+      'financeiro.view': true,
+      'financeiro.manage': true,
+      'financeiro.delete': true
     },
     requiredPermission: 'financeiro.view'
   },
   {
-    id: 'relatorios',
+    id: 'dashboard',
     name: 'Relatórios',
-    description: 'Geração e visualização de relatórios',
+    description: 'Relatórios e análises do sistema',
     icon: 'assessment',
     route: '/relatorios',
     permissions: {
-      'relatorios.view': { read: true, write: false, delete: false },
-      'relatorios.generate': { read: true, write: true, delete: false }
+      'relatorios.view': true,
+      'relatorios.generate': true
     },
     requiredPermission: 'relatorios.view'
   },
   {
-    id: 'configuracoes',
+    id: 'site-edunexia',
     name: 'Configurações',
     description: 'Configurações gerais do sistema',
     icon: 'settings',
     route: '/configuracoes',
     permissions: {
-      'configuracoes.view': { read: true, write: false, delete: false },
-      'configuracoes.manage': { read: true, write: true, delete: true }
+      'configuracoes.view': true,
+      'configuracoes.manage': true
     },
     requiredPermission: 'configuracoes.view'
   }
 ];
 
-export function getModuleConfig(moduleId: string): ModuleConfig | undefined {
+export function getModuleConfig(moduleId: AppModule): ModuleConfig | undefined {
   return MODULES.find(module => module.id === moduleId);
 }
 
-export function hasModulePermission(moduleId: string, permission: ModulePermissionKey): boolean {
+export function hasModulePermission(moduleId: AppModule, permission: ModulePermission): boolean {
   const module = getModuleConfig(moduleId);
-  return module?.permissions[permission]?.read || false;
+  return module?.permissions[permission] ?? false;
 } 

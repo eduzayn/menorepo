@@ -1,11 +1,14 @@
 import React from 'react';
 import { render, screen, waitFor, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { SupabaseClient } from '@supabase/supabase-js';
+import { SupabaseClient, createClient } from '@supabase/supabase-js';
+import { jest } from '@jest/globals';
 
-import { AuthProvider } from '../AuthProvider';
+import { AuthProvider } from '../contexts/AuthContext';
 import { AuthError } from '../types';
 import { useAuth } from '../hooks/useAuth';
+import { MockUser, MockSupabaseClient, AuthProviderProps } from './types';
+import { mockSupabaseClient } from './mocks/supabase';
 
 // Componente de teste para simular interações de login
 const TestSignInComponent = () => {
@@ -55,6 +58,118 @@ const TestSignOutComponent = () => {
     </div>
   );
 };
+
+const mockUser: MockUser = {
+  id: '1',
+  email: 'test@example.com',
+  role: 'user',
+  app_metadata: {},
+  user_metadata: {},
+  aud: 'authenticated',
+  created_at: new Date().toISOString(),
+  permissions: {
+    matriculas: {
+      read: true,
+      write: false,
+      delete: false,
+      admin: false
+    }
+  }
+} as MockUser;
+
+const mockSupabaseClient: MockSupabaseClient = {
+  auth: {
+    signInWithPassword: jest.fn(),
+    signOut: jest.fn(),
+    onAuthStateChange: jest.fn(),
+    getSession: jest.fn()
+  }
+};
+
+const renderAuthProvider = (props: Partial<AuthProviderProps> = {}) => {
+  const defaultProps: AuthProviderProps = {
+    children: <div>Test</div>,
+    supabaseClient: mockSupabaseClient
+  };
+
+  return render(<AuthProvider {...defaultProps} {...props} />);
+};
+
+const supabaseClient = createClient('http://localhost:54321', 'test-key') as unknown as MockSupabaseClient;
+
+describe('AuthProvider', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('should handle auth state change errors', async () => {
+    const error = new Error('Auth state change error');
+    mockSupabaseClient.auth.onAuthStateChange.mockImplementation((callback) => {
+      callback({ event: 'SIGNED_OUT', session: null });
+      return { data: { subscription: { unsubscribe: jest.fn() } } };
+    });
+
+    mockSupabaseClient.auth.getSession.mockResolvedValue({
+      data: { session: null },
+      error: null
+    });
+
+    render(
+      <AuthProvider supabaseClient={mockSupabaseClient as any}>
+        <div>Test</div>
+      </AuthProvider>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Test')).toBeInTheDocument();
+    });
+  });
+
+  it('should handle sign in errors', async () => {
+    const error = new Error('Sign in error');
+    mockSupabaseClient.auth.signInWithPassword.mockRejectedValue({
+      error,
+      data: { user: null, session: null }
+    });
+
+    mockSupabaseClient.auth.getSession.mockResolvedValue({
+      data: { session: null },
+      error: null
+    });
+
+    render(
+      <AuthProvider supabaseClient={mockSupabaseClient as any}>
+        <div>Test</div>
+      </AuthProvider>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Test')).toBeInTheDocument();
+    });
+  });
+
+  it('should handle sign out errors', async () => {
+    const error = new Error('Sign out error');
+    mockSupabaseClient.auth.signOut.mockRejectedValue({
+      error
+    });
+
+    mockSupabaseClient.auth.getSession.mockResolvedValue({
+      data: { session: null },
+      error: null
+    });
+
+    render(
+      <AuthProvider supabaseClient={mockSupabaseClient as any}>
+        <div>Test</div>
+      </AuthProvider>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Test')).toBeInTheDocument();
+    });
+  });
+});
 
 describe('Erros de autenticação', () => {
   // Mock do cliente Supabase
