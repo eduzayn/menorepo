@@ -1,41 +1,43 @@
-import React, { createContext, useContext } from 'react';
-import { User, UserSession } from '../types';
+import { createContext, useContext } from 'react';
+import { User, UserSession, AuthCredentials, SignUpCredentials, UserProfile } from '../types';
 
-// Definição do contexto de autenticação
+/**
+ * Contexto de autenticação
+ */
 export interface AuthContextType {
   user: User | null;
   session: UserSession | null;
   loading: boolean;
   error: Error | null;
-  isAuthenticated: boolean;
-  signIn: (credentials: { email: string; password: string }) => Promise<any>;
-  signOut: () => Promise<any>;
-  hasPermission: (permission: string) => boolean;
-  hasRole: (role: string) => boolean;
-  updateProfile: (data: Partial<User>) => Promise<any>;
+  signIn: (credentials: AuthCredentials) => Promise<{
+    user: User;
+    session: UserSession;
+    error: Error | null;
+  }>;
+  signUp: (credentials: SignUpCredentials) => Promise<{
+    user: User;
+    session: UserSession;
+    error: Error | null;
+  }>;
+  signOut: () => Promise<void>;
+  updateProfile: (updates: Partial<UserProfile>) => Promise<User>;
+  updatePreferences: (preferences: User['preferences']) => Promise<User>;
 }
 
-// Criação do contexto com valores padrão
-export const AuthContext = createContext<AuthContextType>({
-  user: null,
-  session: null,
-  loading: false,
-  error: null,
-  isAuthenticated: false,
-  signIn: async () => ({}),
-  signOut: async () => ({}),
-  hasPermission: () => false,
-  hasRole: () => false,
-  updateProfile: async () => ({})
-});
+/**
+ * Contexto de autenticação
+ */
+export const AuthContext = createContext<AuthContextType | null>(null);
 
-// Hook para acessar o contexto de autenticação
-export const useAuthContext = () => {
+/**
+ * Hook para usar o contexto de autenticação
+ */
+export function useAuth(): AuthContextType {
   const context = useContext(AuthContext);
   
   if (!context) {
-    throw new Error('useAuthContext deve ser usado dentro de um AuthProvider');
+    throw new Error('useAuth deve ser usado dentro de um AuthProvider');
   }
   
   return context;
-}; 
+} 

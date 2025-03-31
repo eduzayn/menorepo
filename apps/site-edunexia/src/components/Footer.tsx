@@ -46,9 +46,9 @@ export function Footer() {
           <div className="mb-6 md:mb-0">
             <h3 className="text-lg font-semibold text-primary-800 mb-4">Suporte</h3>
             <ul className="space-y-3">
-              <li><Link to="/ajuda" className="text-gray-600 hover:text-primary-600">Central de Ajuda</Link></li>
-              <li><Link to="/documentacao" className="text-gray-600 hover:text-primary-600">Documentação</Link></li>
-              <li><Link to="/status" className="text-gray-600 hover:text-primary-600">Status do Sistema</Link></li>
+              <li><Link to="/pagina/central-de-ajuda" className="text-gray-600 hover:text-primary-600">Central de Ajuda</Link></li>
+              <li><Link to="/pagina/documentacao" className="text-gray-600 hover:text-primary-600">Documentação</Link></li>
+              <li><Link to="/pagina/status-do-sistema" className="text-gray-600 hover:text-primary-600">Status do Sistema</Link></li>
               <li><Link to="/contato" className="text-gray-600 hover:text-primary-600">Contato</Link></li>
             </ul>
           </div>
@@ -57,17 +57,17 @@ export function Footer() {
             <ul className="space-y-3">
               <li><Link to="/sobre" className="text-gray-600 hover:text-primary-600">Sobre Nós</Link></li>
               <li><Link to="/blog" className="text-gray-600 hover:text-primary-600">Blog</Link></li>
-              <li><Link to="/carreiras" className="text-gray-600 hover:text-primary-600">Carreiras</Link></li>
-              <li><Link to="/parceiros" className="text-gray-600 hover:text-primary-600">Parceiros</Link></li>
+              <li><Link to="/pagina/carreiras" className="text-gray-600 hover:text-primary-600">Carreiras</Link></li>
+              <li><Link to="/pagina/parceiros" className="text-gray-600 hover:text-primary-600">Parceiros</Link></li>
             </ul>
           </div>
         </div>
         <div className="border-t border-gray-200 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-500 text-sm mb-4 md:mb-0">© {new Date().getFullYear()} Edunéxia. Todos os direitos reservados.</p>
           <div className="flex space-x-6">
-            <Link to="/privacidade" className="text-gray-500 text-sm hover:text-primary-600">Política de Privacidade</Link>
-            <Link to="/termos" className="text-gray-500 text-sm hover:text-primary-600">Termos de Uso</Link>
-            <Link to="/cookies" className="text-gray-500 text-sm hover:text-primary-600">Cookies</Link>
+            <Link to="/pagina/privacidade" className="text-gray-500 text-sm hover:text-primary-600">Política de Privacidade</Link>
+            <Link to="/pagina/termos" className="text-gray-500 text-sm hover:text-primary-600">Termos de Uso</Link>
+            <Link to="/pagina/cookies" className="text-gray-500 text-sm hover:text-primary-600">Cookies</Link>
           </div>
         </div>
       </div>

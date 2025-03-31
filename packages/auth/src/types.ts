@@ -1,140 +1,85 @@
-/**
- * Tipos para o módulo de autenticação unificada da Edunéxia
- */
+import { User as SupabaseUser } from '@supabase/supabase-js';
 
 /**
- * Perfil de usuário
+ * Permissões disponíveis para cada módulo
  */
-export interface UserProfile {
+export type ModulePermission =
+  // Matrículas
+  | 'matriculas.view'
+  | 'matriculas.manage'
+  | 'matriculas.delete'
+  
+  // Portal do Aluno
+  | 'portal-aluno.view'
+  | 'portal-aluno.manage'
+  
+  // Material Didático
+  | 'material-didatico.view'
+  | 'material-didatico.create'
+  | 'material-didatico.edit'
+  | 'material-didatico.delete'
+  
+  // Comunicação
+  | 'comunicacao.view'
+  | 'comunicacao.manage'
+  | 'comunicacao.delete'
+  
+  // Financeiro
+  | 'financeiro.view'
+  | 'financeiro.manage'
+  | 'financeiro.delete'
+  
+  // Relatórios
+  | 'relatorios.view'
+  | 'relatorios.generate'
+  
+  // Configurações
+  | 'configuracoes.view'
+  | 'configuracoes.manage';
+
+/**
+ * Níveis de acesso disponíveis no sistema
+ */
+export type UserRole =
+  | 'super_admin'
+  | 'institution_admin'
+  | 'coordinator'
+  | 'teacher'
+  | 'secretary'
+  | 'financial'
+  | 'student'
+  | 'parent';
+
+/**
+ * Usuário completo com permissões
+ */
+export interface User {
   id: string;
   email: string;
-  nome: string;
-  avatar_url?: string;
-  telefone?: string;
-  cpf?: string;
-  cnpj?: string;
+  name: string;
+  role: UserRole;
+  permissions: ModulePermission[];
+  preferences?: Record<string, any>;
+  app_metadata: Record<string, any>;
+  user_metadata: Record<string, any>;
+  aud: string;
+  created_at: string;
 }
 
 /**
- * Usuário do sistema com perfil e metadados
+ * Contexto de autenticação
  */
-export interface User extends UserProfile {
-  instituicao_id?: string;
-  perfil: UserRole;
-  perfil_detalhes?: Record<string, any>;
-  permissoes?: string[];
-  ultimo_acesso?: string;
-  status: UserStatus;
-  metadata?: Record<string, any>;
-  preferencias?: UserPreferences;
-}
-
-/**
- * Status do usuário
- */
-export type UserStatus = 'ativo' | 'inativo' | 'bloqueado' | 'pendente';
-
-/**
- * Papéis do usuário
- */
-export type UserRole = 
-  | 'admin' // Administradores do sistema 
-  | 'gestor' // Gestores de instituição
-  | 'coordenador' // Coordenador de curso
-  | 'professor' // Professor
-  | 'tutor' // Tutor
-  | 'aluno' // Aluno
-  | 'secretaria' // Secretaria
-  | 'financeiro' // Financeiro
-  | 'parceiro' // Parceiro comercial
-  | 'visitante'; // Acesso limitado
-
-/**
- * Credenciais para login
- */
-export interface AuthCredentials {
-  email: string;
-  password: string;
-  instituicao_id?: string;
-}
-
-/**
- * Token de autenticação
- */
-export interface AuthToken {
-  access_token: string;
-  refresh_token?: string;
-  expires_at: number;
-  token_type: string;
-}
-
-/**
- * Sessão do usuário
- */
-export interface UserSession {
-  user: User;
-  token: AuthToken;
-  expires_at: number;
-}
-
-/**
- * Resposta de autenticação
- */
-export interface AuthResponse {
+export interface AuthContextValue {
   user: User | null;
-  session: UserSession | null;
-  error: Error | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  signIn: (email: string, password: string) => Promise<void>;
+  signOut: () => Promise<void>;
 }
 
 /**
- * Opções para provedores de autenticação
+ * Props do provedor de autenticação
  */
-export interface AuthProviderOptions {
-  /**
-   * URL base da API de autenticação
-   */
-  apiUrl?: string;
-  
-  /**
-   * Definir se deve persistir a sessão no localStorage
-   */
-  persistSession?: boolean;
-  
-  /**
-   * Função a ser chamada quando o usuário é autenticado
-   */
-  onAuthenticated?: (session: UserSession) => void;
-  
-  /**
-   * Função a ser chamada quando o usuário é desconectado
-   */
-  onSignOut?: () => void;
-  
-  /**
-   * Função a ser chamada quando ocorre um erro de autenticação
-   */
-  onError?: (error: Error) => void;
-}
-
-/**
- * Preferências do usuário
- */
-export interface UserPreferences {
-  theme?: 'light' | 'dark' | 'system';
-  language?: string;
-  notifications?: {
-    email?: boolean;
-    push?: boolean;
-    sms?: boolean;
-  };
-  display?: {
-    compact?: boolean;
-    fontSize?: number;
-  };
-}
-
-// Definição de um possível erro de autenticação
-export interface AuthError extends Error {
-  status?: number;
-  code?: string;
+export interface AuthProviderProps {
+  children: React.ReactNode;
 } 

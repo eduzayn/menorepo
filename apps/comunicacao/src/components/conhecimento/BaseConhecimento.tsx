@@ -9,7 +9,7 @@ import { Button } from '../ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { ArtigosList } from './ArtigosList';
 import { ArtigoDetail } from './ArtigoDetail';
-import { FolderIcon, TagIcon, HeartIcon, BookOpenIcon, PlusIcon } from '@heroicons/react/24/outline';
+import { FolderIcon, TagIcon, HeartIcon, BookOpenIcon, PlusIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 
 interface BaseConhecimentoProps {
   integradoChat?: boolean;
@@ -138,77 +138,17 @@ export function BaseConhecimento({ integradoChat = false, onSelecionar }: BaseCo
   };
 
   return (
-    <div className="space-y-4">
-      {!integradoChat && (
-        <div className="flex justify-between items-center">
-          <h2 className="text-xl font-bold">Base de Conhecimento</h2>
-          <div>
-            {/* Botão para criar novo artigo - visível apenas para usuários autorizados */}
-            <Button variant="outline" className="flex items-center">
-              <PlusIcon className="h-4 w-4 mr-1" />
-              Novo Artigo
-            </Button>
-          </div>
-        </div>
-      )}
-      
-      {visualizacao === 'lista' ? (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          {/* Navegação lateral */}
-          <div className="md:col-span-1">
-            <Tabs defaultValue="categorias" value={abaSelecionada} onValueChange={setAbaSelecionada}>
-              <TabsList className="w-full">
-                <TabsTrigger value="categorias" className="flex-1">
-                  <FolderIcon className="h-4 w-4 mr-1" />
-                  Categorias
-                </TabsTrigger>
-                <TabsTrigger value="favoritos" className="flex-1">
-                  <HeartIcon className="h-4 w-4 mr-1" />
-                  Favoritos
-                </TabsTrigger>
-              </TabsList>
-              
-              <div className="mt-4">
-                <TabsContent value="categorias">
-                  {renderCategorias()}
-                </TabsContent>
-                
-                <TabsContent value="favoritos">
-                  <ArtigosList 
-                    onArtigoSelected={handleArtigoClick}
-                    favoritos
-                  />
-                </TabsContent>
-              </div>
-            </Tabs>
-          </div>
-          
-          {/* Lista de artigos */}
-          <div className="md:col-span-3">
-            {categoriaAtiva ? (
-              <ArtigosList 
-                categoria={categoriaAtiva}
-                subcategoria={subcategoriaAtiva}
-                onArtigoSelected={handleArtigoClick}
-              />
-            ) : abaSelecionada === 'favoritos' ? null : (
-              <div className="text-center p-8 border rounded-lg bg-gray-50 flex flex-col items-center justify-center h-64">
-                <BookOpenIcon className="h-12 w-12 text-gray-400 mb-4" />
-                <h3 className="text-lg font-medium">Selecione uma categoria</h3>
-                <p className="text-gray-500 mt-1">
-                  Escolha uma categoria para visualizar os artigos disponíveis
-                </p>
-              </div>
-            )}
-          </div>
-        </div>
-      ) : (
-        /* Visualização de artigo */
-        <ArtigoDetail 
-          artigoId={artigoId!}
-          onVoltar={handleVoltar}
-        />
-      )}
+    <div className="base-conhecimento">
+      <div className="p-8 border rounded-lg bg-gray-50 flex flex-col items-center justify-center">
+        <ExclamationTriangleIcon className="h-12 w-12 text-amber-500 mb-4" />
+        <h3 className="text-lg font-medium">Sistema em Manutenção</h3>
+        <p className="text-gray-500 mt-3 text-center max-w-md">
+          A Base de Conhecimento está temporariamente indisponível enquanto implementamos um novo sistema de autenticação.
+        </p>
+        <p className="text-gray-500 mt-2 text-center max-w-md">
+          Pedimos desculpas pelo inconveniente. Em breve, teremos uma nova versão disponível com melhorias significativas.
+        </p>
+      </div>
     </div>
   );
 } 

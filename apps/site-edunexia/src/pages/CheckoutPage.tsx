@@ -1,12 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 
+// Definição da interface dos parâmetros da URL
 interface CheckoutPageParams {
   planId: string;
 }
 
+// Interface para a integração com o Asaas
+interface AsaasPaymentResponse {
+  id: string;
+  status: string;
+  linkPagamento: string;
+  pixCopiaECola?: string;
+  qrCodeImage?: string;
+  linhaDigitavel?: string;
+  pdf?: string;
+}
+
 const CheckoutPage: React.FC = () => {
-  const { planId } = useParams<CheckoutPageParams>();
+  // Corrigindo a tipagem do useParams para compatibilidade com o React Router v6
+  const params = useParams<Record<string, string | undefined>>();
+  const planId = params.planId;
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [step, setStep] = useState(1);
@@ -22,6 +36,7 @@ const CheckoutPage: React.FC = () => {
     city: '',
     state: '',
     postalCode: '',
+    document: '', // CPF/CNPJ - importante para o Asaas
     studentsCount: '',
     responsibleName: '',
     responsiblePosition: '',
@@ -35,13 +50,16 @@ const CheckoutPage: React.FC = () => {
     expiryDate: '',
     cvv: '',
     installments: '1',
+    paymentMethod: 'credit_card', // 'credit_card', 'pix', ou 'boleto'
   });
 
   // Plan data based on planId
   const [plan, setPlan] = useState<any>(null);
+  // Resposta da API Asaas para usar no checkout
+  const [paymentResponse, setPaymentResponse] = useState<AsaasPaymentResponse | null>(null);
 
   useEffect(() => {
-    // In a real implementation, fetch plan details from an API
+    // Busca detalhes do plano
     const plans = {
       'basic': {
         id: 'basic',
@@ -103,27 +121,87 @@ const CheckoutPage: React.FC = () => {
     window.scrollTo(0, 0);
   };
 
+  // Função para processar o pagamento através do Asaas
+  const processAsaasPayment = async () => {
+    try {
+      setIsLoading(true);
+      
+      // Chamada à Edge Function para integração com o Asaas
+      const response = await fetch('https://npiyusbnaaibibcucspv.supabase.co/functions/v1/process-asaas-payment', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          planoId: plan.id,
+          instituicao: {
+            nome: institution.name,
+            tipo: institution.type,
+            email: institution.email,
+            telefone: institution.phone,
+            website: institution.website,
+            endereco: institution.address,
+            cidade: institution.city,
+            estado: institution.state,
+            cep: institution.postalCode,
+            documento: institution.document, // CPF/CNPJ necessário para o Asaas
+            quantidadeAlunos: institution.studentsCount,
+            responsavelNome: institution.responsibleName,
+            responsavelCargo: institution.responsiblePosition,
+            responsavelEmail: institution.responsibleEmail,
+            responsavelTelefone: institution.responsiblePhone,
+          },
+          pagamento: {
+            metodo: paymentInfo.paymentMethod,
+            parcelas: parseInt(paymentInfo.installments) || 1,
+            cartao: paymentInfo.paymentMethod === 'credit_card' ? {
+              numero: paymentInfo.cardNumber,
+              nome: paymentInfo.cardName,
+              validade: paymentInfo.expiryDate,
+              cvv: paymentInfo.cvv,
+            } : undefined,
+          }
+        }),
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Falha ao processar pagamento');
+      }
+      
+      const asaasResponse = await response.json();
+      setPaymentResponse(asaasResponse);
+      
+      return asaasResponse;
+    } catch (error) {
+      console.error('Erro ao processar pagamento via Asaas:', error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
     
     try {
-      // Simulating API call to process payment and create account
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Processa o pagamento através do Asaas
+      const paymentResult = await processAsaasPayment();
       
-      // Navigate to success page
+      // Redireciona para a página de sucesso
       navigate('/checkout/success', { 
         state: { 
           planName: plan?.name,
           institutionName: institution.name,
-          email: institution.email
+          email: institution.email,
+          paymentId: paymentResult.id,
+          // Inclui a resposta do Asaas para uso na página de sucesso
+          paymentInfo: paymentResult
         } 
       });
     } catch (error) {
-      console.error('Error processing payment:', error);
+      console.error('Erro ao processar pagamento:', error);
       alert('Ocorreu um erro ao processar o pagamento. Por favor, tente novamente.');
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -180,6 +258,23 @@ const CheckoutPage: React.FC = () => {
                           value={institution.name}
                           onChange={handleInstitutionChange}
                           className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Adicionar campo para CPF/CNPJ - necessário para o Asaas */}
+                    <div className="sm:col-span-2">
+                      <label htmlFor="document" className="block text-sm font-medium text-gray-700">CPF/CNPJ</label>
+                      <div className="mt-1">
+                        <input
+                          type="text"
+                          name="document"
+                          id="document"
+                          required
+                          value={institution.document}
+                          onChange={handleInstitutionChange}
+                          className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                          placeholder="Apenas números"
                         />
                       </div>
                     </div>
@@ -383,7 +478,7 @@ const CheckoutPage: React.FC = () => {
             </div>
           )}
 
-          {/* Step 2: Payment Information */}
+          {/* Step 2: Payment Information - atualizado para Asaas */}
           {step === 2 && (
             <div className="bg-white shadow-md rounded-lg overflow-hidden">
               <div className="px-6 py-8">
@@ -412,89 +507,134 @@ const CheckoutPage: React.FC = () => {
                         </p>
                       </div>
                     </div>
-
-                    <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
-                      <div className="sm:col-span-2">
-                        <label htmlFor="cardNumber" className="block text-sm font-medium text-gray-700">Número do Cartão</label>
-                        <div className="mt-1">
-                          <input
-                            type="text"
-                            name="cardNumber"
-                            id="cardNumber"
-                            placeholder="0000 0000 0000 0000"
-                            required
-                            value={paymentInfo.cardNumber}
-                            onChange={handlePaymentChange}
-                            className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                          />
+                    
+                    {/* Método de pagamento - Integração Asaas */}
+                    <div className="mb-6">
+                      <label htmlFor="paymentMethod" className="block text-sm font-medium text-gray-700 mb-2">Método de Pagamento</label>
+                      <div className="grid grid-cols-3 gap-3">
+                        <div 
+                          className={`border rounded-md py-3 px-4 flex items-center justify-center cursor-pointer ${paymentInfo.paymentMethod === 'credit_card' ? 'bg-indigo-50 border-indigo-500' : 'border-gray-300'}`}
+                          onClick={() => setPaymentInfo(prev => ({ ...prev, paymentMethod: 'credit_card' }))}
+                        >
+                          <span className="text-sm font-medium">Cartão de Crédito</span>
                         </div>
-                      </div>
-
-                      <div className="sm:col-span-2">
-                        <label htmlFor="cardName" className="block text-sm font-medium text-gray-700">Nome no Cartão</label>
-                        <div className="mt-1">
-                          <input
-                            type="text"
-                            name="cardName"
-                            id="cardName"
-                            required
-                            value={paymentInfo.cardName}
-                            onChange={handlePaymentChange}
-                            className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                          />
+                        <div 
+                          className={`border rounded-md py-3 px-4 flex items-center justify-center cursor-pointer ${paymentInfo.paymentMethod === 'pix' ? 'bg-indigo-50 border-indigo-500' : 'border-gray-300'}`}
+                          onClick={() => setPaymentInfo(prev => ({ ...prev, paymentMethod: 'pix' }))}
+                        >
+                          <span className="text-sm font-medium">PIX</span>
                         </div>
-                      </div>
-
-                      <div>
-                        <label htmlFor="expiryDate" className="block text-sm font-medium text-gray-700">Data de Validade</label>
-                        <div className="mt-1">
-                          <input
-                            type="text"
-                            name="expiryDate"
-                            id="expiryDate"
-                            placeholder="MM/AA"
-                            required
-                            value={paymentInfo.expiryDate}
-                            onChange={handlePaymentChange}
-                            className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                          />
-                        </div>
-                      </div>
-
-                      <div>
-                        <label htmlFor="cvv" className="block text-sm font-medium text-gray-700">CVV</label>
-                        <div className="mt-1">
-                          <input
-                            type="text"
-                            name="cvv"
-                            id="cvv"
-                            placeholder="123"
-                            required
-                            value={paymentInfo.cvv}
-                            onChange={handlePaymentChange}
-                            className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                          />
-                        </div>
-                      </div>
-
-                      <div className="sm:col-span-2">
-                        <label htmlFor="installments" className="block text-sm font-medium text-gray-700">Parcelamento</label>
-                        <div className="mt-1">
-                          <select
-                            id="installments"
-                            name="installments"
-                            value={paymentInfo.installments}
-                            onChange={handlePaymentChange}
-                            className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                          >
-                            <option value="1">À vista - {plan.price}</option>
-                            <option value="3">3x de {(plan.priceValue / 3).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</option>
-                            <option value="6">6x de {(plan.priceValue / 6).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</option>
-                            <option value="12">12x de {(plan.priceValue / 12).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</option>
-                          </select>
+                        <div 
+                          className={`border rounded-md py-3 px-4 flex items-center justify-center cursor-pointer ${paymentInfo.paymentMethod === 'boleto' ? 'bg-indigo-50 border-indigo-500' : 'border-gray-300'}`}
+                          onClick={() => setPaymentInfo(prev => ({ ...prev, paymentMethod: 'boleto' }))}
+                        >
+                          <span className="text-sm font-medium">Boleto Bancário</span>
                         </div>
                       </div>
                     </div>
+
+                    {/* Campos específicos para cartão de crédito */}
+                    {paymentInfo.paymentMethod === 'credit_card' && (
+                      <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
+                        <div className="sm:col-span-2">
+                          <label htmlFor="cardNumber" className="block text-sm font-medium text-gray-700">Número do Cartão</label>
+                          <div className="mt-1">
+                            <input
+                              type="text"
+                              name="cardNumber"
+                              id="cardNumber"
+                              placeholder="0000 0000 0000 0000"
+                              required
+                              value={paymentInfo.cardNumber}
+                              onChange={handlePaymentChange}
+                              className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="sm:col-span-2">
+                          <label htmlFor="cardName" className="block text-sm font-medium text-gray-700">Nome no Cartão</label>
+                          <div className="mt-1">
+                            <input
+                              type="text"
+                              name="cardName"
+                              id="cardName"
+                              required
+                              value={paymentInfo.cardName}
+                              onChange={handlePaymentChange}
+                              className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                            />
+                          </div>
+                        </div>
+
+                        <div>
+                          <label htmlFor="expiryDate" className="block text-sm font-medium text-gray-700">Data de Validade</label>
+                          <div className="mt-1">
+                            <input
+                              type="text"
+                              name="expiryDate"
+                              id="expiryDate"
+                              placeholder="MM/AA"
+                              required
+                              value={paymentInfo.expiryDate}
+                              onChange={handlePaymentChange}
+                              className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                            />
+                          </div>
+                        </div>
+
+                        <div>
+                          <label htmlFor="cvv" className="block text-sm font-medium text-gray-700">CVV</label>
+                          <div className="mt-1">
+                            <input
+                              type="text"
+                              name="cvv"
+                              id="cvv"
+                              placeholder="123"
+                              required
+                              value={paymentInfo.cvv}
+                              onChange={handlePaymentChange}
+                              className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="sm:col-span-2">
+                          <label htmlFor="installments" className="block text-sm font-medium text-gray-700">Parcelamento</label>
+                          <div className="mt-1">
+                            <select
+                              id="installments"
+                              name="installments"
+                              value={paymentInfo.installments}
+                              onChange={handlePaymentChange}
+                              className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                            >
+                              <option value="1">À vista - {plan.price}</option>
+                              <option value="3">3x de {(plan.priceValue / 3).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</option>
+                              <option value="6">6x de {(plan.priceValue / 6).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</option>
+                              <option value="12">12x de {(plan.priceValue / 12).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Informações para outros métodos de pagamento (PIX e Boleto) */}
+                    {paymentInfo.paymentMethod === 'pix' && (
+                      <div className="bg-blue-50 p-4 rounded-md">
+                        <p className="text-sm text-blue-800">
+                          No próximo passo, você receberá um QR Code PIX para realizar o pagamento instantaneamente.
+                        </p>
+                      </div>
+                    )}
+
+                    {paymentInfo.paymentMethod === 'boleto' && (
+                      <div className="bg-blue-50 p-4 rounded-md">
+                        <p className="text-sm text-blue-800">
+                          No próximo passo, você receberá um boleto bancário para pagamento em até 3 dias úteis.
+                        </p>
+                      </div>
+                    )}
                   </div>
 
                   <div className="mt-8 flex justify-between">
@@ -547,8 +687,8 @@ const CheckoutPage: React.FC = () => {
                         <span>{institution.name}</span>
                       </div>
                       <div>
-                        <span className="block text-gray-500">Tipo:</span>
-                        <span>{institution.type}</span>
+                        <span className="block text-gray-500">CNPJ/CPF:</span>
+                        <span>{institution.document}</span>
                       </div>
                       <div>
                         <span className="block text-gray-500">Email:</span>
@@ -590,22 +730,36 @@ const CheckoutPage: React.FC = () => {
                   <div>
                     <h3 className="font-medium text-gray-900 mb-2">Pagamento</h3>
                     <div className="grid grid-cols-1 gap-y-2 gap-x-4 sm:grid-cols-2 text-sm">
-                      <div>
-                        <span className="block text-gray-500">Cartão:</span>
-                        <span>•••• •••• •••• {paymentInfo.cardNumber.slice(-4)}</span>
-                      </div>
-                      <div>
-                        <span className="block text-gray-500">Titular:</span>
-                        <span>{paymentInfo.cardName}</span>
-                      </div>
-                      <div>
-                        <span className="block text-gray-500">Validade:</span>
-                        <span>{paymentInfo.expiryDate}</span>
-                      </div>
-                      <div>
-                        <span className="block text-gray-500">Parcelamento:</span>
-                        <span>{paymentInfo.installments}x</span>
-                      </div>
+                      {paymentInfo.paymentMethod === 'credit_card' ? (
+                        <>
+                          <div>
+                            <span className="block text-gray-500">Método:</span>
+                            <span>Cartão de Crédito</span>
+                          </div>
+                          <div>
+                            <span className="block text-gray-500">Cartão:</span>
+                            <span>•••• •••• •••• {paymentInfo.cardNumber.slice(-4)}</span>
+                          </div>
+                          <div>
+                            <span className="block text-gray-500">Titular:</span>
+                            <span>{paymentInfo.cardName}</span>
+                          </div>
+                          <div>
+                            <span className="block text-gray-500">Parcelamento:</span>
+                            <span>{paymentInfo.installments}x</span>
+                          </div>
+                        </>
+                      ) : (
+                        <div className="sm:col-span-2">
+                          <span className="block text-gray-500">Método:</span>
+                          <span>{paymentInfo.paymentMethod === 'pix' ? 'PIX' : 'Boleto Bancário'}</span>
+                          <p className="mt-2 text-xs text-gray-500">
+                            {paymentInfo.paymentMethod === 'pix' 
+                              ? 'Você receberá um QR Code PIX para pagamento após confirmar.' 
+                              : 'Você receberá um boleto para pagamento após confirmar.'}
+                          </p>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>

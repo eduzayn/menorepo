@@ -1,114 +1,310 @@
-import React, { useEffect } from 'react';
-import { Link, useLocation, Navigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useLocation, Link, useNavigate } from 'react-router-dom';
 
+// Interface para os dados de pagamento do Asaas
+interface AsaasPaymentResponse {
+  id: string;
+  status: string;
+  linkPagamento: string;
+  pixCopiaECola?: string;
+  qrCodeImage?: string;
+  linhaDigitavel?: string;
+  pdf?: string;
+}
+
+// Interface para o estado passado pela navegação
 interface LocationState {
   planName?: string;
   institutionName?: string;
   email?: string;
+  paymentId?: string;
+  paymentInfo?: AsaasPaymentResponse;
 }
 
 const CheckoutSuccessPage: React.FC = () => {
   const location = useLocation();
-  const state = location.state as LocationState;
+  const navigate = useNavigate();
+  const state = location.state as LocationState || {};
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     // Scroll to top on page load
     window.scrollTo(0, 0);
   }, []);
 
-  // Redirect if accessed directly without state
-  if (!state || !state.planName) {
-    return <Navigate to="/" />;
+  // Se não houver informações no state, o usuário provavelmente acessou diretamente esta URL
+  // Em uma implementação real, buscaríamos os dados do backend
+  if (!state.planName || !state.institutionName) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+        <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+          <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10 text-center">
+            <h2 className="text-2xl font-extrabold text-gray-900 mb-4">Informações não encontradas</h2>
+            <p className="mb-4 text-gray-600">
+              Não foi possível recuperar os detalhes da sua compra. Por favor, verifique seu email para mais informações ou entre em contato com o suporte.
+            </p>
+            <Link
+              to="/"
+              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            >
+              Voltar ao início
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
   }
 
+  // Função para copiar o código PIX ou linha digitável para a área de transferência
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text).then(
+      () => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 3000);
+      },
+      (err) => {
+        console.error('Não foi possível copiar o texto: ', err);
+      }
+    );
+  };
+
+  // Função para cancelar assinatura (em caso de desistência durante teste)
+  const cancelSubscription = async () => {
+    if (!state.paymentId) return;
+    
+    try {
+      await fetch('https://npiyusbnaaibibcucspv.supabase.co/functions/v1/cancel-subscription', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          subscriptionId: state.paymentId
+        }),
+      });
+      
+      alert('Assinatura cancelada com sucesso!');
+      navigate('/');
+    } catch (error) {
+      console.error('Erro ao cancelar assinatura:', error);
+      alert('Erro ao cancelar assinatura. Tente novamente mais tarde.');
+    }
+  };
+
   return (
-    <div className="bg-gray-50 py-16">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="max-w-3xl mx-auto">
-          <div className="text-center">
-            <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100">
-              <svg className="h-10 w-10 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+    <div className="min-h-screen bg-gray-50 py-12">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="bg-white shadow overflow-hidden rounded-lg">
+          <div className="px-4 py-5 sm:px-6 text-center border-b border-gray-200">
+            <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 mb-4">
+              <svg className="h-6 w-6 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
             </div>
-            <h1 className="mt-4 text-3xl font-extrabold text-gray-900 tracking-tight sm:text-4xl">Assinatura realizada com sucesso!</h1>
-            <p className="mt-4 text-lg text-gray-500">
-              Parabéns! Seu período de teste gratuito do {state.planName} foi iniciado.
+            <h2 className="text-2xl font-bold text-gray-900">Assinatura iniciada com sucesso!</h2>
+            <p className="mt-1 text-sm text-gray-500">
+              Seu período de teste gratuito de 14 dias começou agora
             </p>
           </div>
-
-          <div className="mt-12 bg-white shadow overflow-hidden rounded-lg">
-            <div className="px-4 py-5 sm:p-6">
-              <h2 className="text-lg font-medium text-gray-900">Detalhes da sua conta</h2>
-              <div className="mt-4 text-sm text-gray-600">
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          
+          {/* Detalhes da assinatura */}
+          <div className="px-4 py-5 sm:p-6">
+            <div className="mb-8">
+              <h3 className="text-lg font-medium text-gray-900 mb-2">Detalhes da assinatura</h3>
+              <div className="bg-gray-50 rounded-md p-4">
+                <dl className="grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-2">
                   <div>
-                    <span className="block text-gray-500">Instituição:</span>
-                    <span className="font-medium">{state.institutionName}</span>
+                    <dt className="text-sm font-medium text-gray-500">Plano</dt>
+                    <dd className="mt-1 text-sm text-gray-900">{state.planName}</dd>
                   </div>
                   <div>
-                    <span className="block text-gray-500">Plano:</span>
-                    <span className="font-medium">{state.planName}</span>
+                    <dt className="text-sm font-medium text-gray-500">Instituição</dt>
+                    <dd className="mt-1 text-sm text-gray-900">{state.institutionName}</dd>
                   </div>
                   <div>
-                    <span className="block text-gray-500">Status:</span>
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                      Período de avaliação
-                    </span>
+                    <dt className="text-sm font-medium text-gray-500">E-mail</dt>
+                    <dd className="mt-1 text-sm text-gray-900">{state.email}</dd>
                   </div>
                   <div>
-                    <span className="block text-gray-500">Validade do teste:</span>
-                    <span className="font-medium">14 dias</span>
+                    <dt className="text-sm font-medium text-gray-500">ID da transação</dt>
+                    <dd className="mt-1 text-sm text-gray-900">{state.paymentId || 'N/A'}</dd>
+                  </div>
+                </dl>
+              </div>
+            </div>
+            
+            {/* Informações de pagamento específicas do Asaas */}
+            {state.paymentInfo && (
+              <div className="mb-8">
+                <h3 className="text-lg font-medium text-gray-900 mb-2">Informações de pagamento</h3>
+                <div className="bg-gray-50 rounded-md p-4">
+                  {/* PIX */}
+                  {state.paymentInfo.pixCopiaECola && (
+                    <div>
+                      <h4 className="font-medium text-gray-900 mb-3">Pagamento via PIX</h4>
+                      {state.paymentInfo.qrCodeImage && (
+                        <div className="flex justify-center mb-4">
+                          <img 
+                            src={state.paymentInfo.qrCodeImage} 
+                            alt="QR Code PIX" 
+                            className="h-48 w-48"
+                          />
+                        </div>
+                      )}
+                      <div className="mb-4">
+                        <label htmlFor="pix-code" className="block text-sm font-medium text-gray-700 mb-1">
+                          Código PIX Copia e Cola
+                        </label>
+                        <div className="mt-1 flex rounded-md shadow-sm">
+                          <div className="relative flex items-stretch flex-grow">
+                            <input
+                              type="text"
+                              id="pix-code"
+                              className="focus:ring-indigo-500 focus:border-indigo-500 block w-full rounded-none rounded-l-md sm:text-sm border-gray-300 bg-gray-100"
+                              value={state.paymentInfo.pixCopiaECola}
+                              readOnly
+                            />
+                            <button
+                              type="button"
+                              onClick={() => copyToClipboard(state.paymentInfo?.pixCopiaECola || '')}
+                              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-r-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                            >
+                              {copied ? 'Copiado!' : 'Copiar'}
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                      <p className="text-sm text-gray-500">
+                        Abra o aplicativo do seu banco, escolha a opção de pagamento via PIX, e escaneie o QR code ou cole o código acima.
+                      </p>
+                    </div>
+                  )}
+                  
+                  {/* Boleto */}
+                  {state.paymentInfo.linhaDigitavel && (
+                    <div>
+                      <h4 className="font-medium text-gray-900 mb-3">Pagamento via Boleto</h4>
+                      <div className="mb-4">
+                        <label htmlFor="boleto-code" className="block text-sm font-medium text-gray-700 mb-1">
+                          Linha Digitável
+                        </label>
+                        <div className="mt-1 flex rounded-md shadow-sm">
+                          <div className="relative flex items-stretch flex-grow">
+                            <input
+                              type="text"
+                              id="boleto-code"
+                              className="focus:ring-indigo-500 focus:border-indigo-500 block w-full rounded-none rounded-l-md sm:text-sm border-gray-300 bg-gray-100"
+                              value={state.paymentInfo.linhaDigitavel}
+                              readOnly
+                            />
+                            <button
+                              type="button"
+                              onClick={() => copyToClipboard(state.paymentInfo?.linhaDigitavel || '')}
+                              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-r-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                            >
+                              {copied ? 'Copiado!' : 'Copiar'}
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                      {state.paymentInfo.pdf && (
+                        <div className="mt-4">
+                          <a
+                            href={state.paymentInfo.pdf}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                          >
+                            <svg className="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                            </svg>
+                            Baixar Boleto
+                          </a>
+                        </div>
+                      )}
+                      <p className="mt-3 text-sm text-gray-500">
+                        O boleto deve ser pago até o vencimento. Após o pagamento, pode levar até 3 dias úteis para a compensação.
+                      </p>
+                    </div>
+                  )}
+                  
+                  {/* Cartão de Crédito */}
+                  {!state.paymentInfo.pixCopiaECola && !state.paymentInfo.linhaDigitavel && (
+                    <div>
+                      <h4 className="font-medium text-gray-900 mb-3">Pagamento via Cartão de Crédito</h4>
+                      <p className="text-sm text-gray-900">
+                        Seu pagamento via cartão de crédito foi processado com sucesso.
+                      </p>
+                      <p className="mt-1 text-sm text-gray-500">
+                        Após o período de teste gratuito, seu cartão será debitado automaticamente conforme plano escolhido.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+            
+            {/* Próximos passos */}
+            <div className="mb-8">
+              <h3 className="text-lg font-medium text-gray-900 mb-2">Próximos passos</h3>
+              <div className="space-y-4">
+                <div className="flex">
+                  <div className="flex-shrink-0">
+                    <div className="flex items-center justify-center h-8 w-8 rounded-full bg-indigo-100 text-indigo-600">
+                      1
+                    </div>
+                  </div>
+                  <div className="ml-4">
+                    <h4 className="text-sm font-medium text-gray-900">Verifique seu email</h4>
+                    <p className="mt-1 text-sm text-gray-500">
+                      Enviamos um email para {state.email} com instruções detalhadas para acessar a plataforma.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex">
+                  <div className="flex-shrink-0">
+                    <div className="flex items-center justify-center h-8 w-8 rounded-full bg-indigo-100 text-indigo-600">
+                      2
+                    </div>
+                  </div>
+                  <div className="ml-4">
+                    <h4 className="text-sm font-medium text-gray-900">Acesse a plataforma</h4>
+                    <p className="mt-1 text-sm text-gray-500">
+                      Utilize as credenciais fornecidas para acessar o painel administrativo da Edunéxia.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex">
+                  <div className="flex-shrink-0">
+                    <div className="flex items-center justify-center h-8 w-8 rounded-full bg-indigo-100 text-indigo-600">
+                      3
+                    </div>
+                  </div>
+                  <div className="ml-4">
+                    <h4 className="text-sm font-medium text-gray-900">Configure sua instituição</h4>
+                    <p className="mt-1 text-sm text-gray-500">
+                      Complete o cadastro da sua instituição e comece a usar os módulos disponíveis.
+                    </p>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-
-          <div className="mt-8 bg-white shadow overflow-hidden rounded-lg">
-            <div className="px-4 py-5 sm:p-6">
-              <h2 className="text-lg font-medium text-gray-900">Próximos passos</h2>
-              <div className="mt-4 space-y-6">
-                <div>
-                  <h3 className="text-sm font-medium text-gray-900">1. Verifique seu email</h3>
-                  <p className="mt-2 text-sm text-gray-600">
-                    Enviamos um email para <span className="font-medium">{state.email}</span> com suas credenciais de acesso e instruções para começar.
-                  </p>
-                </div>
-                <div>
-                  <h3 className="text-sm font-medium text-gray-900">2. Acesse sua plataforma</h3>
-                  <p className="mt-2 text-sm text-gray-600">
-                    Use o link abaixo para acessar sua plataforma Edunéxia e configurar seu ambiente.
-                  </p>
-                  <div className="mt-3">
-                    <a
-                      href="https://app.edunexia.com/login"
-                      className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      Acessar plataforma
-                    </a>
-                  </div>
-                </div>
-                <div>
-                  <h3 className="text-sm font-medium text-gray-900">3. Configure sua conta</h3>
-                  <p className="mt-2 text-sm text-gray-600">
-                    Complete o assistente de configuração inicial para personalizar sua plataforma de acordo com as necessidades da sua instituição.
-                  </p>
-                </div>
-                <div>
-                  <h3 className="text-sm font-medium text-gray-900">4. Explore os recursos</h3>
-                  <p className="mt-2 text-sm text-gray-600">
-                    Utilize o período de avaliação gratuita para explorar todos os recursos disponíveis no seu plano. Nossa documentação e tutoriais estão disponíveis para ajudar.
-                  </p>
-                </div>
-              </div>
+            
+            {/* Opção de cancelamento durante o período de trial */}
+            <div className="mb-8">
+              <button
+                onClick={cancelSubscription}
+                className="text-sm text-red-600 hover:text-red-500 font-medium underline"
+              >
+                Cancelar assinatura
+              </button>
+              <p className="mt-1 text-xs text-gray-500">
+                Você pode cancelar sua assinatura a qualquer momento durante o período de teste gratuito.
+              </p>
             </div>
-          </div>
-
-          <div className="mt-8 bg-blue-50 rounded-lg overflow-hidden shadow">
-            <div className="px-4 py-5 sm:p-6">
+            
+            {/* Suporte */}
+            <div className="rounded-md bg-blue-50 p-4">
               <div className="flex">
                 <div className="flex-shrink-0">
                   <svg className="h-5 w-5 text-blue-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
@@ -119,23 +315,20 @@ const CheckoutSuccessPage: React.FC = () => {
                   <h3 className="text-sm font-medium text-blue-800">Precisa de ajuda?</h3>
                   <div className="mt-2 text-sm text-blue-700">
                     <p>
-                      Nossa equipe de suporte está disponível para ajudar em sua implementação. Entre em contato pelo email <a href="mailto:suporte@edunexia.com" className="font-medium underline">suporte@edunexia.com</a> ou pelo chat disponível na plataforma.
+                      Nossa equipe de suporte está disponível para ajudar em qualquer etapa do processo. Entre em contato através do email <a href="mailto:suporte@edunexia.com" className="font-medium underline">suporte@edunexia.com</a> ou pelo telefone (11) 4002-8922.
                     </p>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-
-          <div className="mt-12 text-center">
+          
+          <div className="px-4 py-4 sm:px-6 bg-gray-50 border-t border-gray-200 flex justify-center">
             <Link
               to="/"
-              className="inline-flex items-center text-indigo-600 hover:text-indigo-500"
+              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
-              <svg className="mr-1 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
-              </svg>
-              Voltar para a página inicial
+              Voltar à página inicial
             </Link>
           </div>
         </div>

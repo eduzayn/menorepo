@@ -1,329 +1,296 @@
-import React, { FC, ReactNode, useCallback, useEffect, useState } from 'react';
-import { SupabaseClient } from '@supabase/supabase-js';
-import { 
-  User, 
-  UserSession, 
-  AuthCredentials, 
-  AuthResponse 
-} from './types';
-import { AuthContext } from './hooks/AuthContext';
+import { SupabaseClient, Session } from '@supabase/supabase-js';
 
-// Propriedades do AuthProvider
-interface AuthProviderProps {
-  children: ReactNode;
-  supabaseClient: SupabaseClient;
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { User, UserSession, AuthResponse, SignUpCredentials, UserProfile, ModulePermissions, RoleLevel } from './types';
+import { permissionCache } from './utils/permissionCache';
+import { getBasePermissions } from './utils/permissions';
+import { dynamicRoleManager } from './utils/dynamicRoles';
+
+interface AuthContextType {
+  user: User | null;
+  session: UserSession | null;
+  loading: boolean;
+  signIn: (email: string, password: string) => Promise<AuthResponse>;
+  signUp: (credentials: SignUpCredentials) => Promise<AuthResponse>;
+  signOut: () => Promise<void>;
+  updateProfile: (profile: Partial<UserProfile>) => Promise<void>;
+  updatePreferences: (preferences: Record<string, any>) => Promise<void>;
 }
 
-/**
- * Provider de autenticação que encapsula toda a lógica de auth e gerenciamento de sessão
- */
-export const AuthProvider: FC<AuthProviderProps> = ({ children, supabaseClient }) => {
+const AuthContext = createContext<AuthContextType | null>(null);
+
+interface AuthProviderProps {
+  supabase: SupabaseClient;
+  children: React.ReactNode;
+}
+
+const createUserSession = (session: Session): UserSession => ({
+  user: null,
+  token: {
+    access_token: session.access_token,
+    refresh_token: session.refresh_token || '',
+    expires_at: new Date(session.expires_at || 0).getTime(),
+    token_type: session.token_type
+  },
+  expires_at: new Date(session.expires_at || 0).getTime()
+});
+
+const createUserFromProfile = (profile: any, permissions: ModulePermissions): User => ({
+  id: profile.id,
+  email: profile.email,
+  name: profile.name,
+  role: profile.role as RoleLevel,
+  status: profile.status,
+  created_at: profile.created_at,
+  updated_at: profile.updated_at,
+  permissions,
+  preferences: profile.preferences || {},
+  dynamicRoles: profile.dynamic_roles || []
+});
+
+export const AuthProvider: React.FC<AuthProviderProps> = ({ supabase, children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<UserSession | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<Error | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  /**
-   * Verifica se há sessão ativa ao carregar o componente
-   */
   useEffect(() => {
-    const checkSession = async () => {
-      setLoading(true);
-      
-      try {
-        // Verificar sessão atual
-        const { data, error: sessionError } = await supabaseClient.auth.getSession();
-        
-        if (sessionError) {
-          throw sessionError;
-        }
-        
-        const currentSession = data.session;
-        
-        if (currentSession) {
-          // Buscar dados do usuário se há sessão
-          const { data: userData, error: userError } = await supabaseClient
-            .from('usuarios')
-            .select('*, perfil_detalhes:perfis(*)')
-            .eq('id', currentSession.user.id)
-            .single();
-            
-          if (userError) {
-            throw userError;
-          }
-
-          // Se há dados do usuário, atualiza o estado
-          if (userData) {
-            setUser(userData as User);
-            
-            // Armazenar sessão
-            const userSession: UserSession = {
-              user: userData as User,
-              token: {
-                access_token: currentSession.access_token,
-                refresh_token: currentSession.refresh_token || '',
-                expires_at: new Date(currentSession.expires_at || 0).getTime(),
-                token_type: currentSession.token_type
-              },
-              expires_at: new Date(currentSession.expires_at || 0).getTime()
-            };
-            
-            setSession(userSession);
-          }
-        }
-      } catch (err) {
-        console.error('Erro ao verificar autenticação:', err);
-        setError(err instanceof Error ? err : new Error('Erro desconhecido ao verificar sessão'));
-      } finally {
-        setLoading(false);
+    // Carregar sessão inicial
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        setSession(createUserSession(session));
+        loadUserProfile(session.user.id);
       }
-    };
-
-    checkSession();
-    
-    // Configurar listener para alterações de autenticação
-    const { data: authListener } = supabaseClient.auth.onAuthStateChange(
-      async (event, currentSession) => {
-        if (event === 'SIGNED_IN' && currentSession) {
-          // Atualizar usuário e sessão quando há login
-          const { data: userData, error: userError } = await supabaseClient
-            .from('usuarios')
-            .select('*, perfil_detalhes:perfis(*)')
-            .eq('id', currentSession.user.id)
-            .single();
-            
-          if (userError) {
-            console.error('Erro ao buscar dados do usuário:', userError);
-            return;
-          }
-            
-          if (userData) {
-            setUser(userData as User);
-            
-            const userSession: UserSession = {
-              user: userData as User,
-              token: {
-                access_token: currentSession.access_token,
-                refresh_token: currentSession.refresh_token || '',
-                expires_at: new Date(currentSession.expires_at || 0).getTime(),
-                token_type: currentSession.token_type
-              },
-              expires_at: new Date(currentSession.expires_at || 0).getTime()
-            };
-            
-            setSession(userSession);
-          }
-        } else if (event === 'SIGNED_OUT') {
-          // Limpar usuário e sessão quando há logout
-          setUser(null);
-          setSession(null);
-        }
-      }
-    );
-
-    // Cleanup do listener
-    return () => {
-      authListener?.subscription?.unsubscribe();
-    };
-  }, [supabaseClient]);
-
-  /**
-   * Realiza login com email e senha
-   */
-  const signIn = useCallback(async (credentials: AuthCredentials): Promise<AuthResponse> => {
-    setLoading(true);
-    setError(null);
-    
-    try {
-      // Autenticar com email e senha
-      const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({
-        email: credentials.email,
-        password: credentials.password
-      });
-      
-      if (authError) {
-        throw authError;
-      }
-      
-      if (!authData?.session) {
-        throw new Error('Sessão inválida após login');
-      }
-      
-      // Buscar dados completos do usuário
-      const { data: userData, error: userError } = await supabaseClient
-        .from('usuarios')
-        .select('*, perfil_detalhes:perfis(*)')
-        .eq('id', authData.user.id)
-        .single();
-        
-      if (userError) {
-        throw userError;
-      }
-      
-      if (!userData) {
-        throw new Error('Dados do usuário não encontrados');
-      }
-      
-      // Criar sessão e atualizar estado
-      const user = userData as User;
-      const userSession: UserSession = {
-        user,
-        token: {
-          access_token: authData.session.access_token,
-          refresh_token: authData.session.refresh_token,
-          expires_at: new Date(authData.session.expires_at || 0).getTime(),
-          token_type: authData.session.token_type
-        },
-        expires_at: new Date(authData.session.expires_at || 0).getTime()
-      };
-      
-      setUser(user);
-      setSession(userSession);
-      
-      return {
-        user,
-        session: userSession,
-        error: null
-      };
-    } catch (err) {
-      console.error('Erro ao realizar login:', err);
-      const errorObj = err instanceof Error ? err : new Error('Erro desconhecido ao realizar login');
-      setError(errorObj);
-      
-      throw errorObj;
-    } finally {
       setLoading(false);
-    }
-  }, [supabaseClient]);
+    });
 
-  /**
-   * Realiza logout do usuário
-   */
-  const signOut = useCallback(async (): Promise<{ success: boolean, error: Error | null }> => {
-    setLoading(true);
-    
-    try {
-      const { error: signOutError } = await supabaseClient.auth.signOut();
-      
-      if (signOutError) {
-        throw signOutError;
+    // Escutar mudanças na autenticação
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (session) {
+        setSession(createUserSession(session));
+        await loadUserProfile(session.user.id);
+      } else {
+        setUser(null);
+        setSession(null);
+        if (user?.id) {
+          permissionCache.remove(user.id);
+        }
       }
       
-      // Limpar estados
+      setLoading(false);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [supabase]);
+
+  const loadUserProfile = async (userId: string) => {
+    try {
+      // Verificar cache primeiro
+      const cachedPermissions = permissionCache.get(userId);
+      if (cachedPermissions) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', userId)
+          .single();
+        
+        if (profile) {
+          setUser(createUserFromProfile(profile, cachedPermissions));
+          return;
+        }
+      }
+
+      // Se não estiver em cache, buscar do banco
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+
+      if (error) throw error;
+
+      if (profile) {
+        // Combinar permissões base com roles dinâmicos
+        const basePermissions = profile.permissions || getBasePermissions(profile.role as RoleLevel);
+        const dynamicRoleIds = profile.dynamic_roles || [];
+        const permissions = dynamicRoleManager.combinePermissions(profile.role as RoleLevel, dynamicRoleIds);
+
+        // Armazenar no cache
+        permissionCache.set(userId, permissions);
+        setUser(createUserFromProfile(profile, permissions));
+      }
+    } catch (error) {
+      console.error('Erro ao carregar perfil:', error);
+      throw error;
+    }
+  };
+
+  const signIn = async (email: string, password: string): Promise<AuthResponse> => {
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) throw error;
+
+      if (data.user) {
+        await loadUserProfile(data.user.id);
+      }
+
+      return { 
+        user: data.user ? user : null, 
+        session: data.session ? createUserSession(data.session) : null, 
+        error: null 
+      };
+    } catch (error) {
+      return { 
+        user: null, 
+        session: null, 
+        error: error instanceof Error ? error : new Error('Erro desconhecido') 
+      };
+    }
+  };
+
+  const signUp = async (credentials: SignUpCredentials): Promise<AuthResponse> => {
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email: credentials.email,
+        password: credentials.password,
+        options: {
+          data: {
+            name: credentials.name,
+            role: credentials.role,
+          },
+        },
+      });
+
+      if (error) throw error;
+
+      if (data.user) {
+        // Criar perfil inicial
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert([
+            {
+              id: data.user.id,
+              name: credentials.name,
+              email: credentials.email,
+              role: credentials.role,
+              status: 'active',
+              permissions: getBasePermissions(credentials.role),
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+            },
+          ]);
+
+        if (profileError) throw profileError;
+
+        await loadUserProfile(data.user.id);
+      }
+
+      return { 
+        user: data.user ? user : null, 
+        session: data.session ? createUserSession(data.session) : null, 
+        error: null 
+      };
+    } catch (error) {
+      return { 
+        user: null, 
+        session: null, 
+        error: error instanceof Error ? error : new Error('Erro desconhecido') 
+      };
+    }
+  };
+
+  const signOut = async (): Promise<void> => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      
       setUser(null);
       setSession(null);
-      
-      return {
-        success: true,
-        error: null
-      };
-    } catch (err) {
-      console.error('Erro ao realizar logout:', err);
-      const errorObj = err instanceof Error ? err : new Error('Erro desconhecido ao realizar logout');
-      setError(errorObj);
-      
-      throw errorObj;
-    } finally {
-      setLoading(false);
-    }
-  }, [supabaseClient]);
-
-  /**
-   * Verifica se o usuário tem uma permissão específica
-   */
-  const hasPermission = useCallback((permission: string): boolean => {
-    if (!user || !user.permissoes) {
-      return false;
-    }
-    
-    return user.permissoes.includes(permission);
-  }, [user]);
-
-  /**
-   * Verifica se o usuário tem um perfil específico
-   */
-  const hasRole = useCallback((role: string): boolean => {
-    if (!user) {
-      return false;
-    }
-    
-    // Mapeamento de hierarquia de papéis
-    const roles: Record<string, string[]> = {
-      admin: ['admin'],
-      gestor: ['admin', 'gestor'],
-      coordenador: ['admin', 'gestor', 'coordenador'],
-      professor: ['admin', 'gestor', 'coordenador', 'professor'],
-      tutor: ['admin', 'gestor', 'coordenador', 'professor', 'tutor'],
-      secretaria: ['admin', 'gestor', 'secretaria'],
-      financeiro: ['admin', 'gestor', 'financeiro'],
-      aluno: ['aluno'],
-      parceiro: ['parceiro'],
-      visitante: ['admin', 'gestor', 'coordenador', 'professor', 'tutor', 'secretaria', 'financeiro', 'aluno', 'parceiro', 'visitante']
-    };
-    
-    // Verificar se o perfil do usuário está na lista de perfis permitidos
-    return roles[role]?.includes(user.perfil) || false;
-  }, [user]);
-
-  /**
-   * Atualiza dados do perfil do usuário
-   */
-  const updateProfile = useCallback(async (
-    profileData: Partial<User>
-  ): Promise<{ success: boolean, error: Error | null }> => {
-    if (!user) {
-      return {
-        success: false,
-        error: new Error('Usuário não autenticado')
-      };
-    }
-    
-    try {
-      // Atualizar dados do usuário com a sintaxe correta para filtro por ID
-      const { error: updateError } = await supabaseClient
-        .from('usuarios')
-        .update(profileData)
-        .eq('id', user.id);
-        
-      if (updateError) {
-        throw updateError;
+      if (user?.id) {
+        permissionCache.remove(user.id);
       }
-      
-      // Atualizar estado do usuário com novos dados
-      setUser(currentUser => {
-        if (!currentUser) return null;
-        return { ...currentUser, ...profileData };
-      });
-      
-      return {
-        success: true,
-        error: null
-      };
-    } catch (err) {
-      console.error('Erro ao atualizar perfil:', err);
-      const errorObj = err instanceof Error ? err : new Error('Erro desconhecido ao atualizar perfil');
-      
-      throw errorObj;
+    } catch (error) {
+      console.error('Erro ao fazer logout:', error);
+      throw error;
     }
-  }, [supabaseClient, user]);
+  };
 
-  // Valor do contexto de autenticação
-  const authContextValue = {
-    user,
-    session,
-    loading,
-    error,
-    isAuthenticated: !!user,
-    signIn,
-    signOut,
-    hasPermission,
-    hasRole,
-    updateProfile
+  const updateProfile = async (profile: Partial<UserProfile>): Promise<void> => {
+    try {
+      if (!user?.id) throw new Error('Usuário não autenticado');
+
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          ...profile,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', user.id);
+
+      if (error) throw error;
+
+      // Atualizar estado local
+      setUser(prev => prev ? { ...prev, ...profile } : null);
+      
+      // Atualizar cache se necessário
+      if ('permissions' in profile) {
+        permissionCache.set(user.id, profile.permissions as ModulePermissions);
+      }
+    } catch (error) {
+      console.error('Erro ao atualizar perfil:', error);
+      throw error;
+    }
+  };
+
+  const updatePreferences = async (preferences: Record<string, any>): Promise<void> => {
+    try {
+      if (!user?.id) throw new Error('Usuário não autenticado');
+
+      const { error } = await supabase
+        .from('profiles')
+        .update({ 
+          preferences,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', user.id);
+
+      if (error) throw error;
+
+      // Atualizar estado local
+      setUser(prev => prev ? { ...prev, preferences } : null);
+    } catch (error) {
+      console.error('Erro ao atualizar preferências:', error);
+      throw error;
+    }
   };
 
   return (
-    <AuthContext.Provider value={authContextValue}>
+    <AuthContext.Provider
+      value={{
+        user,
+        session,
+        loading,
+        signIn,
+        signUp,
+        signOut,
+        updateProfile,
+        updatePreferences,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
+};
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth deve ser usado dentro de um AuthProvider');
+  }
+  return context;
 }; 

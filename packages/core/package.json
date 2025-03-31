@@ -16,13 +16,14 @@
   ],
   "dependencies": {
     "@edunexia/api-client": "workspace:*",
+    "@edunexia/auth": "workspace:^",
     "@edunexia/database-schema": "workspace:*",
     "@edunexia/utils": "workspace:*"
   },
   "devDependencies": {
-    "typescript": "^5.2.2",
     "@edunexia/eslint-config": "*",
     "@edunexia/typescript-config": "*",
+    "typescript": "^5.2.2",
     "vitest": "^0.32.3"
   }
-} 
+}

@@ -1,33 +1,16 @@
 {
-  "extends": "../typescript-config/base.json",
   "compilerOptions": {
-    "composite": true,
-    "baseUrl": ".",
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "node",
     "jsx": "react-jsx",
-    "paths": {
-      "@/*": [
-        "./src/*"
-      ],
-      "@hooks/*": [
-        "./src/hooks/*"
-      ],
-      "@components/*": [
-        "./src/components/*"
-      ],
-      "@types/*": [
-        "./src/types/*"
-      ]
-    },
+    "declaration": true,
     "outDir": "./dist",
-    "rootDir": "./"
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
   },
-  "include": [
-    "src/**/*",
-    "vitest.config.ts",
-    "src/setupTests.ts"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist"
-  ]
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
 }

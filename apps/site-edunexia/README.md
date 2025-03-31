@@ -227,6 +227,45 @@ site-edunexia/
 - **Checkout**: Fluxo de checkout para assinatura direta dos planos
 - **Trial**: Iniciar período de teste gratuito sem necessidade de cartão de crédito
 
+## Módulos do Ecossistema Edunéxia
+
+O site apresenta os seguintes módulos disponíveis na plataforma:
+
+### 1. Sistema de Matrículas (`/matriculas`)
+- Automação do processo de matrícula online
+- Gestão de documentos digitais
+- Integração com sistema financeiro
+- Dashboard de acompanhamento
+- Relatórios gerenciais
+
+### 2. Portal do Aluno (`/portal-do-aluno`)
+- Acesso a notas e boletins
+- Comunicação direta com professores
+- Conteúdo didático online
+- Acompanhamento de frequência
+- Emissão de boletos e documentos
+
+### 3. Material Didático (`/material-didatico`)
+- Biblioteca digital de conteúdos
+- Criação de conteúdo interativo
+- Vídeo-aulas integradas
+- Avaliações automatizadas
+- Análise de desempenho
+
+### 4. Comunicação (`/comunicacao`)
+- Comunicados institucionais
+- Mensagens direcionadas por turma
+- Chat individual com pais e alunos
+- Confirmação de leitura
+- Notificações por e-mail e SMS
+
+### 5. Gestão Financeira (`/financeiro`)
+- Gestão de mensalidades e boletos
+- Controle de inadimplência
+- Gestão de bolsas e descontos
+- Integração com bancos
+- Relatórios financeiros detalhados
+
 ## Página de Planos
 
 A página de planos detalha as opções de pacotes disponíveis para contratação:
@@ -249,34 +288,27 @@ Cada plano inclui diferentes níveis de suporte e recursos, com opções para pe
 
 Conforme planejado no README principal do monorepo, o módulo implementa um sistema de vendas autoatendimento com as seguintes funcionalidades:
 
-1. **Catálogo de planos** - Exibição clara dos três planos disponíveis com recursos e preços
-2. **Checkout online** - Fluxo de pagamento integrado para assinatura imediata dos planos
-3. **Teste gratuito** - Opção de iniciar período de 14 dias sem fornecer cartão de crédito
-4. **Cadastro automático** - Criação automática de conta para a instituição após checkout ou teste
-5. **Email transacional** - Envio automático de credenciais de acesso por email
+- Contratação direta via site sem intervenção da equipe comercial
+- Opção de período de teste gratuito de 14 dias
+- Integração com gateway de pagamento Asaas
+- Suporte a múltiplas formas de pagamento (cartão, boleto, PIX)
+- Envio automatizado de credenciais de acesso
+- Cancelamento durante período de teste
 
-O fluxo de vendas segue estas etapas:
-1. Cliente visualiza planos na página `/planos`
-2. Escolhe "Assinar agora" ou "Teste grátis por 14 dias"
-3. Fornece dados da instituição e do responsável
-4. Para assinatura, fornece dados de pagamento
-5. Recebe confirmação e credenciais de acesso
-6. Acessa a plataforma imediatamente
+## Suporte e Documentação
 
-## Componentes Principais
+O site também oferece recursos para suporte:
 
-- `Layout.tsx`: Layout principal do site (cabeçalho e rodapé)
-- `AdminLayout.tsx`: Layout da área administrativa
-- `ProtectedRoute.tsx`: Componente para proteger rotas administrativas
-- `ErrorBoundary.tsx`: Componente para captura e tratamento de erros
+- **Central de Ajuda** (`/pagina/central-de-ajuda`): Base de conhecimento e tutoriais
+- **Documentação** (`/pagina/documentacao`): Documentação técnica completa
+- **Status do Sistema** (`/pagina/status-do-sistema`): Monitoramento em tempo real da plataforma
 
-## Dependências
+## Páginas Institucionais
 
-- React + TypeScript
-- React Router para navegação
-- TailwindCSS para estilização
-- Supabase para backend e API
+Além das páginas principais, o site inclui páginas institucionais importantes:
 
-## Scripts Disponíveis
-
-- `pnpm dev`: Executa o site em modo de desenvolvimento
+- **Carreiras** (`/pagina/carreiras`): Oportunidades de trabalho na Edunéxia
+- **Parceiros** (`/pagina/parceiros`): Programa de parcerias e integrações
+- **Política de Privacidade** (`/pagina/privacidade`): Informações sobre uso de dados
+- **Termos de Uso** (`/pagina/termos`): Termos e condições de uso da plataforma
+- **Cookies** (`/pagina/cookies`): Política de uso de cookies

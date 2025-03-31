@@ -47,14 +47,69 @@ window.IntersectionObserver = vi.fn().mockImplementation(() => ({
   disconnect: vi.fn(),
 }));
 
-// Mock para matchMedia
-window.matchMedia = vi.fn().mockImplementation(query => ({
-  matches: false,
-  media: query,
-  onchange: null,
-  addListener: vi.fn(),
-  removeListener: vi.fn(),
-  addEventListener: vi.fn(),
-  removeEventListener: vi.fn(),
-  dispatchEvent: vi.fn(),
+// Mock para window.matchMedia
+Object.defineProperty(window, 'matchMedia', {
+  writable: true,
+  value: vi.fn().mockImplementation(query => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: vi.fn(),
+    removeListener: vi.fn(),
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+  })),
+});
+
+// Mock básico para funções comuns e módulos externos
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual<object>('react-router-dom');
+  return {
+    ...(actual as object),
+    useNavigate: vi.fn().mockReturnValue(vi.fn()),
+    useParams: vi.fn().mockReturnValue({}),
+    useLocation: vi.fn().mockReturnValue({
+      pathname: '/',
+      search: '',
+      hash: '',
+      state: null,
+      key: 'default',
+    }),
+  };
+});
+
+// Mock para API e localStorage
+vi.mock('@edunexia/api-client', () => ({
+  useSupabaseClient: vi.fn().mockReturnValue({
+    auth: {
+      getSession: vi.fn().mockResolvedValue({ data: { session: null } }),
+      signIn: vi.fn(),
+      signOut: vi.fn(),
+    },
+    from: vi.fn().mockReturnValue({
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      data: null,
+      error: null
+    })
+  })
+}));
+
+// Mock para o React Query
+vi.mock('@tanstack/react-query', () => ({
+  useQuery: vi.fn().mockImplementation(() => ({
+    data: null,
+    isLoading: false,
+    error: null
+  })),
+  useMutation: vi.fn().mockImplementation(() => ({
+    mutate: vi.fn(),
+    isLoading: false,
+    error: null
+  })),
+  QueryClient: vi.fn().mockImplementation(() => ({
+    invalidateQueries: vi.fn()
+  })),
+  QueryClientProvider: ({ children }: { children: React.ReactNode }) => children
 })); 

@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@edunexia/api-client": "*",
+    "@edunexia/auth": "workspace:^",
     "@edunexia/ui-components": "*",
     "react": "^18.2.0"
   },
@@ -27,4 +28,4 @@
     "tsup": "^8.0.2",
     "typescript": "^5.0.2"
   }
-} 
+}

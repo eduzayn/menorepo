@@ -1,7 +1,7 @@
 import { BrowserRouter as Router } from 'react-router-dom';
 import { ThemeProvider } from './components/ThemeProvider';
 import { ApiProvider } from './contexts/ApiContext';
-import { AuthProvider } from '@edunexia/auth';
+import AuthProvider from './contexts/AuthContext';
 import ScrollToTop from './components/ScrollToTop';
 import ErrorBoundary from './components/ErrorBoundary';
 import AppRoutes from './routes';

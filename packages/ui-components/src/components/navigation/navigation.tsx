@@ -14,7 +14,7 @@ export interface NavigationProps {
 
 export function Navigation({ children, className }: NavigationProps) {
   return (
-    <nav className={cn("flex items-center space-x-4", className)}>
+    <nav className={cn("flex items-center space-x-4", className)} role="navigation" aria-label="Principal">
       {children}
     </nav>
   );
@@ -41,6 +41,15 @@ export interface NavigationItemProps {
    * URL de destino
    */
   href?: string;
+  /**
+   * Abrir em nova aba
+   */
+  openInNewTab?: boolean;
+  /**
+   * Componente personalizado para renderizar links 
+   * (como Link do react-router-dom ou Next.js)
+   */
+  LinkComponent?: React.ComponentType<any>;
 }
 
 export function NavigationItem({
@@ -49,6 +58,8 @@ export function NavigationItem({
   className,
   onClick,
   href,
+  openInNewTab,
+  LinkComponent
 }: NavigationItemProps) {
   const itemClass = cn(
     "text-sm font-medium transition-colors hover:text-primary",
@@ -57,15 +68,42 @@ export function NavigationItem({
   );
 
   if (href) {
+    // Se um componente Link personalizado foi fornecido (React Router, Next.js, etc.)
+    if (LinkComponent) {
+      return (
+        <LinkComponent 
+          to={href} // para react-router
+          href={href} // para next.js
+          className={itemClass}
+          onClick={onClick}
+          target={openInNewTab ? '_blank' : undefined}
+          rel={openInNewTab ? 'noopener noreferrer' : undefined}
+        >
+          {children}
+        </LinkComponent>
+      );
+    }
+    
+    // Link padrão HTML
     return (
-      <a href={href} className={itemClass} onClick={onClick}>
+      <a 
+        href={href} 
+        className={itemClass} 
+        onClick={onClick}
+        target={openInNewTab ? '_blank' : undefined}
+        rel={openInNewTab ? 'noopener noreferrer' : undefined}
+      >
         {children}
       </a>
     );
   }
 
   return (
-    <button className={itemClass} onClick={onClick}>
+    <button 
+      className={itemClass} 
+      onClick={onClick}
+      type="button"
+    >
       {children}
     </button>
   );

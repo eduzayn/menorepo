@@ -14,6 +14,7 @@
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
   },
   "dependencies": {
+    "@edunexia/auth": "workspace:^",
     "react": "^18.2.0",
     "react-router-dom": "^6.22.3"
   },
@@ -26,4 +27,4 @@
     "tsup": "^8.0.2",
     "typescript": "^5.0.2"
   }
-} 
+}

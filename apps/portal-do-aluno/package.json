@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@edunexia/api-client": "workspace:*",
-    "@edunexia/auth": "*",
+    "@edunexia/auth": "^1.0.0",
     "@edunexia/core-types": "*",
     "@edunexia/database-schema": "workspace:*",
     "@edunexia/ui-components": "workspace:*",
@@ -49,4 +49,4 @@
     "vite": "^4.5.0",
     "vitest": "^0.34.6"
   }
-} 
+}

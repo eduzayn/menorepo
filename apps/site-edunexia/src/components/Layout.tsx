@@ -16,75 +16,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     <ErrorBoundary>
       <ScrollToTop />
       <div className="flex flex-col min-h-screen">
-        <header className="bg-white shadow-sm">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between h-16 items-center">
-              <div className="flex-shrink-0 flex items-center">
-                <Link to="/" className="font-bold text-xl text-indigo-600">
-                  Edunéxia
-                </Link>
-              </div>
-              <nav className="hidden md:ml-6 md:flex md:space-x-8">
-                <Link
-                  to="/"
-                  className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900 border-b-2 border-transparent hover:border-indigo-500"
-                >
-                  Home
-                </Link>
-                <Link
-                  to="/sobre"
-                  className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-500 border-b-2 border-transparent hover:border-indigo-500 hover:text-gray-700"
-                >
-                  Sobre
-                </Link>
-                <Link
-                  to="/blog"
-                  className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-500 border-b-2 border-transparent hover:border-indigo-500 hover:text-gray-700"
-                >
-                  Blog
-                </Link>
-                <Link
-                  to="/contato"
-                  className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-500 border-b-2 border-transparent hover:border-indigo-500 hover:text-gray-700"
-                >
-                  Contato
-                </Link>
-              </nav>
-              <div className="hidden md:flex items-center">
-                <Link
-                  to="/login"
-                  className="ml-8 inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700"
-                >
-                  Login
-                </Link>
-              </div>
-              <div className="flex items-center md:hidden">
-                <button
-                  type="button"
-                  className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
-                  aria-expanded="false"
-                >
-                  <span className="sr-only">Abrir menu</span>
-                  <svg
-                    className="block h-6 w-6"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    aria-hidden="true"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M4 6h16M4 12h16M4 18h16"
-                    />
-                  </svg>
-                </button>
-              </div>
-            </div>
-          </div>
-        </header>
+        {/* Cabeçalho removido completamente */}
 
         <main className="flex-grow">
           {children}

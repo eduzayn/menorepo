@@ -13,9 +13,10 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@edunexia/auth": "workspace:^",
     "@supabase/supabase-js": "^2.39.3"
   },
   "devDependencies": {
     "typescript": "^5.0.2"
   }
-} 
+}

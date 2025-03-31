@@ -17,6 +17,7 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
+    "@edunexia/auth": "workspace:^",
     "date-fns": "^2.30.0",
     "lodash": "^4.17.21"
   },
@@ -28,4 +29,4 @@
     "tsup": "^8.0.2",
     "typescript": "^5.0.2"
   }
-} 
+}

@@ -1,5 +1,5 @@
-import React from 'react';
-import { useParams, Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useParams, Link, useLocation } from 'react-router-dom';
 
 interface PageContent {
   title: string;
@@ -19,9 +19,24 @@ interface PageContentMap {
 
 const DynamicPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
+  const location = useLocation();
+  const [moduleKey, setModuleKey] = useState<string>('');
+  
+  // Detecta o módulo pela rota ou pelo slug
+  useEffect(() => {
+    // Se temos um slug, usamos ele
+    if (slug) {
+      setModuleKey(slug);
+      return;
+    }
+    
+    // Caso contrário, extraímos da pathname (removendo a '/' inicial)
+    const path = location.pathname.substring(1);
+    setModuleKey(path);
+  }, [slug, location.pathname]);
   
   const pageContents: PageContentMap = {
-    'sistema-matriculas': {
+    'matriculas': {
       title: 'Sistema de Matrículas',
       description: 'Simplifique todo o processo de matrículas da sua instituição de ensino, desde a captação de leads até a efetivação e documentação, com nossa solução completa.',
       features: [
@@ -47,7 +62,7 @@ const DynamicPage: React.FC = () => {
         link: '/contato'
       }
     },
-    'portal-aluno': {
+    'portal-do-aluno': {
       title: 'Portal do Aluno',
       description: 'Ofereça uma experiência digital completa para alunos acessarem notas, frequência, material didático e informações financeiras em uma interface intuitiva e moderna.',
       features: [
@@ -73,7 +88,7 @@ const DynamicPage: React.FC = () => {
         link: '/planos'
       }
     },
-    'gestao-financeira': {
+    'financeiro': {
       title: 'Gestão Financeira',
       description: 'Controle completo sobre mensalidades, boletos, acordos, inadimplência e relatórios financeiros para otimizar a saúde financeira da sua instituição.',
       features: [
@@ -98,6 +113,58 @@ const DynamicPage: React.FC = () => {
         text: 'Fale com um consultor',
         link: '/contato'
       }
+    },
+    'material-didatico': {
+      title: 'Material Didático',
+      description: 'Plataforma completa para criação, distribuição e gestão de conteúdo didático digital, proporcionando uma experiência de aprendizagem moderna e engajadora para seus alunos.',
+      features: [
+        'Biblioteca digital de conteúdos',
+        'Criação de conteúdo interativo',
+        'Vídeo-aulas integradas',
+        'Atividades e exercícios online',
+        'Avaliações automatizadas',
+        'Estatísticas de uso e engajamento',
+        'Conteúdo adaptativo',
+        'Acesso offline via aplicativo'
+      ],
+      benefits: [
+        'Redução de custos com materiais físicos',
+        'Conteúdo sempre atualizado',
+        'Aumento do engajamento dos alunos',
+        'Análise de desempenho em tempo real',
+        'Sustentabilidade ambiental'
+      ],
+      image: '/images/material-didatico-preview.jpg',
+      cta: {
+        text: 'Solicite uma demonstração',
+        link: '/contato'
+      }
+    },
+    'comunicacao': {
+      title: 'Comunicação',
+      description: 'Sistema integrado de comunicação para manter todos os envolvidos no processo educacional conectados, desde comunicados institucionais até mensagens individuais para pais e alunos.',
+      features: [
+        'Comunicados institucionais',
+        'Mensagens direcionadas por turma',
+        'Chat individual com pais e alunos',
+        'Agendamento de mensagens',
+        'Confirmação de leitura',
+        'Envio de documentos e arquivos',
+        'Notificações por e-mail e SMS',
+        'Aplicativo mobile para comunicação imediata'
+      ],
+      benefits: [
+        'Redução de ruídos na comunicação',
+        'Aumento da participação dos pais',
+        'Registro centralizado de todas as interações',
+        'Diminuição de reclamações por falta de informação',
+        'Fortalecimento da relação instituição-família'
+      ],
+      image: '/images/comunicacao-preview.jpg',
+      cta: {
+        text: 'Conheça esta solução',
+        link: '/planos'
+      }
     }
   };
 
@@ -114,8 +181,10 @@ const DynamicPage: React.FC = () => {
     }
   };
 
-  // Obter o conteúdo com base no slug ou usar o padrão
-  const content = pageContents[slug || ''] || defaultContent;
+  // Obter o conteúdo com base no moduleKey ou usar o padrão
+  const content = pageContents[moduleKey] || defaultContent;
+
+  console.log('DynamicPage - ModuleKey:', moduleKey, 'Content:', content.title !== 'Página não encontrada' ? 'Found' : 'Not Found');
 
   return (
     <div className="bg-white">

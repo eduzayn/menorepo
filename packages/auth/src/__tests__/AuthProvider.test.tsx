@@ -1,553 +1,375 @@
 import React from 'react';
-import { render, screen, waitFor, act } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { renderHook, act } from '@testing-library/react';
+import { AuthProvider } from '../AuthProvider';
+import { useAuth } from '../hooks/AuthContext';
 import { SupabaseClient } from '@supabase/supabase-js';
 
-import { AuthProvider } from '../AuthProvider';
-import { useAuth } from '../hooks/useAuth';
-import { User } from '../types';
-
-// Mock do cliente Supabase
+// Mock do Supabase Client
 const mockSupabaseClient = {
   auth: {
-    getSession: vi.fn(),
-    signInWithPassword: vi.fn(),
-    signOut: vi.fn(),
-    onAuthStateChange: vi.fn()
+    getSession: jest.fn(),
+    signInWithPassword: jest.fn(),
+    signUp: jest.fn(),
+    signOut: jest.fn(),
+    onAuthStateChange: jest.fn()
   },
-  from: vi.fn()
+  from: jest.fn()
 } as unknown as SupabaseClient;
 
-// Componente de teste que consome o contexto de autenticação
-const TestAuthConsumer = () => {
-  const auth = useAuth();
-  
-  return (
-    <div>
-      <div data-testid="loading">{auth.loading.toString()}</div>
-      <div data-testid="isAuthenticated">{auth.isAuthenticated.toString()}</div>
-      <div data-testid="userId">{auth.user?.id || 'none'}</div>
-      <div data-testid="userEmail">{auth.user?.email || 'none'}</div>
-      <div data-testid="errorMessage">{auth.error?.message || 'none'}</div>
-      
-      <button 
-        data-testid="checkAdmin" 
-        onClick={() => auth.hasRole('admin')}
-      >
-        Check Admin
-      </button>
-      
-      <button 
-        data-testid="checkPermission" 
-        onClick={() => auth.hasPermission('edit_users')}
-      >
-        Check Permission
-      </button>
-      
-      <button 
-        data-testid="updateProfile" 
-        onClick={() => auth.updateProfile({ nome: 'Nome Atualizado' })}
-      >
-        Update Profile
-      </button>
-    </div>
-  );
+// Mock dos dados de teste
+const mockUser = {
+  id: '123',
+  name: 'Test User',
+  email: 'test@example.com',
+  role: 'student',
+  status: 'active',
+  created_at: '2024-01-01T00:00:00Z',
+  updated_at: '2024-01-01T00:00:00Z',
+  permissions: {
+    matriculas: { read: true, write: false, delete: false },
+    comunicacao: { read: true, write: false, delete: false },
+    material_didatico: { read: true, write: false, delete: false },
+    portal_aluno: { read: true, write: true, delete: false },
+    financeiro: { read: false, write: false, delete: false },
+    vendas: { read: false, write: false, delete: false },
+    portal_parceiro: { read: false, write: false, delete: false },
+    portal_polo: { read: false, write: false, delete: false },
+    contabilidade: { read: false, write: false, delete: false },
+    rh: { read: false, write: false, delete: false },
+    configuracoes: { read: false, write: false, delete: false }
+  }
 };
 
-// Componente para testar o hasRole e hasPermission
-const TestRolePermissionComponent = () => {
-  const auth = useAuth();
-  
-  return (
-    <div>
-      <div data-testid="loading">{auth.loading.toString()}</div>
-      <div data-testid="isAuthenticated">{auth.isAuthenticated.toString()}</div>
-      <div data-testid="is-admin">{auth.hasRole('admin').toString()}</div>
-      <div data-testid="is-aluno">{auth.hasRole('aluno').toString()}</div>
-      <div data-testid="is-visitante">{auth.hasRole('visitante').toString()}</div>
-      <div data-testid="can-read">{auth.hasPermission('read_content').toString()}</div>
-      <div data-testid="can-edit">{auth.hasPermission('edit_content').toString()}</div>
-    </div>
-  );
-};
-
-// Componente para testar o updateProfile
-const TestUpdateProfileComponent = () => {
-  const auth = useAuth();
-  const [updateResult, setUpdateResult] = React.useState<any>(null);
-  const [updateError, setUpdateError] = React.useState<Error | null>(null);
-  
-  const handleUpdateProfile = async () => {
-    try {
-      const result = await auth.updateProfile({ nome: 'Nome Atualizado' });
-      setUpdateResult(result);
-    } catch (error) {
-      setUpdateError(error as Error);
-    }
-  };
-  
-  return (
-    <div>
-      <div data-testid="loading">{auth.loading.toString()}</div>
-      <div data-testid="isAuthenticated">{auth.isAuthenticated.toString()}</div>
-      <div data-testid="update-success">{updateResult?.success?.toString() || 'none'}</div>
-      <div data-testid="update-error">{updateError?.message || 'none'}</div>
-      <button 
-        data-testid="update-profile-btn" 
-        onClick={handleUpdateProfile}
-      >
-        Update Profile
-      </button>
-    </div>
-  );
+const mockSession = {
+  user: mockUser,
+  token: {
+    access_token: 'mock-access-token',
+    refresh_token: 'mock-refresh-token',
+    expires_at: Date.now() + 3600000,
+    token_type: 'bearer'
+  },
+  expires_at: Date.now() + 3600000
 };
 
 describe('AuthProvider', () => {
   beforeEach(() => {
-    vi.resetAllMocks();
+    jest.clearAllMocks();
   });
-  
-  afterEach(() => {
-    vi.clearAllMocks();
-    localStorage.clear();
-  });
-  
-  it('deve iniciar com estado de carregamento', async () => {
-    // Configurar o mock para atrasar a resposta
-    mockSupabaseClient.auth.getSession.mockReturnValue(
-      new Promise(resolve => setTimeout(() => {
-        resolve({
-          data: { session: null },
-          error: null
-        });
-      }, 100))
-    );
-    
-    mockSupabaseClient.auth.onAuthStateChange.mockImplementation(() => ({
-      data: { subscription: { unsubscribe: vi.fn() } }
-    }));
-    
-    // Renderizar o componente com o provider
-    render(
-      <AuthProvider supabaseClient={mockSupabaseClient}>
-        <TestAuthConsumer />
-      </AuthProvider>
-    );
-    
-    // Verificar o estado inicial (carregando)
-    expect(screen.getByTestId('loading').textContent).toBe('true');
-    
-    // Aguardar o carregamento ser finalizado
-    await waitFor(() => {
-      expect(screen.getByTestId('loading').textContent).toBe('false');
+
+  it('deve inicializar com estado de carregamento', () => {
+    const { result } = renderHook(() => useAuth(), {
+      wrapper: ({ children }) => (
+        <AuthProvider supabaseClient={mockSupabaseClient}>
+          {children}
+        </AuthProvider>
+      )
     });
+
+    expect(result.current.loading).toBe(true);
+    expect(result.current.user).toBe(null);
+    expect(result.current.session).toBe(null);
+    expect(result.current.error).toBe(null);
   });
-  
-  it('deve lidar com erro ao verificar sessão', async () => {
-    // Configurar o mock para retornar erro
-    const sessionError = new Error('Erro ao verificar sessão');
+
+  it('deve carregar sessão existente ao inicializar', async () => {
+    // Mock da sessão existente
     mockSupabaseClient.auth.getSession.mockResolvedValue({
-      data: { session: null },
-      error: sessionError
-    });
-    
-    mockSupabaseClient.auth.onAuthStateChange.mockImplementation(() => ({
-      data: { subscription: { unsubscribe: vi.fn() } }
-    }));
-    
-    // Espionar console.error para evitar poluição nos logs de teste
-    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    
-    // Renderizar o componente com o provider
-    render(
-      <AuthProvider supabaseClient={mockSupabaseClient}>
-        <TestAuthConsumer />
-      </AuthProvider>
-    );
-    
-    // Aguardar o carregamento ser finalizado
-    await waitFor(() => {
-      expect(screen.getByTestId('loading').textContent).toBe('false');
-    });
-    
-    // Verificar que o erro foi capturado
-    expect(screen.getByTestId('errorMessage').textContent).toBe('Erro ao verificar sessão');
-    expect(screen.getByTestId('isAuthenticated').textContent).toBe('false');
-    
-    // Restaurar mock do console
-    consoleSpy.mockRestore();
-  });
-  
-  it('deve carregar os dados do usuário quando há sessão', async () => {
-    // Criar dados mockados
-    const mockUser: User = {
-      id: 'user-123',
-      email: 'teste@edunexia.com',
-      nome: 'Usuário Teste',
-      perfil: 'aluno',
-      status: 'ativo',
-      permissoes: ['read_content', 'submit_assignments']
-    };
-    
-    const mockSessionData = {
-      user: {
-        id: mockUser.id,
-        email: mockUser.email
-      },
-      access_token: 'token-123',
-      refresh_token: 'refresh-123',
-      expires_at: Date.now() + 3600,
-      token_type: 'bearer'
-    };
-    
-    // Configurar mocks
-    mockSupabaseClient.auth.getSession.mockResolvedValue({
-      data: { session: mockSessionData },
+      data: { session: mockSession },
       error: null
     });
-    
-    mockSupabaseClient.auth.onAuthStateChange.mockImplementation(() => ({
-      data: { subscription: { unsubscribe: vi.fn() } }
-    }));
-    
-    mockSupabaseClient.from.mockImplementation(() => ({
-      select: vi.fn().mockReturnThis(),
-      eq: vi.fn().mockReturnThis(),
-      single: vi.fn().mockResolvedValue({
+
+    // Mock do perfil do usuário
+    mockSupabaseClient.from.mockImplementation((table) => ({
+      select: jest.fn().mockReturnThis(),
+      eq: jest.fn().mockReturnThis(),
+      single: jest.fn().mockResolvedValue({
         data: mockUser,
         error: null
       })
     }));
-    
-    // Renderizar o componente com o provider
-    render(
-      <AuthProvider supabaseClient={mockSupabaseClient}>
-        <TestAuthConsumer />
-      </AuthProvider>
-    );
-    
-    // Aguardar o carregamento ser finalizado
-    await waitFor(() => {
-      expect(screen.getByTestId('loading').textContent).toBe('false');
+
+    const { result } = renderHook(() => useAuth(), {
+      wrapper: ({ children }) => (
+        <AuthProvider supabaseClient={mockSupabaseClient}>
+          {children}
+        </AuthProvider>
+      )
     });
-    
-    // Verificar que os dados do usuário foram carregados
-    expect(screen.getByTestId('isAuthenticated').textContent).toBe('true');
-    expect(screen.getByTestId('userId').textContent).toBe(mockUser.id);
-    expect(screen.getByTestId('userEmail').textContent).toBe(mockUser.email);
-  });
-  
-  it('deve verificar permissões e papéis do usuário corretamente', async () => {
-    // Criar dados mockados
-    const mockUser: User = {
-      id: 'user-123',
-      email: 'teste@edunexia.com',
-      nome: 'Usuário Teste',
-      perfil: 'aluno',
-      status: 'ativo',
-      permissoes: ['read_content', 'submit_assignments']
-    };
-    
-    const mockSessionData = {
-      user: {
-        id: mockUser.id,
-        email: mockUser.email
-      },
-      access_token: 'token-123',
-      refresh_token: 'refresh-123',
-      expires_at: Date.now() + 3600,
-      token_type: 'bearer'
-    };
-    
-    // Configurar mocks
-    mockSupabaseClient.auth.getSession.mockResolvedValue({
-      data: { session: mockSessionData },
-      error: null
-    });
-    
-    mockSupabaseClient.auth.onAuthStateChange.mockImplementation(() => ({
-      data: { subscription: { unsubscribe: vi.fn() } }
-    }));
-    
-    mockSupabaseClient.from.mockImplementation(() => ({
-      select: vi.fn().mockReturnThis(),
-      eq: vi.fn().mockReturnThis(),
-      single: vi.fn().mockResolvedValue({
-        data: mockUser,
-        error: null
-      })
-    }));
-    
-    // Renderizar o componente com o provider
-    render(
-      <AuthProvider supabaseClient={mockSupabaseClient}>
-        <TestRolePermissionComponent />
-      </AuthProvider>
-    );
-    
-    // Aguardar o carregamento ser finalizado
-    await waitFor(() => {
-      expect(screen.getByTestId('loading').textContent).toBe('false');
-    });
-    
-    // Verificar que o usuário está autenticado
-    expect(screen.getByTestId('isAuthenticated').textContent).toBe('true');
-    
-    // Verificar os papéis (roles)
-    expect(screen.getByTestId('is-admin').textContent).toBe('false');
-    expect(screen.getByTestId('is-aluno').textContent).toBe('true');
-    expect(screen.getByTestId('is-visitante').textContent).toBe('true');
-    
-    // Verificar as permissões
-    expect(screen.getByTestId('can-read').textContent).toBe('true');
-    expect(screen.getByTestId('can-edit').textContent).toBe('false');
-  });
-  
-  it('deve atualizar o perfil do usuário corretamente', async () => {
-    // Criar dados mockados
-    const mockUser: User = {
-      id: 'user-123',
-      email: 'teste@edunexia.com',
-      nome: 'Usuário Teste',
-      perfil: 'aluno',
-      status: 'ativo',
-      permissoes: ['read_content', 'submit_assignments']
-    };
-    
-    const mockSessionData = {
-      user: {
-        id: mockUser.id,
-        email: mockUser.email
-      },
-      access_token: 'token-123',
-      refresh_token: 'refresh-123',
-      expires_at: Date.now() + 3600,
-      token_type: 'bearer'
-    };
-    
-    // Configurar mock para getSession
-    mockSupabaseClient.auth.getSession.mockResolvedValue({
-      data: { session: mockSessionData },
-      error: null
-    });
-    
-    // Configurar mock para onAuthStateChange
-    mockSupabaseClient.auth.onAuthStateChange.mockImplementation(() => ({
-      data: { subscription: { unsubscribe: vi.fn() } }
-    }));
-    
-    // Configurar mock para from (consultas ao banco)
-    const updateEqMock = vi.fn().mockResolvedValue({
-      error: null
-    });
-    
-    const updateMock = vi.fn().mockReturnValue({
-      eq: updateEqMock
-    });
-    
-    mockSupabaseClient.from.mockImplementation(() => ({
-      select: vi.fn().mockReturnThis(),
-      eq: vi.fn().mockReturnThis(),
-      update: updateMock,
-      single: vi.fn().mockResolvedValue({
-        data: mockUser,
-        error: null
-      })
-    }));
-    
-    // Renderizar o componente com o provider
-    render(
-      <AuthProvider supabaseClient={mockSupabaseClient}>
-        <TestUpdateProfileComponent />
-      </AuthProvider>
-    );
-    
-    // Aguardar o carregamento ser finalizado
-    await waitFor(() => {
-      expect(screen.getByTestId('loading').textContent).toBe('false');
-    });
-    
-    // Clicar no botão para atualizar o perfil
+
+    // Aguardar carregamento inicial
     await act(async () => {
-      screen.getByTestId('update-profile-btn').click();
+      await new Promise(resolve => setTimeout(resolve, 0));
     });
-    
-    // Verificar que a função update foi chamada
-    expect(updateMock).toHaveBeenCalledWith({ nome: 'Nome Atualizado' });
-    expect(updateEqMock).toHaveBeenCalledWith('id', 'user-123');
-    
-    // Verificar que o update foi bem-sucedido
-    await waitFor(() => {
-      expect(screen.getByTestId('update-success').textContent).toBe('true');
-    });
+
+    expect(result.current.loading).toBe(false);
+    expect(result.current.user).toEqual(mockUser);
+    expect(result.current.session).toEqual(mockSession);
+    expect(result.current.error).toBe(null);
   });
-  
-  it('deve lidar com erros ao atualizar o perfil', async () => {
-    // Criar dados mockados
-    const mockUser: User = {
-      id: 'user-123',
-      email: 'teste@edunexia.com',
-      nome: 'Usuário Teste',
-      perfil: 'aluno',
-      status: 'ativo'
-    };
-    
-    const mockSessionData = {
-      user: {
-        id: mockUser.id,
-        email: mockUser.email
-      },
-      access_token: 'token-123',
-      refresh_token: 'refresh-123',
-      expires_at: Date.now() + 3600,
-      token_type: 'bearer'
-    };
-    
-    // Configurar mocks
-    mockSupabaseClient.auth.getSession.mockResolvedValue({
-      data: { session: mockSessionData },
+
+  it('deve realizar login com sucesso', async () => {
+    // Mock do login
+    mockSupabaseClient.auth.signInWithPassword.mockResolvedValue({
+      data: { session: mockSession },
       error: null
     });
-    
-    mockSupabaseClient.auth.onAuthStateChange.mockImplementation(() => ({
-      data: { subscription: { unsubscribe: vi.fn() } }
-    }));
-    
-    // Configurar erro ao atualizar
-    const updateError = new Error('Erro ao atualizar perfil');
-    
-    const errorUpdateEqMock = vi.fn().mockResolvedValue({
-      error: updateError
-    });
-    
-    const errorUpdateMock = vi.fn().mockReturnValue({
-      eq: errorUpdateEqMock
-    });
-    
-    mockSupabaseClient.from.mockImplementation(() => ({
-      select: vi.fn().mockReturnThis(),
-      eq: vi.fn().mockReturnThis(),
-      update: errorUpdateMock,
-      single: vi.fn().mockResolvedValue({
+
+    // Mock do perfil do usuário
+    mockSupabaseClient.from.mockImplementation((table) => ({
+      select: jest.fn().mockReturnThis(),
+      eq: jest.fn().mockReturnThis(),
+      single: jest.fn().mockResolvedValue({
         data: mockUser,
         error: null
       })
     }));
-    
-    // Espionar console.error para evitar poluição nos logs de teste
-    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    
-    // Renderizar o componente com o provider
-    render(
-      <AuthProvider supabaseClient={mockSupabaseClient}>
-        <TestUpdateProfileComponent />
-      </AuthProvider>
-    );
-    
-    // Aguardar o carregamento ser finalizado
-    await waitFor(() => {
-      expect(screen.getByTestId('loading').textContent).toBe('false');
+
+    const { result } = renderHook(() => useAuth(), {
+      wrapper: ({ children }) => (
+        <AuthProvider supabaseClient={mockSupabaseClient}>
+          {children}
+        </AuthProvider>
+      )
     });
-    
-    // Clicar no botão para atualizar o perfil
+
+    // Aguardar carregamento inicial
     await act(async () => {
-      screen.getByTestId('update-profile-btn').click();
+      await new Promise(resolve => setTimeout(resolve, 0));
     });
-    
-    // Verificar que o erro foi capturado
-    await waitFor(() => {
-      expect(screen.getByTestId('update-error').textContent).toBe('Erro ao atualizar perfil');
+
+    // Realizar login
+    const response = await act(async () => {
+      return result.current.signIn({
+        email: 'test@example.com',
+        password: 'password123'
+      });
     });
-    
-    // Restaurar mock do console
-    consoleSpy.mockRestore();
+
+    expect(response.user).toEqual(mockUser);
+    expect(response.session).toEqual(mockSession);
+    expect(response.error).toBe(null);
+    expect(result.current.user).toEqual(mockUser);
+    expect(result.current.session).toEqual(mockSession);
   });
-  
-  it('deve reagir a eventos de autenticação', async () => {
-    // Configurar mock inicial sem sessão
-    mockSupabaseClient.auth.getSession.mockResolvedValue({
-      data: { session: null },
+
+  it('deve realizar cadastro com sucesso', async () => {
+    // Mock do cadastro
+    mockSupabaseClient.auth.signUp.mockResolvedValue({
+      data: { user: mockUser, session: mockSession },
       error: null
     });
-    
-    // Simular callback de onAuthStateChange
-    let authCallback: Function;
-    mockSupabaseClient.auth.onAuthStateChange.mockImplementation((callback) => {
-      authCallback = callback;
-      return {
-        data: { subscription: { unsubscribe: vi.fn() } }
-      };
-    });
-    
-    // Mock para consulta de usuário
-    const mockUser: User = {
-      id: 'user-123',
-      email: 'teste@edunexia.com',
-      nome: 'Usuário Teste',
-      perfil: 'aluno',
-      status: 'ativo'
-    };
-    
-    mockSupabaseClient.from.mockImplementation(() => ({
-      select: vi.fn().mockReturnThis(),
-      eq: vi.fn().mockReturnThis(),
-      single: vi.fn().mockResolvedValue({
+
+    // Mock do perfil do usuário
+    mockSupabaseClient.from.mockImplementation((table) => ({
+      select: jest.fn().mockReturnThis(),
+      eq: jest.fn().mockReturnThis(),
+      single: jest.fn().mockResolvedValue({
         data: mockUser,
+        error: null
+      }),
+      insert: jest.fn().mockResolvedValue({
         error: null
       })
     }));
-    
-    // Renderizar o componente com o provider
-    render(
-      <AuthProvider supabaseClient={mockSupabaseClient}>
-        <TestAuthConsumer />
-      </AuthProvider>
-    );
-    
-    // Aguardar o carregamento ser finalizado
-    await waitFor(() => {
-      expect(screen.getByTestId('loading').textContent).toBe('false');
+
+    const { result } = renderHook(() => useAuth(), {
+      wrapper: ({ children }) => (
+        <AuthProvider supabaseClient={mockSupabaseClient}>
+          {children}
+        </AuthProvider>
+      )
     });
-    
-    // Estado inicial (não autenticado)
-    expect(screen.getByTestId('isAuthenticated').textContent).toBe('false');
-    
-    // Simular evento de login
-    const mockSessionData = {
-      user: {
-        id: mockUser.id,
-        email: mockUser.email
-      },
-      access_token: 'token-123',
-      refresh_token: 'refresh-123',
-      expires_at: Date.now() + 3600,
-      token_type: 'bearer'
-    };
-    
+
+    // Aguardar carregamento inicial
     await act(async () => {
-      if (authCallback) {
-        await authCallback('SIGNED_IN', mockSessionData);
+      await new Promise(resolve => setTimeout(resolve, 0));
+    });
+
+    // Realizar cadastro
+    const response = await act(async () => {
+      return result.current.signUp({
+        name: 'Test User',
+        email: 'test@example.com',
+        password: 'password123',
+        role: 'student'
+      });
+    });
+
+    expect(response.user).toEqual(mockUser);
+    expect(response.session).toEqual(mockSession);
+    expect(response.error).toBe(null);
+    expect(result.current.user).toEqual(mockUser);
+    expect(result.current.session).toEqual(mockSession);
+  });
+
+  it('deve realizar logout com sucesso', async () => {
+    // Mock do logout
+    mockSupabaseClient.auth.signOut.mockResolvedValue({
+      error: null
+    });
+
+    const { result } = renderHook(() => useAuth(), {
+      wrapper: ({ children }) => (
+        <AuthProvider supabaseClient={mockSupabaseClient}>
+          {children}
+        </AuthProvider>
+      )
+    });
+
+    // Aguardar carregamento inicial
+    await act(async () => {
+      await new Promise(resolve => setTimeout(resolve, 0));
+    });
+
+    // Realizar logout
+    await act(async () => {
+      await result.current.signOut();
+    });
+
+    expect(result.current.user).toBe(null);
+    expect(result.current.session).toBe(null);
+  });
+
+  it('deve atualizar perfil com sucesso', async () => {
+    // Mock do perfil do usuário
+    mockSupabaseClient.from.mockImplementation((table) => ({
+      select: jest.fn().mockReturnThis(),
+      eq: jest.fn().mockReturnThis(),
+      single: jest.fn().mockResolvedValue({
+        data: mockUser,
+        error: null
+      }),
+      update: jest.fn().mockReturnThis()
+    }));
+
+    const { result } = renderHook(() => useAuth(), {
+      wrapper: ({ children }) => (
+        <AuthProvider supabaseClient={mockSupabaseClient}>
+          {children}
+        </AuthProvider>
+      )
+    });
+
+    // Aguardar carregamento inicial
+    await act(async () => {
+      await new Promise(resolve => setTimeout(resolve, 0));
+    });
+
+    // Atualizar perfil
+    const updatedUser = await act(async () => {
+      return result.current.updateProfile({
+        name: 'Updated Name'
+      });
+    });
+
+    expect(updatedUser).toEqual({
+      ...mockUser,
+      name: 'Updated Name'
+    });
+    expect(result.current.user).toEqual({
+      ...mockUser,
+      name: 'Updated Name'
+    });
+  });
+
+  it('deve atualizar preferências com sucesso', async () => {
+    // Mock do perfil do usuário
+    mockSupabaseClient.from.mockImplementation((table) => ({
+      select: jest.fn().mockReturnThis(),
+      eq: jest.fn().mockReturnThis(),
+      single: jest.fn().mockResolvedValue({
+        data: mockUser,
+        error: null
+      }),
+      update: jest.fn().mockReturnThis()
+    }));
+
+    const { result } = renderHook(() => useAuth(), {
+      wrapper: ({ children }) => (
+        <AuthProvider supabaseClient={mockSupabaseClient}>
+          {children}
+        </AuthProvider>
+      )
+    });
+
+    // Aguardar carregamento inicial
+    await act(async () => {
+      await new Promise(resolve => setTimeout(resolve, 0));
+    });
+
+    // Atualizar preferências
+    const updatedUser = await act(async () => {
+      return result.current.updatePreferences({
+        theme: 'dark',
+        language: 'pt-BR',
+        notifications: {
+          email: true,
+          push: true,
+          sms: false
+        },
+        timezone: 'America/Sao_Paulo'
+      });
+    });
+
+    expect(updatedUser).toEqual({
+      ...mockUser,
+      preferences: {
+        theme: 'dark',
+        language: 'pt-BR',
+        notifications: {
+          email: true,
+          push: true,
+          sms: false
+        },
+        timezone: 'America/Sao_Paulo'
       }
     });
-    
-    // Aguardar a atualização do estado
-    await waitFor(() => {
-      expect(screen.getByTestId('isAuthenticated').textContent).toBe('true');
-    });
-    
-    // Verificar que os dados do usuário foram carregados
-    expect(screen.getByTestId('userId').textContent).toBe(mockUser.id);
-    
-    // Simular evento de logout
-    await act(async () => {
-      if (authCallback) {
-        await authCallback('SIGNED_OUT', null);
+    expect(result.current.user).toEqual({
+      ...mockUser,
+      preferences: {
+        theme: 'dark',
+        language: 'pt-BR',
+        notifications: {
+          email: true,
+          push: true,
+          sms: false
+        },
+        timezone: 'America/Sao_Paulo'
       }
     });
-    
-    // Aguardar a atualização do estado
-    await waitFor(() => {
-      expect(screen.getByTestId('isAuthenticated').textContent).toBe('false');
+  });
+
+  it('deve lidar com erros de autenticação', async () => {
+    // Mock de erro no login
+    mockSupabaseClient.auth.signInWithPassword.mockResolvedValue({
+      data: null,
+      error: new Error('Invalid credentials')
     });
+
+    const { result } = renderHook(() => useAuth(), {
+      wrapper: ({ children }) => (
+        <AuthProvider supabaseClient={mockSupabaseClient}>
+          {children}
+        </AuthProvider>
+      )
+    });
+
+    // Aguardar carregamento inicial
+    await act(async () => {
+      await new Promise(resolve => setTimeout(resolve, 0));
+    });
+
+    // Tentar login com credenciais inválidas
+    const response = await act(async () => {
+      return result.current.signIn({
+        email: 'test@example.com',
+        password: 'wrong-password'
+      });
+    });
+
+    expect(response.error).toBeInstanceOf(Error);
+    expect(response.error?.message).toBe('Invalid credentials');
+    expect(result.current.error).toBeInstanceOf(Error);
+    expect(result.current.error?.message).toBe('Invalid credentials');
   });
 }); 
