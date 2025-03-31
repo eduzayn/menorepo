@@ -22,9 +22,9 @@ import {
   createEmailProvider,
   createSMSProvider,
   createPushProvider,
-  EmailMessage,
-  SMSMessage,
-  PushMessage
+  EmailMessageType as EmailMessage,
+  SMSMessageType as SMSMessage,
+  PushMessageType as PushMessage
 } from '../providers';
 import { consentimentoService } from './consentimento';
 import { auditoriaService } from './auditoria';
@@ -359,7 +359,7 @@ export const enviarPorCanal = async (
   destinatarios: string[],
   conteudo: string,
   assunto: string,
-  canal: ComunicacaoCanal,
+  canal: 'EMAIL' | 'SMS' | 'WHATSAPP' | 'PUSH',
   usuarioId: string
 ) => {
   // Verificar consentimento para cada destinatário
@@ -385,9 +385,7 @@ export const enviarPorCanal = async (
       destinatarios,
       assunto,
       canal
-    },
-    ip: '', // TODO: Implementar captura de IP
-    user_agent: '' // TODO: Implementar captura de User Agent
+    }
   });
 
   switch (canal) {
@@ -422,10 +420,10 @@ export const enviarPorCanal = async (
 };
 
 // Função para enviar campanha por múltiplos canais
-export const enviarCampanha = async (
+export const enviarCampanhaMulticanal = async (
   campanha: Campanha,
   destinatarios: { id: string, email: string, telefone: string, pushToken?: string }[],
-  canais: ComunicacaoCanal[],
+  canais: ('EMAIL' | 'SMS' | 'WHATSAPP' | 'PUSH')[],
   usuarioId: string
 ) => {
   // Verificar consentimento para cada destinatário e canal
@@ -453,17 +451,14 @@ export const enviarCampanha = async (
       campanha,
       destinatarios: destinatarios.map(d => d.id),
       canais
-    },
-    ip: '', // TODO: Implementar captura de IP
-    user_agent: '' // TODO: Implementar captura de User Agent
+    }
   });
 
-  const resultados: Record<ComunicacaoCanal, { sucesso: number, falha: number }> = {
+  const resultados: Record<string, { sucesso: number, falha: number }> = {
     'EMAIL': { sucesso: 0, falha: 0 },
     'SMS': { sucesso: 0, falha: 0 },
     'WHATSAPP': { sucesso: 0, falha: 0 },
-    'PUSH': { sucesso: 0, falha: 0 },
-    'CHAT': { sucesso: 0, falha: 0 }
+    'PUSH': { sucesso: 0, falha: 0 }
   };
 
   for (const canal of canais) {
