@@ -1,266 +1,233 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
-// Tipos para o contexto de autenticação
-interface UserData {
+// Definição do tipo User
+interface User {
   id: string;
   name: string;
   email: string;
-  roles: string[];
-  token?: string;
-  user_metadata?: {
-    role?: string;
-  };
-  permissions?: Array<{
-    portal_id: string;
-    can_access: boolean;
-  }>;
+  role: string;
+  permissions?: Record<string, { read: boolean; write: boolean; delete: boolean }>;
 }
 
-interface AuthContextType {
-  user: UserData | null;
-  isAuthenticated: boolean;
+// Interface do contexto de autenticação
+interface AuthContextProps {
+  user: User | null;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<UserData>;
-  logout: () => void;
-  refreshToken: () => Promise<void>;
-  canAccessPortal: (portalId: string) => boolean;
+  error: string | null;
+  signIn: (email: string, password: string) => Promise<void>;
+  signOut: () => Promise<void>;
 }
 
-// Valores padrão para o contexto
-const defaultContext: AuthContextType = {
-  user: null,
-  isAuthenticated: false,
-  isLoading: true,
-  login: async () => ({ id: '', name: '', email: '', roles: [] }),
-  logout: () => {},
-  refreshToken: async () => {},
-  canAccessPortal: () => false,
+// Mock de usuário para desenvolvimento
+const MOCK_USER: User = {
+  id: '1',
+  name: 'Usuário de Teste',
+  email: 'usuario@edunexia.com.br',
+  role: 'admin',
+  permissions: {
+    'matriculas.view': { read: true, write: true, delete: true },
+    'portal-aluno.view': { read: true, write: true, delete: true },
+    'material-didatico.view': { read: true, write: true, delete: true },
+    'comunicacao.view': { read: true, write: true, delete: true },
+    'financeiro.view': { read: true, write: true, delete: true },
+    'relatorios.view': { read: true, write: true, delete: true },
+    'configuracoes.view': { read: true, write: true, delete: true },
+    'dashboard.view': { read: true, write: true, delete: true }
+  }
 };
 
-// Criação do contexto
-const AuthContext = createContext<AuthContextType>(defaultContext);
+// Dados de usuários para teste
+const TEST_USERS = [
+  {
+    email: 'admin@edunexia.com.br',
+    password: 'admin123',
+    user: {
+      ...MOCK_USER,
+      name: 'Administrador',
+      role: 'admin'
+    }
+  },
+  {
+    email: 'professor@edunexia.com.br',
+    password: 'prof123',
+    user: {
+      ...MOCK_USER,
+      id: '2',
+      name: 'Professor Teste',
+      role: 'teacher',
+      permissions: {
+        'matriculas.view': { read: true, write: false, delete: false },
+        'portal-aluno.view': { read: true, write: true, delete: false },
+        'material-didatico.view': { read: true, write: true, delete: true },
+        'comunicacao.view': { read: true, write: true, delete: false },
+      }
+    }
+  },
+  {
+    email: 'aluno@edunexia.com.br',
+    password: 'aluno123',
+    user: {
+      ...MOCK_USER,
+      id: '3',
+      name: 'Aluno Teste',
+      role: 'student',
+      permissions: {
+        'portal-aluno.view': { read: true, write: false, delete: false },
+        'material-didatico.view': { read: true, write: false, delete: false },
+      }
+    }
+  }
+];
 
-// Hook personalizado para usar o contexto de autenticação
-export const useAuth = () => useContext(AuthContext);
+// Funções auxiliares padrão para uso quando o contexto não está disponível
+const noopSignIn = async (_email: string, _password: string): Promise<void> => {
+  console.warn('AuthProvider não encontrado! Usando função signIn padrão.');
+};
 
-interface AuthProviderProps {
-  children: ReactNode;
-}
+const noopSignOut = async (): Promise<void> => {
+  console.warn('AuthProvider não encontrado! Usando função signOut padrão.');
+};
+
+// Valor padrão para o contexto
+const defaultContextValue: AuthContextProps = {
+  user: null,
+  isLoading: false,
+  error: null,
+  signIn: noopSignIn,
+  signOut: noopSignOut
+};
+
+// Criando o contexto de autenticação
+const AuthContext = createContext<AuthContextProps>(defaultContextValue);
 
 /**
- * Verifica se um usuário tem permissão para acessar um portal específico
+ * Provedor de autenticação temporário
+ * Esta implementação serve como uma ponte até que o pacote @edunexia/auth 
+ * esteja completamente disponível e configurado
  */
-export function canAccessPortal(user: UserData | null, portalId: string): boolean {
-  if (!user) return false;
-  
-  // Verificar primeiro nos metadados do usuário
-  const userRole = user.user_metadata?.role;
-  
-  // Se for admin global ou admin de instituição, permitir acesso
-  if (userRole === 'admin' || userRole === 'institution_admin') {
-    return true;
-  }
-  
-  // Verificar na lista de roles do usuário
-  if (user.roles && (user.roles.includes('admin') || user.roles.includes('institution_admin'))) {
-    return true;
-  }
-  
-  // Verificar nas permissões específicas
-  const userPermissions = user.permissions || [];
-  return userPermissions.some(p => p.portal_id === portalId && p.can_access);
-}
-
-/**
- * Provedor de autenticação para a aplicação
- */
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<UserData | null>(null);
+const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Efeito para verificar a autenticação quando o componente é montado
+  // Efeito para carregar o usuário do localStorage na inicialização
   useEffect(() => {
-    const checkAuth = async () => {
+    const loadUser = async () => {
+      setIsLoading(true);
       try {
-        // Verificar se há um token no localStorage
-        const token = localStorage.getItem('auth_token');
+        // Verificar se há usuário no localStorage
+        const savedUser = localStorage.getItem('edunexia-user');
         
-        if (token) {
-          // Simulação de verificação de token
-          // Em produção, isto seria substituído por uma chamada real ao backend
-          
-          // Dados falsos de usuário para desenvolvimento
-          const mockUser: UserData = {
-            id: '1',
-            name: 'Usuário Teste',
-            email: 'usuario@teste.com',
-            roles: ['aluno', 'admin'],
-            token,
-            user_metadata: {
-              role: 'institution_admin'
-            },
-            permissions: [
-              { portal_id: 'aluno', can_access: true },
-              { portal_id: 'admin', can_access: true }
-            ]
-          };
-          
-          setUser(mockUser);
+        if (savedUser) {
+          setUser(JSON.parse(savedUser));
         }
-      } catch (error) {
-        console.error('Erro ao verificar autenticação:', error);
-        // Limpar dados de autenticação em caso de erro
-        localStorage.removeItem('auth_token');
-        setUser(null);
+      } catch (err) {
+        console.error('Erro ao carregar usuário:', err);
+        setError('Falha ao carregar dados do usuário');
       } finally {
         setIsLoading(false);
       }
     };
-    
-    checkAuth();
+
+    loadUser();
   }, []);
 
   /**
-   * Função para realizar login
+   * Função de login
+   * @param email - Email do usuário
+   * @param password - Senha do usuário
    */
-  const login = async (email: string, password: string): Promise<UserData> => {
+  const signIn = async (email: string, password: string): Promise<void> => {
+    setIsLoading(true);
+    setError(null);
+    console.log('Início do processo de login:', { email });
+
     try {
-      setIsLoading(true);
+      // Simular uma requisição de API
+      await new Promise(resolve => setTimeout(resolve, 800));
+
+      // Tratar caso específico de admin@edunexia.com.br (sem o .br)
+      let foundUser = TEST_USERS.find(
+        u => u.email === email && u.password === password
+      );
       
-      // Simulação de requisição de login
-      // Em produção, isto seria substituído por uma chamada real ao backend
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Validação básica para desenvolvimento
-      if (!email || !password) {
-        throw new Error('Email e senha são obrigatórios');
+      // Tratar caso onde os usuários tentem usar admin@edunexia.com sem o .br
+      if (!foundUser && email === "admin@edunexia.com" && password === "admin123") {
+        foundUser = TEST_USERS[0]; // Usar o primeiro usuário admin da lista
+        console.log('Ajuste para compatibilidade: admin@edunexia.com -> admin@edunexia.com.br');
       }
-      
-      // Token falso para desenvolvimento
-      const token = 'mock_jwt_token_' + Math.random().toString(36).substr(2);
-      
-      // Determinar roles com base no email para testes
-      const roles = [];
-      
-      if (email.includes('aluno')) {
-        roles.push('student');
+
+      console.log('Tentativa de login - usuário encontrado:', !!foundUser);
+
+      if (foundUser) {
+        console.log('Login bem-sucedido para:', foundUser.user.name);
+        setUser(foundUser.user);
+        localStorage.setItem('edunexia-user', JSON.stringify(foundUser.user));
+        // Não precisamos mais redirecionar aqui, já que estamos fazendo isso no componente de login
+      } else {
+        console.log('Credenciais inválidas');
+        throw new Error('Credenciais inválidas');
       }
-      
-      if (email.includes('admin')) {
-        roles.push('admin');
+    } catch (err) {
+      console.error('Erro no processo de login:', err);
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('Erro durante o login');
       }
-      
-      if (email.includes('professor')) {
-        roles.push('teacher');
-      }
-      
-      if (roles.length === 0) {
-        roles.push('student'); // Role padrão para testes
-      }
-      
-      // Criar objeto de usuário
-      const userData: UserData = {
-        id: '1',
-        name: email.split('@')[0],
-        email,
-        roles,
-        token,
-        user_metadata: {
-          role: email.includes('admin') ? 'institution_admin' : 'user'
-        },
-        permissions: [
-          { portal_id: 'aluno', can_access: email.includes('aluno') || roles.includes('admin') },
-          { portal_id: 'admin', can_access: roles.includes('admin') }
-        ]
-      };
-      
-      // Salvar token no localStorage
-      localStorage.setItem('auth_token', token);
-      
-      // Atualizar estado
-      setUser(userData);
-      
-      return userData;
-    } catch (error) {
-      console.error('Erro no login:', error);
-      throw error;
+      throw err;
     } finally {
       setIsLoading(false);
+      console.log('Processo de login finalizado');
     }
   };
 
   /**
-   * Função para realizar logout
+   * Função de logout
    */
-  const logout = () => {
-    // Remover token do localStorage
-    localStorage.removeItem('auth_token');
-    
-    // Atualizar estado
-    setUser(null);
-  };
-
-  /**
-   * Função para renovar o token de autenticação
-   */
-  const refreshToken = async (): Promise<void> => {
+  const signOut = async (): Promise<void> => {
     try {
-      // Verificar se o usuário está autenticado
-      if (!user || !user.token) {
-        throw new Error('Usuário não autenticado');
-      }
+      // Simular uma requisição de API
+      await new Promise(resolve => setTimeout(resolve, 300));
       
-      // Simulação de renovação de token
-      // Em produção, isto seria substituído por uma chamada real ao backend
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      // Novo token falso
-      const newToken = 'refreshed_token_' + Math.random().toString(36).substr(2);
-      
-      // Atualizar token no localStorage
-      localStorage.setItem('auth_token', newToken);
-      
-      // Atualizar estado
-      setUser(prev => prev ? { ...prev, token: newToken } : null);
-    } catch (error) {
-      console.error('Erro ao renovar token:', error);
-      
-      // Se houver erro na renovação, fazer logout
-      logout();
-      
-      throw error;
+      localStorage.removeItem('edunexia-user');
+      setUser(null);
+    } catch (err) {
+      console.error('Erro ao fazer logout:', err);
+      setError('Falha ao encerrar a sessão');
     }
-  };
-
-  /**
-   * Função para verificar se o usuário pode acessar um portal
-   */
-  const checkPortalAccess = (portalId: string): boolean => {
-    return canAccessPortal(user, portalId);
   };
 
   // Valor do contexto
-  const value: AuthContextType = {
+  const contextValue: AuthContextProps = {
     user,
-    isAuthenticated: !!user,
     isLoading,
-    login,
-    logout,
-    refreshToken,
-    canAccessPortal: checkPortalAccess
+    error,
+    signIn,
+    signOut,
   };
 
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider value={contextValue}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-// Hook personalizado para verificar acesso a um portal específico
-export const useCanAccessPortal = (portalId: string): boolean => {
-  const { canAccessPortal } = useAuth();
-  return canAccessPortal(portalId);
+// Hook personalizado para acessar o contexto
+export const useAuth = (): AuthContextProps => {
+  const context = useContext(AuthContext);
+  
+  if (!context || context === defaultContextValue) {
+    console.error('useAuth deve ser usado dentro de um AuthProvider');
+    return defaultContextValue;
+  }
+  
+  return context;
 };
 
+// Adicionando uma exportação nomeada para garantir compatibilidade
+export { AuthProvider };
+
+// Mantendo a exportação padrão para compatibilidade com código existente
 export default AuthProvider; 
