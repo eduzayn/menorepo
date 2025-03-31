@@ -141,4 +141,233 @@ Todas as tabelas têm Row Level Security (RLS) habilitada com as seguintes polí
 
 - [Documentação do Supabase](https://supabase.com/docs)
 - [Guia de Row Level Security](https://supabase.com/docs/guides/auth/row-level-security)
-- [Referência de Políticas](https://supabase.com/docs/guides/auth/row-level-security/policies) 
+- [Referência de Políticas](https://supabase.com/docs/guides/auth/row-level-security/policies)
+
+## 1. Configuração Inicial
+
+### 1.1 Variáveis de Ambiente
+
+```env
+# Supabase
+SUPABASE_URL=sua_url_do_supabase
+SUPABASE_ANON_KEY=sua_chave_anonima
+SUPABASE_SERVICE_ROLE_KEY=sua_chave_de_servico
+
+# Configuração de Teste
+ENABLE_TEST_BYPASS=true
+TEST_USER_EMAIL=ana.diretoria@edunexia.com
+TEST_USER_PASSWORD=teste123
+```
+
+### 1.2 Criação do Banco de Dados
+
+1. Acesse o painel do Supabase
+2. Crie um novo projeto
+3. Copie as credenciais para o arquivo `.env`
+
+## 2. Estrutura do Banco
+
+### 2.1 Tabelas Principais
+
+1. **auth.users**
+   ```sql
+   -- Criada automaticamente pelo Supabase
+   -- Não requer criação manual
+   ```
+
+2. **profiles**
+   ```sql
+   CREATE TABLE profiles (
+     id UUID REFERENCES auth.users(id) PRIMARY KEY,
+     name TEXT,
+     email TEXT UNIQUE,
+     institution_id UUID REFERENCES institutions(id),
+     role TEXT,
+     preferences JSONB DEFAULT '{}',
+     created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()),
+     updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW())
+   );
+   ```
+
+3. **user_permissions**
+   ```sql
+   CREATE TABLE user_permissions (
+     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+     user_id UUID REFERENCES auth.users(id),
+     permissions JSONB DEFAULT '{}',
+     created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()),
+     updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW())
+   );
+   ```
+
+4. **institutions**
+   ```sql
+   CREATE TABLE institutions (
+     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+     name TEXT NOT NULL,
+     domain TEXT UNIQUE,
+     settings JSONB DEFAULT '{}',
+     active BOOLEAN DEFAULT true,
+     created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()),
+     updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW())
+   );
+   ```
+
+### 2.2 Índices
+
+```sql
+-- Índices para profiles
+CREATE INDEX profiles_email_idx ON profiles(email);
+CREATE INDEX profiles_institution_id_idx ON profiles(institution_id);
+CREATE INDEX profiles_role_idx ON profiles(role);
+
+-- Índices para user_permissions
+CREATE INDEX user_permissions_user_id_idx ON user_permissions(user_id);
+
+-- Índices para institutions
+CREATE INDEX institutions_domain_idx ON institutions(domain);
+CREATE INDEX institutions_active_idx ON institutions(active);
+```
+
+### 2.3 Políticas de Segurança (RLS)
+
+```sql
+-- Políticas para profiles
+ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Usuários podem ver seus próprios perfis"
+  ON profiles FOR SELECT
+  USING (auth.uid() = id);
+
+CREATE POLICY "Apenas super_admin pode modificar perfis"
+  ON profiles FOR ALL
+  USING (auth.jwt() ->> 'role' = 'super_admin');
+
+-- Políticas para user_permissions
+ALTER TABLE user_permissions ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Usuários podem ver suas próprias permissões"
+  ON user_permissions FOR SELECT
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Apenas super_admin pode modificar permissões"
+  ON user_permissions FOR ALL
+  USING (auth.jwt() ->> 'role' = 'super_admin');
+
+-- Políticas para institutions
+ALTER TABLE institutions ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Usuários autenticados podem ver instituições ativas"
+  ON institutions FOR SELECT
+  USING (active = true);
+
+CREATE POLICY "Apenas super_admin pode modificar instituições"
+  ON institutions FOR ALL
+  USING (auth.jwt() ->> 'role' = 'super_admin');
+```
+
+## 3. Configuração do Usuário de Teste
+
+### 3.1 Criação do Usuário
+
+```sql
+-- Inserir usuário de teste
+INSERT INTO auth.users (
+  id,
+  email,
+  encrypted_password,
+  email_confirmed_at,
+  role,
+  raw_user_meta_data,
+  raw_app_meta_data,
+  created_at,
+  updated_at
+) VALUES (
+  '00000000-0000-0000-0000-000000000000',
+  'ana.diretoria@edunexia.com',
+  crypt('teste123', gen_salt('bf')),
+  NOW(),
+  'super_admin',
+  '{"role": "super_admin"}',
+  '{"provider": "email"}',
+  NOW(),
+  NOW()
+);
+
+-- Inserir perfil do usuário de teste
+INSERT INTO profiles (
+  id,
+  name,
+  email,
+  role,
+  preferences
+) VALUES (
+  '00000000-0000-0000-0000-000000000000',
+  'Ana Diretoria',
+  'ana.diretoria@edunexia.com',
+  'super_admin',
+  '{"theme": "light", "language": "pt-BR"}'
+);
+
+-- Inserir permissões do usuário de teste
+INSERT INTO user_permissions (
+  user_id,
+  permissions
+) VALUES (
+  '00000000-0000-0000-0000-000000000000',
+  '{
+    "viewEnrollments": true,
+    "manageEnrollments": true,
+    "viewCommunications": true,
+    "manageCommunications": true,
+    "sendBulkMessages": true,
+    "viewMaterials": true,
+    "createMaterials": true,
+    "editMaterials": true,
+    "viewStudentPortal": true,
+    "viewFinancialData": true,
+    "manageFinancialData": true,
+    "viewReports": true,
+    "generateReports": true,
+    "manageSettings": true,
+    "manageUsers": true,
+    "manageRoles": true,
+    "manageInstitution": true
+  }'
+);
+```
+
+### 3.2 Verificação
+
+Para verificar se o usuário de teste foi criado corretamente:
+
+```sql
+-- Verificar usuário
+SELECT * FROM auth.users WHERE email = 'ana.diretoria@edunexia.com';
+
+-- Verificar perfil
+SELECT * FROM profiles WHERE email = 'ana.diretoria@edunexia.com';
+
+-- Verificar permissões
+SELECT * FROM user_permissions WHERE user_id = '00000000-0000-0000-0000-000000000000';
+```
+
+## 4. Manutenção
+
+### 4.1 Backup
+
+1. Configure backup automático no Supabase
+2. Mantenha backups por 30 dias
+3. Teste restauração periodicamente
+
+### 4.2 Monitoramento
+
+1. Configure alertas para:
+   - Falhas de autenticação
+   - Tentativas de acesso não autorizado
+   - Problemas de sincronização
+
+2. Monitore métricas:
+   - Número de usuários ativos
+   - Taxa de autenticação
+   - Erros de permissão 

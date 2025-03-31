@@ -4,7 +4,7 @@
 
 Este documento descreve o processo de implementação de um sistema de entrada unificada para todos os módulos do ecossistema Edunexia, permitindo que usuários acessem diferentes funcionalidades através de uma autenticação centralizada, com visualização e acesso baseados em suas permissões.
 
-## 2. Arquitetura da Solução (Atualizada)
+## 2. Arquitetura da Solução
 
 ### 2.1 Componentes Principais
 
@@ -18,7 +18,7 @@ Este documento descreve o processo de implementação de um sistema de entrada u
 O sistema de autenticação da Edunexia utiliza a seguinte hierarquia clara de funções:
 
 ```typescript
-export type RoleLevel = 
+export type UserRole = 
   | 'super_admin'        // Acesso completo a todas instituições
   | 'institution_admin'  // Administrador de uma instituição específica
   | 'coordinator'        // Coordenador de cursos/áreas
@@ -38,6 +38,8 @@ export type RoleLevel =
 | Material Didático | material | `/material-didatico` | `ContentEditor.tsx` | `viewMaterials` |
 | Comunicação | comunicacao | `/comunicacao` | `CommunicationPage.tsx` | `viewCommunications` |
 | Gestão Financeira | financeiro | `/financeiro` | `FinancialPage.tsx` | `viewFinancialData` |
+| Relatórios | relatorios | `/relatorios` | `ReportsPage.tsx` | `viewReports` |
+| Configurações | configuracoes | `/configuracoes` | `SettingsPage.tsx` | `manageSettings` |
 
 **Estrutura de Permissões:**
 ```typescript
@@ -63,23 +65,67 @@ export interface ModulePermissions {
   viewFinancialData?: boolean;
   manageFinancialData?: boolean;
   
+  // Relatórios
+  viewReports?: boolean;
+  generateReports?: boolean;
+  
   // Configurações
+  manageSettings?: boolean;
   manageUsers?: boolean;
   manageRoles?: boolean;
   manageInstitution?: boolean;
 }
 ```
 
-**Estrutura Simplificada:**
-- **URL de Login**: `/login`
-- **Portal Unificado**: `/portal-selector`
-- **Acesso Direto a Módulo**: `/{id_módulo}`
+### 2.4 Usuário de Teste
+
+Para facilitar o desenvolvimento e testes, o sistema inclui um usuário de teste com permissões completas:
+
+```typescript
+const TEST_USER = {
+  email: 'ana.diretoria@edunexia.com',
+  password: 'teste123',
+  name: 'Ana Diretoria',
+  role: 'super_admin' as UserRole,
+  permissions: {
+    viewEnrollments: true,
+    manageEnrollments: true,
+    viewCommunications: true,
+    manageCommunications: true,
+    sendBulkMessages: true,
+    viewMaterials: true,
+    createMaterials: true,
+    editMaterials: true,
+    viewStudentPortal: true,
+    viewFinancialData: true,
+    manageFinancialData: true,
+    viewReports: true,
+    generateReports: true,
+    manageSettings: true,
+    manageUsers: true,
+    manageRoles: true,
+    manageInstitution: true
+  },
+  preferences: {
+    theme: 'light',
+    language: 'pt-BR'
+  },
+  app_metadata: {
+    provider: 'email'
+  },
+  user_metadata: {
+    role: 'super_admin'
+  },
+  aud: 'authenticated',
+  created_at: new Date().toISOString()
+};
+```
 
 **Notas para Desenvolvedores:**
-1. O sistema é baseado em um único domínio, simplificando a implementação
-2. As permissões são verificadas de forma centralizada no AuthContext
-3. Administradores têm acesso a todos os módulos automaticamente
-4. Permissões podem ser personalizadas por usuário além das padrões por função
+1. O bypass de teste só funciona com as credenciais exatas do usuário de teste
+2. O bypass é controlado pela variável de ambiente `ENABLE_TEST_BYPASS`
+3. Em produção, o bypass deve ser desabilitado
+4. O usuário de teste tem todas as permissões para facilitar o desenvolvimento
 
 ## 3. Fluxo Detalhado de Implementação
 
@@ -96,7 +142,7 @@ export interface ModulePermissions {
      id: string;
      name: string;
      email: string;
-     role: RoleLevel;
+     role: UserRole;
      institution_id: string;
      permissions: ModulePermissions;
    }
@@ -287,7 +333,7 @@ export interface ModulePermissions {
    }
    
    // Permissões padrão por papel
-   function getDefaultPermissionsForRole(role: RoleLevel): ModulePermissions {
+   function getDefaultPermissionsForRole(role: UserRole): ModulePermissions {
      switch (role) {
        case 'super_admin':
        case 'institution_admin':
@@ -304,6 +350,9 @@ export interface ModulePermissions {
            viewStudentPortal: true,
            viewFinancialData: true,
            manageFinancialData: true,
+           viewReports: true,
+           generateReports: true,
+           manageSettings: true,
            manageUsers: true,
            manageRoles: true,
            manageInstitution: true
