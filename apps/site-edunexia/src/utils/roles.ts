@@ -1,137 +1,180 @@
-import type { User, ModulePermission } from '@edunexia/auth';
-
-// Lista de todas as permissões válidas
-const VALID_PERMISSIONS: ModulePermission[] = [
-  // Matrículas
-  'matriculas.view',
-  'matriculas.manage',
-  'matriculas.delete',
-  
-  // Portal do Aluno
-  'portal-aluno.view',
-  'portal-aluno.manage',
-  
-  // Material Didático
-  'material-didatico.view',
-  'material-didatico.create',
-  'material-didatico.edit',
-  'material-didatico.delete',
-  
-  // Comunicação
-  'comunicacao.view',
-  'comunicacao.manage',
-  'comunicacao.delete',
-  
-  // Financeiro
-  'financeiro.view',
-  'financeiro.manage',
-  'financeiro.delete',
-  
-  // Relatórios
-  'relatorios.view',
-  'relatorios.generate',
-  
-  // Configurações
-  'configuracoes.view',
-  'configuracoes.manage'
-];
-
-interface DynamicRole {
-  name: string;
-  permissions: ModulePermission[];
-  isDynamic: boolean;
-}
+import { ModulePermission, User, UserRole } from '@edunexia/auth';
 
 /**
- * Cria um role dinâmico com permissões específicas
- * @param name Nome do role
- * @param permissions Lista de permissões
- * @returns Role dinâmico criado
+ * Constantes de permissões tipadas
  */
-export function createDynamicRole(name: string, permissions: ModulePermission[]): DynamicRole {
-  // Validar permissões
-  const invalidPermissions = permissions.filter(
-    permission => !VALID_PERMISSIONS.includes(permission)
-  );
+const PERMISSIONS = {
+  MATRICULAS: {
+    VIEW: 'matriculas.view' as const,
+    MANAGE: 'matriculas.manage' as const,
+    DELETE: 'matriculas.delete' as const,
+  },
+  PORTAL_ALUNO: {
+    VIEW: 'portal-aluno.view' as const,
+    MANAGE: 'portal-aluno.manage' as const,
+  },
+  MATERIAL_DIDATICO: {
+    VIEW: 'material-didatico.view' as const,
+    CREATE: 'material-didatico.create' as const,
+    EDIT: 'material-didatico.edit' as const,
+    DELETE: 'material-didatico.delete' as const,
+  },
+  COMUNICACAO: {
+    VIEW: 'comunicacao.view' as const,
+    MANAGE: 'comunicacao.manage' as const,
+    DELETE: 'comunicacao.delete' as const,
+  },
+  FINANCEIRO: {
+    VIEW: 'financeiro.view' as const,
+    MANAGE: 'financeiro.manage' as const,
+    DELETE: 'financeiro.delete' as const,
+  },
+  RELATORIOS: {
+    VIEW: 'relatorios.view' as const,
+    GENERATE: 'relatorios.generate' as const,
+  },
+  CONFIGURACOES: {
+    VIEW: 'configuracoes.view' as const,
+    MANAGE: 'configuracoes.manage' as const,
+  },
+} as const;
 
-  if (invalidPermissions.length > 0) {
-    throw new Error(`Permissões inválidas: ${invalidPermissions.join(', ')}`);
+/**
+ * Helper para converter strings em ModulePermission de forma segura
+ */
+function asModulePermission(permission: string): ModulePermission {
+  return permission as unknown as ModulePermission;
+}
+
+type RolePermissions = {
+  [K in UserRole]: readonly ModulePermission[];
+};
+
+/**
+ * Define os templates de permissões para cada papel funcional
+ */
+const ROLE_PERMISSIONS: RolePermissions = {
+  super_admin: [
+    PERMISSIONS.MATRICULAS.VIEW,
+    PERMISSIONS.MATRICULAS.MANAGE,
+    PERMISSIONS.MATRICULAS.DELETE,
+    PERMISSIONS.PORTAL_ALUNO.VIEW,
+    PERMISSIONS.PORTAL_ALUNO.MANAGE,
+    PERMISSIONS.MATERIAL_DIDATICO.VIEW,
+    PERMISSIONS.MATERIAL_DIDATICO.CREATE,
+    PERMISSIONS.MATERIAL_DIDATICO.EDIT,
+    PERMISSIONS.MATERIAL_DIDATICO.DELETE,
+    PERMISSIONS.COMUNICACAO.VIEW,
+    PERMISSIONS.COMUNICACAO.MANAGE,
+    PERMISSIONS.COMUNICACAO.DELETE,
+    PERMISSIONS.FINANCEIRO.VIEW,
+    PERMISSIONS.FINANCEIRO.MANAGE,
+    PERMISSIONS.FINANCEIRO.DELETE,
+    PERMISSIONS.RELATORIOS.VIEW,
+    PERMISSIONS.RELATORIOS.GENERATE,
+    PERMISSIONS.CONFIGURACOES.VIEW,
+    PERMISSIONS.CONFIGURACOES.MANAGE,
+  ],
+  institution_admin: [
+    PERMISSIONS.MATRICULAS.VIEW,
+    PERMISSIONS.MATRICULAS.MANAGE,
+    PERMISSIONS.PORTAL_ALUNO.VIEW,
+    PERMISSIONS.PORTAL_ALUNO.MANAGE,
+    PERMISSIONS.MATERIAL_DIDATICO.VIEW,
+    PERMISSIONS.MATERIAL_DIDATICO.CREATE,
+    PERMISSIONS.MATERIAL_DIDATICO.EDIT,
+    PERMISSIONS.COMUNICACAO.VIEW,
+    PERMISSIONS.COMUNICACAO.MANAGE,
+    PERMISSIONS.FINANCEIRO.VIEW,
+    PERMISSIONS.FINANCEIRO.MANAGE,
+    PERMISSIONS.RELATORIOS.VIEW,
+    PERMISSIONS.RELATORIOS.GENERATE,
+    PERMISSIONS.CONFIGURACOES.VIEW,
+    PERMISSIONS.CONFIGURACOES.MANAGE,
+  ],
+  coordinator: [
+    PERMISSIONS.MATRICULAS.VIEW,
+    PERMISSIONS.MATRICULAS.MANAGE,
+    PERMISSIONS.PORTAL_ALUNO.VIEW,
+    PERMISSIONS.MATERIAL_DIDATICO.VIEW,
+    PERMISSIONS.MATERIAL_DIDATICO.CREATE,
+    PERMISSIONS.MATERIAL_DIDATICO.EDIT,
+    PERMISSIONS.COMUNICACAO.VIEW,
+    PERMISSIONS.COMUNICACAO.MANAGE,
+    PERMISSIONS.RELATORIOS.VIEW,
+  ],
+  teacher: [
+    PERMISSIONS.MATRICULAS.VIEW,
+    PERMISSIONS.PORTAL_ALUNO.VIEW,
+    PERMISSIONS.MATERIAL_DIDATICO.VIEW,
+    PERMISSIONS.MATERIAL_DIDATICO.CREATE,
+    PERMISSIONS.MATERIAL_DIDATICO.EDIT,
+    PERMISSIONS.COMUNICACAO.VIEW,
+    PERMISSIONS.COMUNICACAO.MANAGE,
+  ],
+  secretary: [
+    PERMISSIONS.MATRICULAS.VIEW,
+    PERMISSIONS.MATRICULAS.MANAGE,
+    PERMISSIONS.PORTAL_ALUNO.VIEW,
+    PERMISSIONS.COMUNICACAO.VIEW,
+    PERMISSIONS.COMUNICACAO.MANAGE,
+  ],
+  financial: [
+    PERMISSIONS.FINANCEIRO.VIEW,
+    PERMISSIONS.FINANCEIRO.MANAGE,
+    PERMISSIONS.RELATORIOS.VIEW,
+  ],
+  student: [
+    PERMISSIONS.PORTAL_ALUNO.VIEW,
+    PERMISSIONS.MATERIAL_DIDATICO.VIEW,
+  ],
+  parent: [
+    PERMISSIONS.PORTAL_ALUNO.VIEW,
+    PERMISSIONS.MATERIAL_DIDATICO.VIEW,
+  ],
+};
+
+/**
+ * Obtém as permissões padrão do papel do usuário
+ */
+export const getDefaultRolePermissions = (role: UserRole): ModulePermission[] => {
+  return [...ROLE_PERMISSIONS[role]];
+};
+
+/**
+ * Obtém todas as permissões do usuário (papel + permissões adicionais)
+ */
+export const getUserPermissions = (user: User): ModulePermission[] => {
+  if (!user?.role) {
+    return [];
   }
-
-  return {
-    name,
-    permissions,
-    isDynamic: true
-  };
-}
-
-/**
- * Atribui um role dinâmico a um usuário
- * @param user Usuário alvo
- * @param roleName Nome do role
- * @param permissions Lista de permissões
- * @returns Usuário atualizado com o novo role
- */
-export function assignRoleToUser(
-  user: User,
-  roleName: string,
-  permissions: ModulePermission[]
-): User {
-  return {
-    ...user,
-    role: roleName,
-    permissions: [...permissions]
-  };
-}
-
-/**
- * Combina permissões de múltiplos roles
- * @param permissionsList Lista de arrays de permissões
- * @returns Array único com todas as permissões (sem duplicatas)
- */
-export function combinePermissions(permissionsList: ModulePermission[][]): ModulePermission[] {
-  const uniquePermissions = new Set<ModulePermission>();
   
-  permissionsList.forEach(permissions => {
-    permissions.forEach(permission => {
-      uniquePermissions.add(permission);
-    });
-  });
-
-  return Array.from(uniquePermissions);
-}
-
-/**
- * Verifica se um usuário tem uma permissão específica
- * @param user Usuário alvo
- * @param permission Permissão a ser verificada
- * @returns true se o usuário tem a permissão
- */
-export function hasPermission(user: User, permission: ModulePermission): boolean {
-  // Super admin tem todas as permissões
-  if (user.role === 'super_admin') {
-    return true;
-  }
-
-  return user.permissions.includes(permission);
-}
+  // Combina as permissões padrão do papel com as permissões específicas do usuário
+  const rolePermissions = getDefaultRolePermissions(user.role);
+  const userPermissions = user.permissions || [];
+  
+  // Remove duplicatas e converte para array
+  return Array.from(new Set([...rolePermissions, ...userPermissions]));
+};
 
 /**
- * Verifica se um usuário tem todas as permissões especificadas
- * @param user Usuário alvo
- * @param permissions Lista de permissões a serem verificadas
- * @returns true se o usuário tem todas as permissões
+ * Verifica se o usuário tem uma permissão específica
  */
-export function hasAllPermissions(user: User, permissions: ModulePermission[]): boolean {
-  return permissions.every(permission => hasPermission(user, permission));
-}
+export const hasPermission = (user: User, permission: ModulePermission): boolean => {
+  const userPermissions = getUserPermissions(user);
+  return userPermissions.includes(permission);
+};
 
 /**
- * Verifica se um usuário tem pelo menos uma das permissões especificadas
- * @param user Usuário alvo
- * @param permissions Lista de permissões a serem verificadas
- * @returns true se o usuário tem pelo menos uma das permissões
+ * Verifica se o usuário tem pelo menos uma das permissões especificadas
  */
-export function hasAnyPermission(user: User, permissions: ModulePermission[]): boolean {
+export const hasAnyPermission = (user: User, permissions: ModulePermission[]): boolean => {
   return permissions.some(permission => hasPermission(user, permission));
-} 
+};
+
+/**
+ * Verifica se o usuário tem todas as permissões especificadas
+ */
+export const hasAllPermissions = (user: User, permissions: ModulePermission[]): boolean => {
+  return permissions.every(permission => hasPermission(user, permission));
+}; 

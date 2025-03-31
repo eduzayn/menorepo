@@ -194,4 +194,44 @@ npx supabase db push --db-url=YOUR_SUPABASE_URL --schema-only
 
 1. Criar jobs agendados para executar funções como `gerar_provisoes_mensais` automaticamente.
 2. Implementar métricas e monitoramento para as integrações.
-3. Expandir relatórios gerenciais com mais indicadores financeiros e de RH. 
+3. Expandir relatórios gerenciais com mais indicadores financeiros e de RH.
+
+## 002_update_permissions.sql
+
+**Data:** 26/03/2024
+
+**Descrição:** Atualiza a estrutura de permissões de usuários para usar arrays tipados e adiciona funções de gerenciamento.
+
+**Alterações:**
+- Altera o tipo da coluna `permissions` na tabela `user_permissions` de `JSONB` para `TEXT[]`
+- Adiciona constraint `valid_permissions` para validar as permissões permitidas
+- Cria função `assign_role_permissions` para atribuir permissões padrão baseadas no papel
+- Cria funções auxiliares para verificar permissões:
+  - `has_permission`: verifica uma permissão específica
+  - `has_all_permissions`: verifica se tem todas as permissões
+  - `has_any_permission`: verifica se tem pelo menos uma das permissões
+- Atualiza as permissões de todos os usuários existentes
+
+**Impacto:** Médio
+- Faz backup dos dados existentes antes da alteração
+- Converte permissões existentes para o novo formato
+- Não há perda de dados
+
+**Como reverter:**
+```sql
+-- Restaura os dados do backup
+UPDATE user_permissions 
+SET permissions = (SELECT permissions FROM user_permissions_backup WHERE user_permissions_backup.user_id = user_permissions.user_id);
+
+-- Remove as funções criadas
+DROP FUNCTION IF EXISTS assign_role_permissions;
+DROP FUNCTION IF EXISTS has_permission;
+DROP FUNCTION IF EXISTS has_all_permissions;
+DROP FUNCTION IF EXISTS has_any_permission;
+
+-- Remove a constraint de validação
+ALTER TABLE user_permissions DROP CONSTRAINT IF EXISTS valid_permissions;
+
+-- Remove a tabela de backup
+DROP TABLE IF EXISTS user_permissions_backup;
+``` 
