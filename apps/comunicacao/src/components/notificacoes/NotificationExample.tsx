@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { NotificationCard } from '@edunexia/ui-components';
-import { Button } from '@/components/ui/button';
+import { Button } from '@edunexia/ui-components';
 import { toast } from 'sonner';
 
 export const NotificationExample: React.FC = () => {
@@ -83,12 +83,11 @@ export const NotificationExample: React.FC = () => {
             <NotificationCard
               key={notification.id}
               title={notification.title}
-              content={notification.content}
-              type={notification.type as any}
-              date={notification.date}
-              unread={notification.unread}
-              onClose={() => handleNotificationClose(notification.id)}
-              className="transition-all hover:shadow-md"
+              message={notification.content}
+              date={notification.date.toLocaleString()}
+              isRead={!notification.unread}
+              onRead={() => handleNotificationClose(notification.id)}
+              onDelete={() => handleNotificationClose(notification.id)}
             />
           ))
         )}

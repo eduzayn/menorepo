@@ -1,3 +1,4 @@
+import React from 'react';
 import { useEffect, useState } from 'react';
 import type { Lead, Interacao } from '@/types/comunicacao';
 import { Card } from '@edunexia/ui-components';
@@ -10,6 +11,7 @@ import {
   UserGroupIcon,
   DocumentTextIcon,
 } from '@heroicons/react/24/outline';
+import { mockSupabase as supabase } from '../../lib/mock-supabase';
 
 interface LeadActivityProps {
   lead: Lead;

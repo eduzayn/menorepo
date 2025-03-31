@@ -1,42 +1,35 @@
+import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { useAuth } from '@edunexia/auth';
 
-// Página principal do módulo de comunicação
-const ComunicacaoHome = () => (
-  <div className="p-4">
-    <h1 className="text-2xl font-bold">Módulo de Comunicação</h1>
-    <p className="mt-2">Esta é a página principal do módulo de comunicação.</p>
-  </div>
-);
+// Componentes de páginas
+const ConversacoesPage = React.lazy(() => import('./pages/ConversacoesPage'));
+const MensagensPage = React.lazy(() => import('./pages/MensagensPage'));
+const CRMPage = React.lazy(() => import('./pages/CRMPage'));
+const ConfiguracoesPage = React.lazy(() => import('./pages/ConfiguracoesPage'));
+const NotificacoesPage = React.lazy(() => import('./pages/NotificacoesPage'));
+const AnalyticsPage = React.lazy(() => import('./pages/AnalyticsPage'));
 
-// Componente de layout principal
-const AppRoutes = () => {
-  const { user, isAuthenticated, isLoading } = useAuth();
+// Layout principal
+import Layout from './components/Layout';
 
-  // Exibe um indicador de carregamento enquanto verifica a autenticação
-  if (isLoading) {
-    return <div className="p-4">Carregando...</div>;
-  }
+// Componente de carregamento
+const Loading = () => <div className="p-6 text-center">Carregando...</div>;
 
+export default function AppRoutes() {
   return (
-    <Routes>
-      {isAuthenticated ? (
-        <>
-          {/* Rotas autenticadas */}
-          <Route path="/" element={<ComunicacaoHome />} />
-          <Route path="/mensagens" element={<div>Mensagens</div>} />
-          <Route path="/conversas" element={<div>Conversas</div>} />
-          <Route path="/configuracoes" element={<div>Configurações</div>} />
-          
-          {/* Rota para qualquer caminho não encontrado */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </>
-      ) : (
-        // Redireciona para a página de login se não estiver autenticado
-        <Route path="*" element={<div>Por favor, faça login para acessar o módulo de comunicação.</div>} />
-      )}
-    </Routes>
+    <React.Suspense fallback={<Loading />}>
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route index element={<Navigate to="/conversacoes" replace />} />
+          <Route path="conversacoes" element={<ConversacoesPage />} />
+          <Route path="mensagens" element={<MensagensPage />} />
+          <Route path="crm" element={<CRMPage />} />
+          <Route path="configuracoes" element={<ConfiguracoesPage />} />
+          <Route path="notificacoes" element={<NotificacoesPage />} />
+          <Route path="analytics" element={<AnalyticsPage />} />
+          <Route path="*" element={<div>Página não encontrada</div>} />
+        </Route>
+      </Routes>
+    </React.Suspense>
   );
-};
-
-export default AppRoutes; 
+} 

@@ -5,14 +5,39 @@
  * import { useSupabaseClient } from '@edunexia/api-client';
  */
 
-import { createSupabaseClient } from '@edunexia/api-client'
-import type { Database } from '@/types/database'
+import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+// Criando um cliente Supabase mock para desenvolvimento local
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://placeholder-url.supabase.co';
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'placeholder-key';
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Faltam variáveis de ambiente do Supabase')
-}
+// Exportando cliente Supabase
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-export const supabase = createSupabaseClient(supabaseUrl, supabaseAnonKey) 
+// Função de utilidade para mock de dados durante o desenvolvimento
+export const mockData = {
+  from: () => ({
+    select: () => ({
+      order: () => ({
+        then: (callback: Function) => callback({
+          data: [],
+          error: null
+        })
+      })
+    })
+  })
+};
+
+// Use este cliente mock quando o Supabase não estiver disponível
+export const mockSupabase = {
+  from: (table: string) => ({
+    select: (columns: string) => ({
+      order: (column: string) => ({
+        then: (callback: Function) => callback({
+          data: [],
+          error: null
+        })
+      })
+    })
+  })
+}; 

@@ -5,9 +5,8 @@ import { Container } from '@edunexia/ui-components';
 function BaseConhecimentoPage() {
   return (
     <Container>
-      <div className="py-6">
-        <BaseConhecimento />
-      </div>
+      <h1 className="text-2xl font-bold mb-6">Base de Conhecimento</h1>
+      <BaseConhecimento />
     </Container>
   );
 }

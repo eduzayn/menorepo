@@ -1,15 +1,21 @@
+import React from 'react';
 import { useState } from 'react';
 import { Interacao } from '../../types/comunicacao';
-import { 
-  PhoneIcon, 
-  EnvelopeIcon, 
-  ChatBubbleOvalLeftIcon, 
-  UserIcon, 
-  AcademicCapIcon
+import {
+  EnvelopeIcon,
+  PhoneIcon,
+  ClipboardDocumentCheckIcon,
+  ChatBubbleLeftEllipsisIcon,
+  EllipsisHorizontalIcon,
 } from '@heroicons/react/24/outline';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Badge } from '@edunexia/ui-components';
+import { 
+  ChatBubbleOvalLeftIcon, 
+  UserIcon, 
+  AcademicCapIcon
+} from '@heroicons/react/24/outline';
 
 // Mapeamento de tipos de interação para ícones e cores
 const interacaoConfig: Record<string, { icon: any, cor: string, nome: string }> = {

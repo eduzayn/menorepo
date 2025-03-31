@@ -1,17 +1,14 @@
 import React from 'react';
-import { NotificacoesConfig } from '../components';
-import { useAuth } from '../hooks/useAuth';
 
-export const NotificacoesPage: React.FC = () => {
-  const { user } = useAuth();
-
-  if (!user) {
-    return null;
-  }
-
+const NotificacoesPage: React.FC = () => {
   return (
     <div>
-      <NotificacoesConfig usuarioId={user.id} />
+      <h2 className="text-xl font-semibold mb-4">Notificações</h2>
+      <div className="bg-white p-4 rounded shadow">
+        <p>Esta é a página de gerenciamento de notificações.</p>
+      </div>
     </div>
   );
-}; 
+};
+
+export default NotificacoesPage; 

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Button, Input, Label, Textarea } from '@edunexia/ui-components';
 import { Interacao } from '../../types/comunicacao';
 import { toast } from 'sonner';

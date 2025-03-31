@@ -17,7 +17,7 @@ import {
   TableHead,
   TableHeader,
   TableRow
-} from '@edunexia/ui-components';
+} from '@/components/ui/table';
 import {
   Dialog,
   DialogContent,

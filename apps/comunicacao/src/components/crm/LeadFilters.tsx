@@ -1,117 +1,122 @@
-import React from 'react';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Input } from '@edunexia/ui-components';
-import { Button } from '@edunexia/ui-components';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from '@edunexia/ui-components';
-import { useState } from 'react';
-import { SearchIcon, FilterIcon } from '@heroicons/react/outline';
-import type { LeadStatus } from '@/types/comunicacao';
+import React, { useState } from 'react';
+import { Input, Button, Select } from '@edunexia/ui-components';
 
-interface LeadFiltersProps {
-  onSearch: (search: string) => void;
-  onStatusChange: (status: LeadStatus | null) => void;
-  onSortChange: (sort: 'criado_at' | 'atualizado_at' | 'ultima_interacao') => void;
-  onOrderChange: (order: 'asc' | 'desc') => void;
+// Tipo para status de lead
+export type LeadStatus = 'NOVO' | 'EM_CONTATO' | 'QUALIFICADO' | 'CONVERTIDO' | 'PERDIDO';
+export type SortField = 'nome' | 'data_criacao' | 'status' | 'ultima_interacao';
+export type SortOrder = 'asc' | 'desc';
+
+export interface LeadFiltersProps {
+  onSearch: (term: string) => void;
+  onStatusFilter: (status: LeadStatus | '') => void;
+  onSort: (field: SortField, order: SortOrder) => void;
 }
 
-export function LeadFilters({
-  onSearch,
-  onStatusChange,
-  onSortChange,
-  onOrderChange,
-}: LeadFiltersProps) {
-  const [search, setSearch] = useState('');
-  const [status, setStatus] = useState<LeadStatus | null>(null);
-  const [sort, setSort] = useState<'criado_at' | 'atualizado_at' | 'ultima_interacao'>('ultima_interacao');
-  const [order, setOrder] = useState<'asc' | 'desc'>('desc');
+const SearchIcon = () => (
+  <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+  </svg>
+);
 
-  const handleSearch = (value: string) => {
-    setSearch(value);
-    onSearch(value);
-  };
+export function LeadFilters({ onSearch, onStatusFilter, onSort }: LeadFiltersProps) {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [status, setStatus] = useState<LeadStatus | ''>('');
+  const [sortField, setSortField] = useState<SortField>('data_criacao');
+  const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
 
-  const handleStatusChange = (value: LeadStatus | null) => {
+  const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value as LeadStatus | '';
     setStatus(value);
-    onStatusChange(value);
+    onStatusFilter(value);
   };
 
-  const handleSortChange = (value: 'criado_at' | 'atualizado_at' | 'ultima_interacao') => {
-    setSort(value);
-    onSortChange(value);
+  const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value as SortField;
+    setSortField(value);
+    onSort(value, sortOrder);
   };
 
-  const handleOrderChange = (value: 'asc' | 'desc') => {
-    setOrder(value);
-    onOrderChange(value);
+  const handleOrderChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value as SortOrder;
+    setSortOrder(value);
+    onSort(sortField, value);
+  };
+
+  const handleSearch = () => {
+    onSearch(searchTerm);
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
   };
 
   return (
-    <div className="flex flex-col sm:flex-row gap-4 mb-6">
-      <div className="flex-1">
-        <div className="relative">
-          <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-          <Input
-            type="text"
-            placeholder="Buscar por nome, email ou telefone..."
-            value={search}
-            onChange={(e) => handleSearch(e.target.value)}
-            className="pl-10"
+    <div className="mb-6 space-y-4">
+      <div className="relative">
+        <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+          <SearchIcon />
+        </div>
+        <Input
+          type="text"
+          placeholder="Buscar leads por nome, email ou telefone..."
+          className="pl-10"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          onKeyPress={handleKeyPress}
+        />
+      </div>
+      
+      <div className="flex flex-wrap gap-4">
+        <div className="w-full md:w-auto">
+          <Select
+            placeholder="Filtrar por status"
+            value={status}
+            onChange={handleStatusChange}
+            options={[
+              { value: '', label: 'Todos os status' },
+              { value: 'NOVO', label: 'Novo' },
+              { value: 'EM_CONTATO', label: 'Em contato' },
+              { value: 'QUALIFICADO', label: 'Qualificado' },
+              { value: 'CONVERTIDO', label: 'Convertido' },
+              { value: 'PERDIDO', label: 'Perdido' }
+            ]}
           />
         </div>
-      </div>
-
-      <div className="flex gap-2">
-        <Select
-          value={status || ''}
-          onValueChange={(value) => handleStatusChange(value as LeadStatus || null)}
+        
+        <div className="w-full md:w-auto">
+          <Select
+            placeholder="Ordenar por"
+            value={sortField}
+            onChange={handleSortChange}
+            options={[
+              { value: 'nome', label: 'Nome' },
+              { value: 'data_criacao', label: 'Data de criação' },
+              { value: 'status', label: 'Status' },
+              { value: 'ultima_interacao', label: 'Última interação' }
+            ]}
+          />
+        </div>
+        
+        <div className="w-full md:w-auto">
+          <Select
+            placeholder="Ordem"
+            value={sortOrder}
+            onChange={handleOrderChange}
+            options={[
+              { value: 'asc', label: 'Crescente' },
+              { value: 'desc', label: 'Decrescente' }
+            ]}
+          />
+        </div>
+        
+        <Button
+          onClick={handleSearch}
+          className="md:ml-auto"
         >
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="">Todos</SelectItem>
-            <SelectItem value="NOVO">Novo</SelectItem>
-            <SelectItem value="EM_CONTATO">Em Contato</SelectItem>
-            <SelectItem value="QUALIFICADO">Qualificado</SelectItem>
-            <SelectItem value="CONVERTIDO">Convertido</SelectItem>
-            <SelectItem value="PERDIDO">Perdido</SelectItem>
-          </SelectContent>
-        </Select>
-
-        <Select
-          value={sort}
-          onValueChange={(value) => handleSortChange(value as typeof sort)}
-        >
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Ordenar por" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="criado_at">Data de Criação</SelectItem>
-            <SelectItem value="atualizado_at">Última Atualização</SelectItem>
-            <SelectItem value="ultima_interacao">Última Interação</SelectItem>
-          </SelectContent>
-        </Select>
-
-        <Select
-          value={order}
-          onValueChange={(value) => handleOrderChange(value as 'asc' | 'desc')}
-        >
-          <SelectTrigger className="w-[120px]">
-            <SelectValue placeholder="Ordem" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="desc">Mais Recente</SelectItem>
-            <SelectItem value="asc">Mais Antigo</SelectItem>
-          </SelectContent>
-        </Select>
+          Buscar
+        </Button>
       </div>
     </div>
   );
