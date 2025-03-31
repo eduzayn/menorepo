@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { DndProvider } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
+import React, { useState } from 'react';
+// Removendo importações problemáticas
+// import { DndProvider } from 'react-dnd';
+// import { HTML5Backend } from 'react-dnd-html5-backend';
 import { LeadCard } from '../components/crm/LeadCard';
 import { LeadFilters } from '../components/crm/LeadFilters';
 import { LeadMetrics } from '../components/crm/LeadMetrics';
@@ -10,8 +11,12 @@ import { useComunicacao } from '../contexts/ComunicacaoContext';
 import type { Lead, LeadStatus } from '../types/comunicacao';
 import { UserPlusIcon, ArrowsPointingOutIcon } from '@heroicons/react/24/outline';
 import { toast } from 'sonner';
-import { LeadsKanban } from '../components/crm/LeadsKanban';
+// import { KanbanColumn } from '../components/crm/KanbanColumn';
 import { NovoLeadForm } from '../components/crm/NovoLeadForm';
+import { useLeads } from '../hooks/useLeads';
+
+// Tipo para criação de leads
+type LeadCreateData = Omit<Lead, 'id' | 'criado_at' | 'atualizado_at' | 'online' | 'ultimo_acesso'>;
 
 const statusMap = {
   'NOVO': 'Novos Leads',
@@ -20,6 +25,100 @@ const statusMap = {
   'CONVERTIDO': 'Convertidos',
   'PERDIDO': 'Perdidos'
 } as const;
+
+// Componente temporário para substituir o KanbanColumn
+const SimpleKanbanColumn = ({ 
+  title, 
+  status, 
+  leads = [], 
+  onLeadDrop, 
+  onLeadEdit, 
+  onLeadView 
+}: { 
+  title: string; 
+  status: LeadStatus; 
+  leads: Lead[]; 
+  onLeadDrop: (id: string, status: LeadStatus) => void; 
+  onLeadEdit?: (lead: Lead) => void; 
+  onLeadView?: (lead: Lead) => void; 
+}) => (
+  <div className="flex-shrink-0 w-80 bg-neutral-50 rounded-lg p-4">
+    <div className="flex items-center justify-between mb-4">
+      <h3 className="text-sm font-medium text-gray-900">{title}</h3>
+      <span className="inline-flex items-center justify-center w-5 h-5 text-xs font-medium text-primary bg-primary-lightest rounded-full">
+        {leads.length}
+      </span>
+    </div>
+    
+    <div className="space-y-3">
+      {leads.map((lead) => (
+        <div key={lead.id} className="transform transition-transform hover:scale-[1.02]">
+          <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+            <p className="font-medium">{lead.nome}</p>
+            <p className="text-sm text-gray-500">{lead.email}</p>
+            <div className="mt-2 flex justify-end gap-2">
+              {onLeadEdit && (
+                <button 
+                  onClick={() => onLeadEdit(lead)} 
+                  className="text-sm text-blue-600 hover:text-blue-800"
+                >
+                  Editar
+                </button>
+              )}
+              {onLeadView && (
+                <button 
+                  onClick={() => onLeadView(lead)} 
+                  className="text-sm text-indigo-600 hover:text-indigo-800"
+                >
+                  Conversar
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      ))}
+
+      {leads.length === 0 && (
+        <div className="text-center py-8">
+          <p className="text-sm text-neutral-500">
+            Nenhum lead neste status
+          </p>
+        </div>
+      )}
+    </div>
+  </div>
+);
+
+// Versão simplificada do Dialog que não usa context
+const SimpleDialog = ({ 
+  open, 
+  onOpenChange, 
+  children, 
+  className = "" 
+}: { 
+  open: boolean; 
+  onOpenChange: (open: boolean) => void;
+  children: React.ReactNode;
+  className?: string;
+}) => {
+  if (!open) return null;
+  
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div className={`bg-white rounded-lg shadow-lg max-w-lg w-full ${className}`}>
+        <div className="p-4">
+          {children}
+          <button 
+            className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+            onClick={() => onOpenChange(false)}
+          >
+            ✕
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export default function LeadsKanbanPage() {
   const [search, setSearch] = useState('');
@@ -78,10 +177,15 @@ export default function LeadsKanbanPage() {
 
   const handleChatWithLead = async (lead: Lead) => {
     try {
-      const conversaId = await iniciarConversa(lead);
+      const conversaId = await iniciarConversa({
+        participante_id: lead.id,
+        participante_tipo: 'LEAD',
+        titulo: `Conversa com ${lead.nome}`,
+        canal: 'CHAT'
+      });
       if (conversaId) {
         // Navegar para a conversa
-        window.location.href = `/?conversa=${conversaId}`;
+        window.location.href = `/conversas/${conversaId}`;
       }
     } catch (error) {
       console.error('Erro ao iniciar conversa:', error);
@@ -89,7 +193,7 @@ export default function LeadsKanbanPage() {
     }
   };
 
-  const handleCreateLead = async (data: Omit<Lead, 'id' | 'criado_at' | 'atualizado_at' | 'online' | 'ultimo_acesso'>) => {
+  const handleCreateLead = async (data: LeadCreateData) => {
     try {
       await createLead(data);
       setShowForm(false);
@@ -100,7 +204,7 @@ export default function LeadsKanbanPage() {
     }
   };
 
-  const handleUpdateLead = async (data: Omit<Lead, 'id' | 'criado_at' | 'atualizado_at' | 'online' | 'ultimo_acesso'>) => {
+  const handleUpdateLead = async (data: Partial<Lead>) => {
     if (!selectedLead) return;
 
     try {
@@ -179,30 +283,27 @@ export default function LeadsKanbanPage() {
 
       {/* Conteúdo Kanban */}
       <div className="mt-4 flex-1 overflow-hidden">
-        <DndProvider backend={HTML5Backend}>
-          <div className="flex space-x-4 overflow-x-auto pb-4 h-full">
-            {(Object.keys(statusMap) as LeadStatus[]).map((status) => (
-              <KanbanColumn
-                key={status}
-                title={statusMap[status]}
-                status={status}
-                leads={leadsByStatus[status] || []}
-                onLeadDrop={handleLeadDrop}
-                onLeadEdit={handleEditLead}
-                onLeadChat={handleChatWithLead}
-              />
-            ))}
-          </div>
-        </DndProvider>
+        {/* Versão simplificada sem DndProvider */}
+        <div className="flex space-x-4 overflow-x-auto pb-4 h-full">
+          {(Object.keys(statusMap) as LeadStatus[]).map((status) => (
+            <SimpleKanbanColumn
+              key={status}
+              title={statusMap[status]}
+              status={status}
+              leads={leadsByStatus[status] || []}
+              onLeadDrop={handleLeadDrop}
+              onLeadEdit={handleEditLead}
+              onLeadView={handleChatWithLead}
+            />
+          ))}
+        </div>
       </div>
 
-      {/* Modal de formulário */}
-      <Dialog open={showForm} onOpenChange={setShowForm}>
-        <DialogContent className="sm:max-w-lg">
-          <DialogHeader>
-            <DialogTitle>{selectedLead ? 'Editar Lead' : 'Novo Lead'}</DialogTitle>
-          </DialogHeader>
-          <LeadForm
+      {/* Modal de formulário simplificado */}
+      <SimpleDialog open={showForm} onOpenChange={setShowForm} className="max-w-xl">
+        <div>
+          <h2 className="text-xl font-semibold mb-6">{selectedLead ? 'Editar Lead' : 'Novo Lead'}</h2>
+          <NovoLeadForm
             initialData={selectedLead}
             onSubmit={selectedLead ? handleUpdateLead : handleCreateLead}
             onCancel={() => {
@@ -210,8 +311,8 @@ export default function LeadsKanbanPage() {
               setSelectedLead(null);
             }}
           />
-        </DialogContent>
-      </Dialog>
+        </div>
+      </SimpleDialog>
     </div>
   );
 } 

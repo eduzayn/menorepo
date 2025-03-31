@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { useAuth as useEdunexiaAuth } from '@edunexia/auth';
+import React, { createContext, useContext } from 'react';
+import { useAuth as useHookAuth } from '../hooks/useAuth';
 
 interface AuthContextType {
   user: any | null;
@@ -14,7 +14,7 @@ const AuthContext = createContext<AuthContextType>({
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const { user, loading, error } = useEdunexiaAuth();
+  const { user, isLoading: loading, error } = useHookAuth();
 
   return (
     <AuthContext.Provider value={{ user, loading, error }}>

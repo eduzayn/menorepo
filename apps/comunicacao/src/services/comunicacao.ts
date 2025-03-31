@@ -141,37 +141,176 @@ export const enviarMensagem = async (mensagem: InsertMensagem) => {
   return data as Mensagem;
 };
 
-// Campanhas
-export const getCampanhas = async () => {
-  const { data, error } = await supabase
-    .from('campanhas')
-    .select('*')
-    .order('criado_at', { ascending: false });
+// Dados mock para campanhas
+const MOCK_CAMPANHAS: Campanha[] = [
+  {
+    id: '1',
+    titulo: 'Campanha de Boas-vindas',
+    descricao: 'Mensagens automáticas de boas-vindas para novos leads',
+    tipo: 'marketing',
+    status: 'ATIVO',
+    data_inicio: new Date().toISOString(),
+    criado_at: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+    atualizado_at: new Date().toISOString()
+  },
+  {
+    id: '2',
+    titulo: 'Lembrete de Matrícula 2024',
+    descricao: 'Lembrete para alunos sobre o período de matrícula',
+    tipo: 'lembrete',
+    status: 'ATIVO',
+    data_inicio: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+    criado_at: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
+    atualizado_at: new Date().toISOString()
+  },
+  {
+    id: '3',
+    titulo: 'Pesquisa de Satisfação Q1',
+    descricao: 'Pesquisa trimestral de satisfação com os alunos',
+    tipo: 'pesquisa',
+    status: 'FINALIZADO',
+    data_inicio: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString(),
+    data_fim: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+    criado_at: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString(),
+    atualizado_at: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
+  },
+  {
+    id: '4',
+    titulo: 'Notificação de Novas Funcionalidades',
+    descricao: 'Aviso sobre novas funcionalidades da plataforma',
+    tipo: 'notificacao',
+    status: 'ARQUIVADO',
+    data_inicio: new Date(Date.now() - 120 * 24 * 60 * 60 * 1000).toISOString(),
+    data_fim: new Date(Date.now() - 100 * 24 * 60 * 60 * 1000).toISOString(),
+    criado_at: new Date(Date.now() - 150 * 24 * 60 * 60 * 1000).toISOString(),
+    atualizado_at: new Date(Date.now() - 100 * 24 * 60 * 60 * 1000).toISOString()
+  }
+];
 
-  if (error) throw error;
-  return data as Campanha[];
+// Função para simular atraso de rede
+const simulateNetworkDelay = async () => {
+  await new Promise(resolve => setTimeout(resolve, 300));
 };
 
-export const getCampanha = async (id: string) => {
-  const { data, error } = await supabase
-    .from('campanhas')
-    .select('*')
-    .eq('id', id)
-    .single();
-
-  if (error) throw error;
-  return data as Campanha;
+/**
+ * Busca todas as campanhas
+ */
+export const getCampanhas = async (): Promise<Campanha[]> => {
+  try {
+    // Simular chamada de API
+    await simulateNetworkDelay();
+    
+    // Ordenar campanhas por data de criação (mais recentes primeiro)
+    return [...MOCK_CAMPANHAS].sort((a, b) => 
+      new Date(b.criado_at).getTime() - new Date(a.criado_at).getTime()
+    );
+  } catch (error) {
+    console.error('Erro ao buscar campanhas:', error);
+    throw error;
+  }
 };
 
-export const criarCampanha = async (campanha: InsertCampanha) => {
-  const { data, error } = await supabase
-    .from('campanhas')
-    .insert([campanha])
-    .select()
-    .single();
+/**
+ * Busca uma campanha pelo ID
+ */
+export const getCampanhaPorId = async (id: string): Promise<Campanha | null> => {
+  try {
+    await simulateNetworkDelay();
+    const campanha = MOCK_CAMPANHAS.find(c => c.id === id);
+    return campanha || null;
+  } catch (error) {
+    console.error(`Erro ao buscar campanha ${id}:`, error);
+    throw error;
+  }
+};
 
-  if (error) throw error;
-  return data as Campanha;
+/**
+ * Cria uma nova campanha
+ */
+export const criarCampanha = async (campanha: InsertCampanha): Promise<Campanha> => {
+  try {
+    await simulateNetworkDelay();
+    
+    const novaCampanha: Campanha = {
+      id: `mock-${Date.now()}`,
+      ...campanha,
+      criado_at: new Date().toISOString(),
+      atualizado_at: new Date().toISOString()
+    };
+    
+    MOCK_CAMPANHAS.push(novaCampanha);
+    return novaCampanha;
+  } catch (error) {
+    console.error('Erro ao criar campanha:', error);
+    throw error;
+  }
+};
+
+/**
+ * Atualiza uma campanha existente
+ */
+export const atualizarCampanha = async (id: string, campanha: UpdateCampanha): Promise<Campanha | null> => {
+  try {
+    await simulateNetworkDelay();
+    
+    const index = MOCK_CAMPANHAS.findIndex(c => c.id === id);
+    if (index === -1) return null;
+    
+    const campanhaAtualizada: Campanha = {
+      ...MOCK_CAMPANHAS[index],
+      ...campanha,
+      atualizado_at: new Date().toISOString()
+    };
+    
+    MOCK_CAMPANHAS[index] = campanhaAtualizada;
+    return campanhaAtualizada;
+  } catch (error) {
+    console.error(`Erro ao atualizar campanha ${id}:`, error);
+    throw error;
+  }
+};
+
+/**
+ * Deleta uma campanha pelo ID
+ */
+export const deletarCampanha = async (id: string): Promise<{ success: boolean }> => {
+  try {
+    await simulateNetworkDelay();
+    
+    const index = MOCK_CAMPANHAS.findIndex(c => c.id === id);
+    if (index === -1) return { success: false };
+    
+    MOCK_CAMPANHAS.splice(index, 1);
+    return { success: true };
+  } catch (error) {
+    console.error(`Erro ao deletar campanha ${id}:`, error);
+    throw error;
+  }
+};
+
+/**
+ * Envia uma campanha (simula envio) e altera o status para FINALIZADO
+ */
+export const enviarCampanha = async (id: string, destinatarios: string[]): Promise<{ success: boolean, enviados: number }> => {
+  try {
+    await simulateNetworkDelay();
+    
+    const index = MOCK_CAMPANHAS.findIndex(c => c.id === id);
+    if (index === -1) return { success: false, enviados: 0 };
+    
+    // Atualizar status da campanha para FINALIZADO
+    MOCK_CAMPANHAS[index] = {
+      ...MOCK_CAMPANHAS[index],
+      status: 'FINALIZADO',
+      data_fim: new Date().toISOString(),
+      atualizado_at: new Date().toISOString()
+    };
+    
+    return { success: true, enviados: destinatarios.length };
+  } catch (error) {
+    console.error(`Erro ao enviar campanha ${id}:`, error);
+    throw error;
+  }
 };
 
 // Respostas Rápidas

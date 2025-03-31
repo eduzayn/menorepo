@@ -1,4 +1,4 @@
-import { useDrop } from 'react-dnd';
+// import { useDrop } from 'react-dnd';
 import type { Lead } from '@/types/comunicacao';
 import { LeadCard } from './LeadCard';
 
@@ -8,7 +8,7 @@ interface KanbanColumnProps {
   leads: Lead[];
   onLeadDrop: (leadId: string, newStatus: Lead['status']) => void;
   onLeadEdit?: (lead: Lead) => void;
-  onLeadChat?: (lead: Lead) => void;
+  onLeadView?: (lead: Lead) => void;
 }
 
 export function KanbanColumn({
@@ -17,24 +17,24 @@ export function KanbanColumn({
   leads,
   onLeadDrop,
   onLeadEdit,
-  onLeadChat
+  onLeadView
 }: KanbanColumnProps) {
-  const [{ isOver }, drop] = useDrop(() => ({
-    accept: 'lead',
-    drop: (item: { id: string }) => {
-      onLeadDrop(item.id, status);
-    },
-    collect: (monitor) => ({
-      isOver: monitor.isOver(),
-    }),
-  }));
+  // Versão temporária sem drag-and-drop
+  // const [{ isOver }, drop] = useDrop(() => ({
+  //   accept: 'lead',
+  //   drop: (item: { id: string }) => {
+  //     onLeadDrop(item.id, status);
+  //   },
+  //   collect: (monitor) => ({
+  //     isOver: monitor.isOver(),
+  //   }),
+  // }));
 
   return (
     <div
-      ref={drop}
+      // ref={drop}
       className={`
         flex-shrink-0 w-80 bg-neutral-50 rounded-lg p-4
-        ${isOver ? 'ring-2 ring-primary ring-opacity-50' : ''}
       `}
     >
       {/* Cabeçalho da Coluna */}
@@ -52,7 +52,7 @@ export function KanbanColumn({
             <LeadCard
               lead={lead}
               onEdit={onLeadEdit}
-              onChat={onLeadChat}
+              onView={onLeadView}
             />
           </div>
         ))}

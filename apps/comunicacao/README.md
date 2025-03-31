@@ -282,4 +282,106 @@ O módulo possui um sistema inteligente de atribuição automática de conversas
 4. Defina a prioridade das regras (as de maior prioridade são verificadas primeiro)
 5. Use a ferramenta de teste para verificar o funcionamento das regras
 
-As regras são aplicadas automaticamente quando um cliente envia uma mensagem, analisando o texto para identificar o departamento mais adequado. Por exemplo, mensagens contendo palavras como "comprar" ou "preço" podem ser direcionadas ao setor comercial, enquanto mensagens com "problema" ou "erro" podem ir para o suporte técnico. 
+As regras são aplicadas automaticamente quando um cliente envia uma mensagem, analisando o texto para identificar o departamento mais adequado. Por exemplo, mensagens contendo palavras como "comprar" ou "preço" podem ser direcionadas ao setor comercial, enquanto mensagens com "problema" ou "erro" podem ir para o suporte técnico.
+
+## Representação Visual do Layout do Módulo
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                        Edunéxia - Módulo de Comunicação                 │
+├────────────────────┬────────────────────────────────────────────────────┤
+│                    │                                                    │
+│                    │                                                    │
+│                    │                                                    │
+│                    │                                                    │
+│                    │                                                    │
+│  Barra Lateral     │                                                    │
+│                    │                                                    │
+│ ┌────────────────┐ │                                                    │
+│ │ Conversações   │ │              Área de Conteúdo Principal           │
+│ ├────────────────┤ │                                                    │
+│ │ Mensagens      │ │              (Renderização de Páginas)            │
+│ ├────────────────┤ │                                                    │
+│ │ CRM            │ │              <Outlet /> do React Router           │
+│ ├────────────────┤ │                                                    │
+│ │ Notificações   │ │                                                    │
+│ ├────────────────┤ │                                                    │
+│ │ Analytics      │ │                                                    │
+│ ├────────────────┤ │                                                    │
+│ │ Configurações  │ │                                                    │
+│ └────────────────┘ │                                                    │
+│                    │                                                    │
+└────────────────────┴────────────────────────────────────────────────────┘
+```
+
+### Estrutura Modular do Sistema
+
+```
+apps/comunicacao/
+├── src/
+│   ├── components/              # Componentes reutilizáveis 
+│   │   ├── Layout.tsx           # Layout principal da aplicação
+│   │   ├── ChatWindow.tsx       # Janela de chat para conversações
+│   │   ├── ConversationList.tsx # Lista de conversas disponíveis
+│   │   ├── RespostasRapidas.tsx # Componente de respostas rápidas
+│   │   ├── EnvioMensagem.tsx    # Formulário de envio de mensagens
+│   │   ├── ui/                  # Componentes de UI específicos
+│   │   ├── chat/                # Componentes relacionados ao chat
+│   │   ├── campanhas/           # Componentes de campanhas
+│   │   └── notificacoes/        # Componentes de notificações
+│   │
+│   ├── pages/                   # Páginas da aplicação
+│   │   ├── ConversacoesPage.tsx # Página principal de conversas
+│   │   ├── MensagensPage.tsx    # Gerenciamento de mensagens
+│   │   ├── CRMPage.tsx          # Interface de CRM
+│   │   ├── NotificacoesPage.tsx # Central de notificações
+│   │   ├── AnalyticsPage.tsx    # Análise de dados e relatórios 
+│   │   ├── ConfiguracoesPage.tsx# Configurações do módulo
+│   │   ├── LeadsPage.tsx        # Gerenciamento de leads
+│   │   └── CampanhasPage.tsx    # Gerenciamento de campanhas
+│   │
+│   ├── contexts/                # Contextos React para estado global
+│   ├── hooks/                   # Hooks personalizados
+│   ├── services/                # Serviços de API e integração
+│   ├── utils/                   # Utilitários e funções auxiliares
+│   ├── types/                   # Definições de tipos TypeScript
+│   ├── routes.tsx               # Configuração de rotas da aplicação
+│   └── main.tsx                 # Ponto de entrada da aplicação
+```
+
+### Fluxo de Navegação
+
+```
+             ┌─────────────┐
+             │  Entrada    │
+             │ Aplicação   │
+             └──────┬──────┘
+                    │
+                    ▼
+        ┌───────────────────────┐
+        │  Layout Principal     │
+        │  (com barra lateral)  │
+        └───────────┬───────────┘
+                    │
+         ┌──────────┴──────────┐
+         │                     │
+┌────────▼─────────┐   ┌───────▼────────┐   ┌─────────────────┐
+│  Conversações    │   │     CRM        │   │   Notificações  │
+│  (Chat, Leads)   │──►│  (Leads, KPI)  │──►│  (Alertas)      │
+└────────┬─────────┘   └───────┬────────┘   └────────┬────────┘
+         │                     │                     │
+         └─────────────────────┼─────────────────────┘
+                               │
+                      ┌────────▼────────┐
+                      │  Configurações  │
+                      │  (Preferências) │
+                      └─────────────────┘
+```
+
+### Principais Características
+
+- **Layout responsivo**: Adapta-se a diferentes tamanhos de tela
+- **Navegação intuitiva**: Barra lateral sempre visível para acesso rápido
+- **Carregamento dinâmico**: Páginas carregadas sob demanda (React.lazy)
+- **Fluxo integrado**: Todas as funcionalidades se integram no mesmo ambiente
+- **Experiência consistente**: Padrão visual unificado em todo o módulo

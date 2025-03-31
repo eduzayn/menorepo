@@ -1,4 +1,16 @@
-import { headers } from 'next/headers';
+// import { headers } from 'next/headers';
+
+// Implementação temporária sem depender do Next.js
+const mockHeaders = new Map<string, string>([
+  ['user-agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'],
+  ['x-forwarded-for', '192.168.1.1']
+]);
+
+function headers() {
+  return {
+    get: (name: string) => mockHeaders.get(name.toLowerCase()) || null
+  };
+}
 
 export interface RequestInfo {
   ip: string;

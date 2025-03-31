@@ -17,6 +17,10 @@ export interface ArtigoConhecimento {
   favorito: boolean;
   visualizacoes: number;
   destacado: boolean;
+  autor?: string;
+  data_criacao: string;
+  data_atualizacao?: string;
+  artigos_relacionados?: { id: string; titulo: string }[];
 }
 
 export interface CategoriaConhecimento {

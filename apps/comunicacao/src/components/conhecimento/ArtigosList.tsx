@@ -13,174 +13,141 @@ import {
 import { ArtigoConhecimento, useBaseConhecimento } from '../../hooks/useBaseConhecimento';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { Card, CardContent } from '../ui/card';
+import { BookOpenIcon, ClockIcon, UserIcon, TagIcon } from '@heroicons/react/24/outline';
 
 interface ArtigosListProps {
-  categoria?: string;
-  subcategoria?: string | null;
-  favoritos?: boolean;
-  onArtigoSelected: (artigo: ArtigoConhecimento) => void;
+  categoriaId: string | null;
+  subcategoriaId: string | null;
+  termoBusca?: string;
+  onArtigoClick: (artigo: ArtigoConhecimento) => void;
 }
 
 export function ArtigosList({ 
-  categoria, 
-  subcategoria, 
-  favoritos = false,
-  onArtigoSelected 
+  categoriaId, 
+  subcategoriaId, 
+  termoBusca = '', 
+  onArtigoClick 
 }: ArtigosListProps) {
   const { 
     artigos, 
-    buscarArtigos,
-    buscarArtigosFavoritos,
-    marcarFavorito,
-    isLoading
+    buscarArtigos, 
+    isLoading 
   } = useBaseConhecimento();
   
-  const [filtro, setFiltro] = useState('');
-  const [ordenacao, setOrdenacao] = useState<'recentes' | 'relevantes' | 'alfabetica'>('recentes');
+  const [filteredArtigos, setFilteredArtigos] = useState<ArtigoConhecimento[]>([]);
 
-  // Carregar artigos ao iniciar ou quando os filtros mudarem
+  // Buscar artigos quando a categoria ou subcategoria mudar
   useEffect(() => {
-    if (favoritos) {
-      buscarArtigosFavoritos();
-    } else if (categoria) {
-      buscarArtigos(categoria, subcategoria || undefined, filtro);
+    if (categoriaId) {
+      buscarArtigos(categoriaId, subcategoriaId);
+    } else if (termoBusca) {
+      buscarArtigos(null, null, termoBusca);
     }
-  }, [buscarArtigos, buscarArtigosFavoritos, categoria, subcategoria, favoritos, filtro]);
+  }, [categoriaId, subcategoriaId, termoBusca, buscarArtigos]);
 
-  // Manipular busca
-  const handleBusca = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFiltro(e.target.value);
-  };
-
-  // Manipular favorito
-  const handleFavorito = (e: React.MouseEvent, artigoId: string) => {
-    e.stopPropagation();
-    marcarFavorito(artigoId);
-  };
-
-  // Ordenar artigos
-  const artigosOrdenados = [...artigos].sort((a, b) => {
-    if (ordenacao === 'recentes') {
-      return new Date(b.data_atualizacao).getTime() - new Date(a.data_atualizacao).getTime();
+  // Filtrar artigos localmente com base no termo de busca
+  useEffect(() => {
+    if (!termoBusca) {
+      setFilteredArtigos(artigos);
+      return;
     }
     
-    if (ordenacao === 'alfabetica') {
-      return a.titulo.localeCompare(b.titulo);
-    }
+    const termoLowerCase = termoBusca.toLowerCase();
+    const filtered = artigos.filter(artigo => 
+      artigo.titulo.toLowerCase().includes(termoLowerCase) || 
+      artigo.conteudo.toLowerCase().includes(termoLowerCase) ||
+      (artigo.tags && artigo.tags.some(tag => tag.toLowerCase().includes(termoLowerCase)))
+    );
     
-    // Relevantes (por visualizações/relevância)
-    return b.visualizacoes - a.visualizacoes;
-  });
+    setFilteredArtigos(filtered);
+  }, [artigos, termoBusca]);
 
-  // Formatação da data relativa
-  const formatarDataRelativa = (data: string) => {
-    return formatDistanceToNow(new Date(data), { 
-      addSuffix: true,
-      locale: ptBR
-    });
-  };
+  // Estado de carregamento
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center py-8">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />
+      </div>
+    );
+  }
 
+  // Nenhum artigo encontrado
+  if (filteredArtigos.length === 0) {
+    return (
+      <div className="text-center py-8 px-4">
+        <BookOpenIcon className="mx-auto h-12 w-12 text-gray-400" />
+        <h3 className="mt-2 text-sm font-medium text-gray-900">Nenhum artigo encontrado</h3>
+        <p className="mt-1 text-sm text-gray-500">
+          {termoBusca 
+            ? `Não encontramos resultados para "${termoBusca}"`
+            : 'Tente selecionar outra categoria ou faça uma busca'
+          }
+        </p>
+      </div>
+    );
+  }
+
+  // Renderiza a lista de artigos
   return (
-    <div className="space-y-4">
-      {/* Cabeçalho com filtros */}
-      <div className="flex justify-between items-center">
-        <div className="relative flex-1 max-w-md">
-          <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-          <Input
-            type="text"
-            placeholder="Buscar artigos..."
-            className="pl-9"
-            value={filtro}
-            onChange={handleBusca}
-          />
-        </div>
-        
-        <div className="flex space-x-2">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm" className="ml-2">
-                <FilterIcon className="h-4 w-4 mr-1" />
-                Ordenar
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => setOrdenacao('recentes')}>
-                Mais recentes
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setOrdenacao('relevantes')}>
-                Mais relevantes
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setOrdenacao('alfabetica')}>
-                Ordem alfabética
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </div>
+    <div className="mt-6 space-y-4">
+      <h3 className="font-medium text-lg mb-2">
+        {termoBusca 
+          ? `Resultados para "${termoBusca}" (${filteredArtigos.length})`
+          : `Artigos (${filteredArtigos.length})`
+        }
+      </h3>
       
-      {/* Lista de artigos */}
-      <div className="space-y-3">
-        {isLoading && artigos.length === 0 ? (
-          // Estado de carregamento
-          <div className="flex justify-center items-center p-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />
-          </div>
-        ) : artigosOrdenados.length === 0 ? (
-          // Estado vazio
-          <div className="text-center p-8 border rounded-lg bg-gray-50">
-            <p className="text-gray-500">
-              {filtro ? 'Nenhum resultado encontrado' : 'Nenhum artigo disponível'}
-            </p>
-          </div>
-        ) : (
-          // Lista de artigos
-          artigosOrdenados.map(artigo => (
-            <div 
-              key={artigo.id}
-              onClick={() => onArtigoSelected(artigo)}
-              className="border rounded-lg p-4 hover:border-blue-300 cursor-pointer transition-colors bg-white"
-            >
-              <div className="flex justify-between items-start">
-                <div className="flex-1">
-                  <h3 className="font-medium text-lg">{artigo.titulo}</h3>
-                  <p className="text-gray-600 text-sm mt-1 line-clamp-2">{artigo.resumo}</p>
-                  
-                  {/* Metadados */}
-                  <div className="flex items-center mt-3 text-xs text-gray-500 space-x-4">
-                    <div>Atualizado {formatarDataRelativa(artigo.data_atualizacao)}</div>
-                    <div>{artigo.visualizacoes} visualizações</div>
-                  </div>
-                  
-                  {/* Tags */}
-                  {artigo.tags && artigo.tags.length > 0 && (
-                    <div className="flex flex-wrap mt-3 gap-2">
-                      {artigo.tags.map(tag => (
-                        <Badge key={tag} variant="secondary" className="text-xs">
-                          {tag}
-                        </Badge>
-                      ))}
-                    </div>
-                  )}
-                </div>
-                
-                {/* Ações rápidas */}
-                <div className="flex items-center space-x-1">
-                  <button 
-                    onClick={(e) => handleFavorito(e, artigo.id)}
-                    className={`p-1.5 rounded-full hover:bg-gray-100 ${artigo.favorito ? 'text-red-500' : 'text-gray-400'}`}
-                  >
-                    {artigo.favorito ? (
-                      <HeartSolidIcon className="h-5 w-5" />
-                    ) : (
-                      <HeartIcon className="h-5 w-5" />
-                    )}
-                  </button>
-                </div>
+      {filteredArtigos.map(artigo => (
+        <Card 
+          key={artigo.id}
+          className="cursor-pointer hover:border-blue-200 transition-colors"
+          onClick={() => onArtigoClick(artigo)}
+        >
+          <CardContent className="p-4">
+            <h4 className="font-medium text-blue-700">{artigo.titulo}</h4>
+            
+            {artigo.resumo && (
+              <p className="text-sm text-gray-600 mt-1 line-clamp-2">{artigo.resumo}</p>
+            )}
+            
+            <div className="flex items-center mt-3 text-xs text-gray-500 space-x-4">
+              <div className="flex items-center">
+                <ClockIcon className="h-3 w-3 mr-1" />
+                <span>{artigo.data_atualizacao || artigo.data_criacao}</span>
               </div>
+              
+              {artigo.autor && (
+                <div className="flex items-center">
+                  <UserIcon className="h-3 w-3 mr-1" />
+                  <span>{artigo.autor}</span>
+                </div>
+              )}
+              
+              {artigo.visualizacoes !== undefined && (
+                <div className="flex items-center">
+                  <BookOpenIcon className="h-3 w-3 mr-1" />
+                  <span>{artigo.visualizacoes} {artigo.visualizacoes === 1 ? 'visualização' : 'visualizações'}</span>
+                </div>
+              )}
             </div>
-          ))
-        )}
-      </div>
+            
+            {artigo.tags && artigo.tags.length > 0 && (
+              <div className="flex flex-wrap gap-1 mt-2">
+                {artigo.tags.map((tag, idx) => (
+                  <span 
+                    key={idx} 
+                    className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800"
+                  >
+                    <TagIcon className="h-2.5 w-2.5 mr-1" />
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      ))}
     </div>
   );
 } 

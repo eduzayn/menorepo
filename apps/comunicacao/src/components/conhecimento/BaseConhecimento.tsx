@@ -9,7 +9,8 @@ import { Button } from '../ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { ArtigosList } from './ArtigosList';
 import { ArtigoDetail } from './ArtigoDetail';
-import { FolderIcon, TagIcon, HeartIcon, BookOpenIcon, PlusIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+import { FolderIcon, TagIcon, HeartIcon, BookOpenIcon, PlusIcon, SearchIcon } from '@heroicons/react/24/outline';
+import { Input } from '../ui/input';
 
 interface BaseConhecimentoProps {
   integradoChat?: boolean;
@@ -28,6 +29,7 @@ export function BaseConhecimento({ integradoChat = false, onSelecionar }: BaseCo
   const [visualizacao, setVisualizacao] = useState<'lista' | 'artigo'>('lista');
   const [artigoId, setArtigoId] = useState<string | null>(null);
   const [abaSelecionada, setAbaSelecionada] = useState<string>('categorias');
+  const [termoBusca, setTermoBusca] = useState<string>('');
 
   // Carregar categorias ao iniciar
   useEffect(() => {
@@ -137,18 +139,105 @@ export function BaseConhecimento({ integradoChat = false, onSelecionar }: BaseCo
     );
   };
 
-  return (
-    <div className="base-conhecimento">
-      <div className="p-8 border rounded-lg bg-gray-50 flex flex-col items-center justify-center">
-        <ExclamationTriangleIcon className="h-12 w-12 text-amber-500 mb-4" />
-        <h3 className="text-lg font-medium">Sistema em Manutenção</h3>
-        <p className="text-gray-500 mt-3 text-center max-w-md">
-          A Base de Conhecimento está temporariamente indisponível enquanto implementamos um novo sistema de autenticação.
-        </p>
-        <p className="text-gray-500 mt-2 text-center max-w-md">
-          Pedimos desculpas pelo inconveniente. Em breve, teremos uma nova versão disponível com melhorias significativas.
-        </p>
+  // Renderiza a interface de artigos baseado na categoria/subcategoria selecionada
+  const renderArtigos = () => {
+    if (visualizacao === 'artigo' && artigoId) {
+      return (
+        <ArtigoDetail
+          artigoId={artigoId}
+          onVoltar={handleVoltar}
+        />
+      );
+    }
+
+    return (
+      <ArtigosList
+        categoriaId={categoriaAtiva}
+        subcategoriaId={subcategoriaAtiva}
+        onArtigoClick={handleArtigoClick}
+        termoBusca={termoBusca}
+      />
+    );
+  };
+
+  // Renderiza a interface de busca
+  const renderBuscaConteudo = () => {
+    return (
+      <div className="space-y-4">
+        <div className="relative">
+          <Input
+            type="search"
+            placeholder="Buscar na base de conhecimento..."
+            className="w-full pl-10"
+            value={termoBusca}
+            onChange={(e) => setTermoBusca(e.target.value)}
+          />
+          <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+            <SearchIcon className="h-5 w-5 text-gray-400" />
+          </div>
+        </div>
+        {renderArtigos()}
       </div>
+    );
+  };
+
+  // Renderiza a interface de artigos favoritos
+  const renderFavoritos = () => {
+    return (
+      <div className="p-4">
+        <div className="flex items-center justify-center h-40 border-2 border-dashed rounded-lg border-gray-300">
+          <div className="text-center">
+            <HeartIcon className="mx-auto h-10 w-10 text-gray-400" />
+            <h3 className="mt-2 text-sm font-semibold text-gray-900">Sem favoritos</h3>
+            <p className="mt-1 text-sm text-gray-500">
+              Explore os artigos e marque-os como favoritos
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className="base-conhecimento bg-white p-4 rounded-lg shadow">
+      <Tabs defaultValue="categorias" value={abaSelecionada} onValueChange={setAbaSelecionada}>
+        <div className="flex items-center justify-between mb-4">
+          <TabsList>
+            <TabsTrigger value="categorias" className="flex items-center space-x-2">
+              <FolderIcon className="h-4 w-4" />
+              <span>Categorias</span>
+            </TabsTrigger>
+            <TabsTrigger value="busca" className="flex items-center space-x-2">
+              <SearchIcon className="h-4 w-4" />
+              <span>Busca</span>
+            </TabsTrigger>
+            <TabsTrigger value="favoritos" className="flex items-center space-x-2">
+              <HeartIcon className="h-4 w-4" />
+              <span>Favoritos</span>
+            </TabsTrigger>
+          </TabsList>
+          
+          {!integradoChat && (
+            <Button variant="outline" size="sm" className="flex items-center gap-2">
+              <PlusIcon className="h-4 w-4" />
+              <span>Sugerir Artigo</span>
+            </Button>
+          )}
+        </div>
+
+        <TabsContent value="categorias" className="mt-0">
+          {renderCategorias()}
+          {(categoriaAtiva || subcategoriaAtiva) && renderArtigos()}
+        </TabsContent>
+        
+        <TabsContent value="busca" className="mt-0">
+          {renderBuscaConteudo()}
+        </TabsContent>
+        
+        <TabsContent value="favoritos" className="mt-0">
+          {renderFavoritos()}
+        </TabsContent>
+      </Tabs>
     </div>
   );
 } 

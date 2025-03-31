@@ -34,7 +34,7 @@ interface Departamento {
 }
 
 function WidgetConfigPage() {
-  const { usuario } = useAuth();
+  const { user } = useAuth();
   const [departamentos, setDepartamentos] = useState<Departamento[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [savedSuccess, setSavedSuccess] = useState(false);
@@ -113,7 +113,7 @@ function WidgetConfigPage() {
         .upsert({
           chave: 'widget_config',
           valor: JSON.stringify(config),
-          atualizado_por: usuario?.id,
+          atualizado_por: user?.id,
           atualizado_em: new Date().toISOString()
         }, {
           onConflict: 'chave'

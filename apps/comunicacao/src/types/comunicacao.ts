@@ -134,13 +134,20 @@ export interface Lead {
   telefone: string;
   status: LeadStatus;
   ultima_interacao: string;
-  engajamento: number;
-  canal_origem: string;
+  engajamento?: number;
+  canal_origem?: string;
   observacoes?: string;
   online: boolean;
   ultimo_acesso?: string;
   criado_at: string;
   atualizado_at: string;
+  // Campos utilizados no mock
+  empresa?: string;
+  cargo?: string;
+  origem?: string;
+  data_ultimo_contato?: string;
+  pontuacao?: number;
+  notas?: string;
   // Novos campos para CRM avançado
   score?: number;
   responsavel_id?: string;

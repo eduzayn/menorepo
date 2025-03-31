@@ -1,12 +1,42 @@
-import React from 'react';
-import { Card, Button } from '../mock-components';
+import React, { useState } from 'react';
+import { useRouter } from 'next/router';
+import { Card } from '../mock-components';
+import { Button } from '../components/ui/button';
+import { NovoLeadForm } from '../components/crm/NovoLeadForm';
+import { useLeads } from '../hooks/useLeads';
+import { toast } from 'sonner';
+import type { Lead } from '../types/comunicacao';
 
 export default function CRMPage() {
+  const router = useRouter();
+  const [showNovoLeadModal, setShowNovoLeadModal] = useState(false);
+  const { createLead } = useLeads();
+
+  const handleNovoLead = () => {
+    setShowNovoLeadModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowNovoLeadModal(false);
+  };
+
+  const handleCreateLead = async (leadData: Partial<Lead>) => {
+    try {
+      await createLead(leadData);
+      setShowNovoLeadModal(false);
+      toast.success('Lead criado com sucesso!');
+      router.push('/leads');
+    } catch (error) {
+      console.error('Erro ao criar lead:', error);
+      toast.error('Erro ao criar lead');
+    }
+  };
+
   return (
     <div className="container mx-auto px-4 py-6 max-w-7xl">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">CRM</h1>
-        <Button variant="primary">Novo Lead</Button>
+        <Button onClick={handleNovoLead}>Novo Lead</Button>
       </div>
       
       <div className="grid md:grid-cols-3 gap-6 mb-6">
@@ -69,6 +99,16 @@ export default function CRMPage() {
           </table>
         </div>
       </Card>
+
+      {/* Modal para adicionar novo lead */}
+      {showNovoLeadModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg shadow-lg max-w-lg w-full p-6">
+            <h2 className="text-xl font-bold mb-4">Adicionar Novo Lead</h2>
+            <NovoLeadForm onSubmit={handleCreateLead} onCancel={handleCloseModal} />
+          </div>
+        </div>
+      )}
     </div>
   );
 } 

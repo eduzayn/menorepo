@@ -1,122 +1,88 @@
-import React, { useState } from 'react';
-import { Input, Button, Select } from '../../mock-components';
-
-// Tipo para status de lead
-export type LeadStatus = 'NOVO' | 'EM_CONTATO' | 'QUALIFICADO' | 'CONVERTIDO' | 'PERDIDO';
-export type SortField = 'nome' | 'data_criacao' | 'status' | 'ultima_interacao';
-export type SortOrder = 'asc' | 'desc';
+import React from 'react';
+import { LeadStatus } from '../../types/comunicacao';
 
 export interface LeadFiltersProps {
   onSearch: (term: string) => void;
-  onStatusFilter: (status: LeadStatus | '') => void;
-  onSort: (field: SortField, order: SortOrder) => void;
+  onStatusChange: (status: LeadStatus | null) => void;
+  onSortChange: (field: 'criado_at' | 'atualizado_at' | 'ultima_interacao') => void;
+  onOrderChange: (order: 'asc' | 'desc') => void;
 }
 
-const SearchIcon = () => (
-  <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-  </svg>
-);
-
-export function LeadFilters({ onSearch, onStatusFilter, onSort }: LeadFiltersProps) {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [status, setStatus] = useState<LeadStatus | ''>('');
-  const [sortField, setSortField] = useState<SortField>('data_criacao');
-  const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
-
-  const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = e.target.value as LeadStatus | '';
-    setStatus(value);
-    onStatusFilter(value);
-  };
-
-  const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = e.target.value as SortField;
-    setSortField(value);
-    onSort(value, sortOrder);
-  };
-
-  const handleOrderChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = e.target.value as SortOrder;
-    setSortOrder(value);
-    onSort(sortField, value);
-  };
-
-  const handleSearch = () => {
-    onSearch(searchTerm);
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      handleSearch();
-    }
-  };
-
+export function LeadFilters({
+  onSearch,
+  onStatusChange,
+  onSortChange,
+  onOrderChange,
+}: LeadFiltersProps) {
   return (
-    <div className="mb-6 space-y-4">
-      <div className="relative">
-        <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-          <SearchIcon />
-        </div>
-        <Input
-          type="text"
-          placeholder="Buscar leads por nome, email ou telefone..."
-          className="pl-10"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          onKeyPress={handleKeyPress}
-        />
-      </div>
-      
+    <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
       <div className="flex flex-wrap gap-4">
-        <div className="w-full md:w-auto">
-          <Select
-            placeholder="Filtrar por status"
-            value={status}
-            onChange={handleStatusChange}
-            options={[
-              { value: '', label: 'Todos os status' },
-              { value: 'NOVO', label: 'Novo' },
-              { value: 'EM_CONTATO', label: 'Em contato' },
-              { value: 'QUALIFICADO', label: 'Qualificado' },
-              { value: 'CONVERTIDO', label: 'Convertido' },
-              { value: 'PERDIDO', label: 'Perdido' }
-            ]}
+        {/* Busca */}
+        <div className="w-full md:w-auto flex-1">
+          <label htmlFor="search" className="block text-sm font-medium text-gray-700 mb-1">
+            Buscar lead
+          </label>
+          <input
+            type="text"
+            id="search"
+            className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            placeholder="Nome, email ou telefone..."
+            onChange={(e) => onSearch(e.target.value)}
           />
         </div>
-        
+
+        {/* Status */}
         <div className="w-full md:w-auto">
-          <Select
-            placeholder="Ordenar por"
-            value={sortField}
-            onChange={handleSortChange}
-            options={[
-              { value: 'nome', label: 'Nome' },
-              { value: 'data_criacao', label: 'Data de criação' },
-              { value: 'status', label: 'Status' },
-              { value: 'ultima_interacao', label: 'Última interação' }
-            ]}
-          />
+          <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-1">
+            Status
+          </label>
+          <select
+            id="status"
+            className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            onChange={(e) => onStatusChange(e.target.value as LeadStatus || null)}
+            defaultValue=""
+          >
+            <option value="">Todos</option>
+            <option value="NOVO">Novos</option>
+            <option value="EM_CONTATO">Em Contato</option>
+            <option value="QUALIFICADO">Qualificados</option>
+            <option value="CONVERTIDO">Convertidos</option>
+            <option value="PERDIDO">Perdidos</option>
+          </select>
         </div>
-        
+
+        {/* Ordenação */}
         <div className="w-full md:w-auto">
-          <Select
-            placeholder="Ordem"
-            value={sortOrder}
-            onChange={handleOrderChange}
-            options={[
-              { value: 'asc', label: 'Crescente' },
-              { value: 'desc', label: 'Decrescente' }
-            ]}
-          />
+          <label htmlFor="sortField" className="block text-sm font-medium text-gray-700 mb-1">
+            Ordenar por
+          </label>
+          <select
+            id="sortField"
+            className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            onChange={(e) => onSortChange(e.target.value as 'criado_at' | 'atualizado_at' | 'ultima_interacao')}
+            defaultValue="ultima_interacao"
+          >
+            <option value="ultima_interacao">Última interação</option>
+            <option value="criado_at">Data de criação</option>
+            <option value="atualizado_at">Data de atualização</option>
+          </select>
         </div>
-        
-        <Button
-          onClick={handleSearch}
-          className="md:ml-auto"
-        >
-          Buscar
-        </Button>
+
+        {/* Direção da ordenação */}
+        <div className="w-full md:w-auto">
+          <label htmlFor="sortOrder" className="block text-sm font-medium text-gray-700 mb-1">
+            Direção
+          </label>
+          <select
+            id="sortOrder"
+            className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            onChange={(e) => onOrderChange(e.target.value as 'asc' | 'desc')}
+            defaultValue="desc"
+          >
+            <option value="desc">Mais recentes primeiro</option>
+            <option value="asc">Mais antigos primeiro</option>
+          </select>
+        </div>
       </div>
     </div>
   );
