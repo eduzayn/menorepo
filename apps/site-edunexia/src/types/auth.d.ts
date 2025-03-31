@@ -6,46 +6,99 @@
 declare module '@edunexia/auth' {
   import { ReactNode } from 'react';
 
+  /**
+   * Tipos para autenticação
+   */
+
+  export type UserRole = 'admin' | 'teacher' | 'student' | 'parent' | 'super_admin';
+
+  export type ModuleId = 
+    | 'matriculas'
+    | 'portal-aluno'
+    | 'material-didatico'
+    | 'comunicacao'
+    | 'financeiro'
+    | 'relatorios'
+    | 'configuracoes';
+
+  export type ModuleAction = 
+    | 'view'
+    | 'manage'
+    | 'create'
+    | 'edit'
+    | 'delete'
+    | 'generate';
+
+  export type ModulePermissionKey = `${ModuleId}.${ModuleAction}`;
+
+  export interface ModulePermission {
+    read: boolean;
+    write: boolean;
+    delete: boolean;
+  }
+
   export interface User {
     id: string;
     email: string;
+    name?: string;
     role?: string;
-    nome?: string;
-    avatar_url?: string;
+    permissions: Record<ModulePermissionKey, ModulePermission>;
   }
 
   export interface UserSession {
-    access_token: string;
-    refresh_token?: string;
-    expires_at?: number;
     user: User;
+    token: string;
   }
 
   export interface AuthResponse {
-    session?: UserSession;
-    user?: User;
-    error?: Error;
+    user: User | null;
+    session: any;
+    error: Error | null;
+  }
+
+  export interface AuthError extends Error {
+    message: string;
+    status?: number;
   }
 
   export interface AuthContextValue {
     user: User | null;
-    session: UserSession | null;
-    error: string | null;
-    isLoading: boolean;
     isAuthenticated: boolean;
-    signIn: (email: string, password: string) => Promise<AuthResponse>;
+    signIn: (email: string, password: string) => Promise<void>;
+    signUp: (email: string, password: string) => Promise<void>;
     signOut: () => Promise<void>;
+    loading: boolean;
+    error: string | null;
+  }
+
+  export interface AuthContextType extends AuthContextValue {
+    children: React.ReactNode;
   }
 
   export function useAuth(): AuthContextValue;
 
-  export interface AuthProviderProps {
-    children: ReactNode;
-  }
-
-  export function AuthProvider(props: AuthProviderProps): JSX.Element;
+  export function AuthProvider({ children }: AuthContextType): JSX.Element;
 
   export function useAuthContext(): AuthContextValue;
 
   export const AuthContext: React.Context<AuthContextValue>;
+
+  export interface PortalConfig {
+    id: string;
+    name: string;
+    description?: string;
+    icon?: string;
+    route: string;
+    permissions?: Record<ModulePermissionKey, ModulePermission>;
+  }
+
+  export interface ModuleConfig {
+    id: ModuleId;
+    name: string;
+    description?: string;
+    icon?: string;
+    route: string;
+    permissions: ModulePermissionKey[];
+    requiredPermission: ModulePermissionKey;
+  }
 } 

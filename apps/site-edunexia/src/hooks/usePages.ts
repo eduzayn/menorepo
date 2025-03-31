@@ -4,24 +4,46 @@ import { ApiError } from '@edunexia/api-client/src/types';
 import * as SitePageService from '../services/site-pages';
 import { PageInput } from '../services/site-pages';
 import { SitePage } from '@edunexia/database-schema/src/site-edunexia';
+import { supabase } from '@/lib/supabase';
+
+interface ContentBlock {
+  type: 'paragraph' | 'heading' | 'list' | 'image';
+  content?: string;
+  items?: string[];
+  url?: string;
+  caption?: string;
+}
+
+interface Page {
+  title: string;
+  meta_description: string | null;
+  featured_image_url?: string;
+  content: {
+    blocks: ContentBlock[];
+  };
+}
 
 /**
  * Hook para buscar uma página pelo slug
  */
-export function usePageBySlug(slug: string) {
-  const { client } = useApi();
-  
-  return useQuery({
-    queryKey: ['site-page', slug],
+export const usePageBySlug = (slug: string) => {
+  return useQuery<Page, Error>({
+    queryKey: ['page', slug],
     queryFn: async () => {
-      const { page, error } = await SitePageService.getPageBySlug(client, slug);
-      if (error) throw error;
-      return page;
+      const { data, error } = await supabase
+        .from('pages')
+        .select('*')
+        .eq('slug', slug)
+        .single();
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      return data as Page;
     },
-    enabled: !!slug,
-    staleTime: 5 * 60 * 1000, // 5 minutos
   });
-}
+};
 
 /**
  * Hook para buscar todas as páginas publicadas

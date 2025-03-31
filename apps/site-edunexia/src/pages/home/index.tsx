@@ -1,157 +1,143 @@
 import React from 'react';
+import { usePublishedPages } from '@/hooks/usePages';
+import { usePublishedBlogPosts } from '@/hooks/useBlog';
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
 
 const HomePage: React.FC = () => {
+  const { data: pages } = usePublishedPages();
+  const { data: blogData } = usePublishedBlogPosts();
+
   return (
-    <div>
-      {/* Hero Section */}
-      <div className="bg-white">
-        <div className="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center">
-          <div className="md:w-1/2 md:pr-8 mb-8 md:mb-0">
-            <h1 className="text-4xl font-extrabold text-gray-900 sm:text-5xl sm:tracking-tight lg:text-6xl">
-              Transformando a educação com tecnologia
-            </h1>
-            <p className="mt-5 text-xl text-gray-500">
-              A Edunéxia oferece uma plataforma completa e integrada para instituições de ensino gerenciarem processos acadêmicos, financeiros e administrativos.
+    <>
+      <Helmet>
+        <title>Edunéxia - Plataforma Educacional Completa</title>
+        <meta name="description" content="A Edunéxia é uma plataforma educacional completa que oferece soluções para gestão escolar, portal do aluno, material didático e muito mais." />
+      </Helmet>
+
+      <main className="flex-1">
+        {/* Hero Section */}
+        <section className="bg-gradient-to-r from-primary-600 to-primary-800 text-white py-20">
+          <div className="container mx-auto px-4">
+            <div className="max-w-4xl mx-auto text-center">
+              <h1 className="text-5xl font-bold mb-6">
+                Transforme a gestão da sua escola
+              </h1>
+              <p className="text-xl mb-8">
+                Uma plataforma completa para escolas e instituições de ensino.
+                Simplifique processos, melhore a comunicação e potencialize o aprendizado.
+              </p>
+              <div className="flex justify-center gap-4">
+                <Link
+                  to="/planos"
+                  className="bg-white text-primary-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition"
+                >
+                  Ver planos
+                </Link>
+                <Link
+                  to="/trial"
+                  className="bg-transparent border-2 border-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-primary-600 transition"
+                >
+                  Teste grátis
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Features Section */}
+        <section className="py-20 bg-gray-50">
+          <div className="container mx-auto px-4">
+            <h2 className="text-4xl font-bold text-center mb-12">
+              Tudo que você precisa em um só lugar
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="bg-white p-8 rounded-lg shadow-md">
+                <h3 className="text-2xl font-semibold mb-4">Gestão Escolar</h3>
+                <p className="text-gray-600">
+                  Simplifique processos administrativos, matrículas e gestão financeira.
+                </p>
+              </div>
+              <div className="bg-white p-8 rounded-lg shadow-md">
+                <h3 className="text-2xl font-semibold mb-4">Portal do Aluno</h3>
+                <p className="text-gray-600">
+                  Acesso fácil a notas, frequência, material didático e comunicados.
+                </p>
+              </div>
+              <div className="bg-white p-8 rounded-lg shadow-md">
+                <h3 className="text-2xl font-semibold mb-4">Material Didático</h3>
+                <p className="text-gray-600">
+                  Biblioteca digital completa com conteúdo atualizado e interativo.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Blog Section */}
+        {blogData?.posts && blogData.posts.length > 0 && (
+          <section className="py-20">
+            <div className="container mx-auto px-4">
+              <h2 className="text-4xl font-bold text-center mb-12">
+                Blog Edunéxia
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {blogData.posts.slice(0, 3).map((post) => (
+                  <article key={post.id} className="bg-white rounded-lg overflow-hidden shadow-md">
+                    {post.featured_image_url && (
+                      <img
+                        src={post.featured_image_url}
+                        alt={post.title}
+                        className="w-full h-48 object-cover"
+                      />
+                    )}
+                    <div className="p-6">
+                      <h3 className="text-xl font-semibold mb-2">
+                        <Link to={`/blog/${post.slug}`} className="hover:text-primary-600">
+                          {post.title}
+                        </Link>
+                      </h3>
+                      <p className="text-gray-600 mb-4">{post.excerpt}</p>
+                      <div className="flex items-center justify-between text-sm text-gray-500">
+                        <span>{post.author.name}</span>
+                        <span>{new Date(post.published_at).toLocaleDateString()}</span>
+                      </div>
+                    </div>
+                  </article>
+                ))}
+              </div>
+              <div className="text-center mt-8">
+                <Link
+                  to="/blog"
+                  className="inline-block bg-primary-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-primary-700 transition"
+                >
+                  Ver todos os posts
+                </Link>
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* CTA Section */}
+        <section className="bg-primary-600 text-white py-20">
+          <div className="container mx-auto px-4 text-center">
+            <h2 className="text-4xl font-bold mb-6">
+              Comece agora mesmo
+            </h2>
+            <p className="text-xl mb-8 max-w-2xl mx-auto">
+              Experimente a Edunéxia gratuitamente por 14 dias e descubra como podemos
+              transformar a gestão da sua instituição de ensino.
             </p>
-            <div className="mt-8 flex flex-col sm:flex-row gap-4">
-              <Link
-                to="/contato"
-                className="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
-              >
-                Agende uma demonstração
-              </Link>
-              <Link
-                to="/planos"
-                className="inline-flex items-center justify-center px-5 py-3 border border-gray-300 text-base font-medium rounded-md text-indigo-700 bg-white hover:bg-gray-50"
-              >
-                Conheça nossos planos
-              </Link>
-            </div>
+            <Link
+              to="/trial"
+              className="inline-block bg-white text-primary-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition"
+            >
+              Começar teste grátis
+            </Link>
           </div>
-          <div className="md:w-1/2">
-            <img
-              className="h-full w-full object-cover rounded-lg shadow-xl"
-              src="/images/platform-preview.svg"
-              alt="Plataforma Edunéxia"
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Features Section */}
-      <div className="bg-gray-50 py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h2 className="text-3xl font-extrabold text-gray-900">Soluções para cada necessidade</h2>
-            <p className="mt-4 text-lg text-gray-600">
-              Nossa plataforma integra todos os módulos essenciais para a gestão educacional moderna
-            </p>
-          </div>
-
-          <div className="mt-16 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {/* Feature 1 */}
-            <div className="bg-white overflow-hidden shadow rounded-lg">
-              <div className="p-6">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0 bg-indigo-100 rounded-md p-3">
-                    <svg className="h-6 w-6 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                    </svg>
-                  </div>
-                  <h3 className="ml-4 text-lg font-medium text-gray-900">Sistema de Matrículas</h3>
-                </div>
-                <div className="mt-4">
-                  <p className="text-base text-gray-600">
-                    Simplifique todo o processo de matrículas, desde a inscrição até a documentação e aprovação.
-                  </p>
-                  <div className="mt-4">
-                    <Link
-                      to="/pagina/sistema-matriculas"
-                      className="text-indigo-600 hover:text-indigo-700 font-medium inline-flex items-center"
-                    >
-                      Saiba mais
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-1" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
-                      </svg>
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Feature 2 */}
-            <div className="bg-white overflow-hidden shadow rounded-lg">
-              <div className="p-6">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0 bg-indigo-100 rounded-md p-3">
-                    <svg className="h-6 w-6 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
-                  </div>
-                  <h3 className="ml-4 text-lg font-medium text-gray-900">Portal do Aluno</h3>
-                </div>
-                <div className="mt-4">
-                  <p className="text-base text-gray-600">
-                    Ofereça uma experiência digital completa para alunos acessarem notas, material didático e financeiro.
-                  </p>
-                  <div className="mt-4">
-                    <Link
-                      to="/pagina/portal-aluno"
-                      className="text-indigo-600 hover:text-indigo-700 font-medium inline-flex items-center"
-                    >
-                      Saiba mais
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-1" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
-                      </svg>
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Feature 3 */}
-            <div className="bg-white overflow-hidden shadow rounded-lg">
-              <div className="p-6">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0 bg-indigo-100 rounded-md p-3">
-                    <svg className="h-6 w-6 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  </div>
-                  <h3 className="ml-4 text-lg font-medium text-gray-900">Gestão Financeira</h3>
-                </div>
-                <div className="mt-4">
-                  <p className="text-base text-gray-600">
-                    Controle completo sobre mensalidades, boletos, inadimplência e relatórios financeiros.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* CTA Section */}
-      <div className="bg-indigo-700">
-        <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:py-16 lg:px-8 lg:flex lg:items-center lg:justify-between">
-          <h2 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
-            <span className="block">Pronto para modernizar sua instituição?</span>
-            <span className="block text-indigo-200">Comece hoje mesmo com a Edunéxia.</span>
-          </h2>
-          <div className="mt-8 flex lg:mt-0 lg:flex-shrink-0">
-            <div className="inline-flex rounded-md shadow">
-              <Link
-                to="/contato"
-                className="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-indigo-600 bg-white hover:bg-indigo-50"
-              >
-                Fale com um consultor
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+        </section>
+      </main>
+    </>
   );
 };
 

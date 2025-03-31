@@ -6,6 +6,7 @@ import PlanosPage from '../pages/PlanosPage';
 import { DynamicPage } from '../pages/DynamicPage';
 import App from '../App';
 import DynamicMenu from '../components/DynamicMenu';
+import { Navigation } from '../components/Navigation';
 
 // Mock dos hooks usados
 vi.mock('../hooks/usePages', () => ({
@@ -281,7 +282,28 @@ const mockFallbackUseMenu = () => ({
   })
 });
 
-describe('Navegação do Site Edunéxia', () => {
+describe('Navigation', () => {
+  const mockMenuItems = [
+    {
+      id: '1',
+      title: 'Home',
+      path: '/',
+      order: 1,
+      parent_id: null,
+      children: []
+    }
+  ];
+
+  it('renders navigation links', () => {
+    render(
+      <HashRouter>
+        <DynamicMenu items={mockMenuItems} />
+      </HashRouter>
+    );
+    
+    expect(screen.getByText('Home')).toBeInTheDocument();
+  });
+
   beforeEach(() => {
     mockNavigate.mockReset();
     vi.clearAllMocks();

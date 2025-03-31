@@ -1,54 +1,37 @@
-import type { User } from '@edunexia/auth';
+import { User, UserRole, ModulePermission } from '@edunexia/auth';
 
-// Lista de usuários de teste com bypass de autenticação
+const PERMISSIONS: ModulePermission[] = [
+  'matriculas.view',
+  'matriculas.manage',
+  'matriculas.delete',
+  'portal-aluno.view',
+  'portal-aluno.manage',
+  'material-didatico.view',
+  'material-didatico.create',
+  'material-didatico.edit',
+  'material-didatico.delete',
+  'comunicacao.view',
+  'comunicacao.manage',
+  'comunicacao.delete',
+  'financeiro.view',
+  'financeiro.manage',
+  'financeiro.delete',
+  'relatorios.view',
+  'relatorios.generate',
+  'configuracoes.view',
+  'configuracoes.manage'
+];
+
 export const TEST_USERS: Record<string, User> = {
-  'ana.diretoria@eduzayn.com.br': {
-    id: 'test-admin-1',
-    email: 'ana.diretoria@eduzayn.com.br',
-    name: 'Ana Diretoria',
-    role: 'super_admin',
-    permissions: [
-      // Matrículas
-      'matriculas.view',
-      'matriculas.manage',
-      'matriculas.delete',
-      
-      // Portal do Aluno
-      'portal-aluno.view',
-      'portal-aluno.manage',
-      
-      // Material Didático
-      'material-didatico.view',
-      'material-didatico.create',
-      'material-didatico.edit',
-      'material-didatico.delete',
-      
-      // Comunicação
-      'comunicacao.view',
-      'comunicacao.manage',
-      'comunicacao.delete',
-      
-      // Financeiro
-      'financeiro.view',
-      'financeiro.manage',
-      'financeiro.delete',
-      
-      // Relatórios
-      'relatorios.view',
-      'relatorios.generate',
-      
-      // Configurações
-      'configuracoes.view',
-      'configuracoes.manage'
-    ],
-    preferences: {
-      theme: 'light',
-      language: 'pt-BR'
-    },
+  admin: {
+    id: '1',
+    email: 'admin@edunexia.com',
+    name: 'Administrador',
+    role: 'super_admin' as UserRole,
+    permissions: PERMISSIONS,
+    preferences: {},
     app_metadata: {},
-    user_metadata: {
-      role: 'super_admin'
-    },
+    user_metadata: {},
     aud: 'authenticated',
     created_at: new Date().toISOString()
   }

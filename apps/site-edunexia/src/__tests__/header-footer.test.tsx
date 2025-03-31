@@ -122,4 +122,14 @@ describe('Navegação - Header & Footer', () => {
       expect(screen.getByText(`© ${anoAtual} Edunéxia. Todos os direitos reservados.`)).toBeInTheDocument();
     });
   });
+});
+
+describe('Header and Footer', () => {
+  it('should render DynamicMenu with items', () => {
+    const items = [
+      { id: '1', title: 'Home', url: '/' },
+      { id: '2', title: 'About', url: '/about' }
+    ];
+    render(<DynamicMenu items={items} />);
+  });
 }); 

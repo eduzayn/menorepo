@@ -1,9 +1,8 @@
-import { describe, it, expect } from 'vitest';
-import { render, screen } from '@edunexia/test-config';
+import React from 'react';
+import { render } from '@edunexia/test-config';
 
-describe('Site Edunexia - Exemplo', () => {
-  it('deve renderizar corretamente', () => {
-    // Um teste simples para verificar que a configuração está funcionando
-    expect(2 + 2).toBe(4);
+describe('Example', () => {
+  it('should render', () => {
+    render(<div>Example</div>);
   });
 }); 

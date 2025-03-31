@@ -1,37 +1,21 @@
-import { createVitestConfig } from '@edunexia/test-config';
-import path from 'path';
+/// <reference types="vitest" />
+import { createComponentTestConfig } from '@edunexia/test-config';
+import { resolve } from 'path';
 
-export default createVitestConfig('./', {
-  plugins: [
-    // Plugins específicos para o site Edunexia, se necessário
-  ],
+export default createComponentTestConfig(__dirname, {
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),
-      '@components': path.resolve(__dirname, './src/components'),
-      '@contexts': path.resolve(__dirname, './src/contexts'),
-      '@hooks': path.resolve(__dirname, './src/hooks'),
-      '@pages': path.resolve(__dirname, './src/pages'),
-      '@services': path.resolve(__dirname, './src/services'),
-      '@utils': path.resolve(__dirname, './src/utils'),
-      '@layouts': path.resolve(__dirname, './src/layouts'),
-      '@assets': path.resolve(__dirname, './src/assets')
+      '@': resolve(__dirname, './src'),
+      '@components': resolve(__dirname, './src/components'),
+      '@hooks': resolve(__dirname, './src/hooks'),
+      '@services': resolve(__dirname, './src/services'),
+      '@utils': resolve(__dirname, './src/utils'),
+      '@pages': resolve(__dirname, './src/pages'),
+      '@config': resolve(__dirname, './src/config'),
+      '@lib': resolve(__dirname, './src/lib'),
+      '@types': resolve(__dirname, './src/types'),
+      '@edunexia/auth': resolve(__dirname, './src/types/auth'),
+      '@edunexia/api-client': resolve(__dirname, './src/types/api-client')
     }
-  },
-  test: {
-    globals: true,
-    environment: 'jsdom',
-    setupFiles: ['./src/setupTests.ts'],
-    include: ['**/__tests__/**/*.{test,spec}.{js,jsx,ts,tsx}'],
-    coverage: {
-      include: [
-        'src/components/**',
-        'src/hooks/**',
-        'src/services/**',
-        'src/contexts/**',
-        'src/utils/**',
-        'src/layouts/**'
-      ],
-    },
-  },
+  }
 }); 

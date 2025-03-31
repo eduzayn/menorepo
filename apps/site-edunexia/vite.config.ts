@@ -1,3 +1,4 @@
+/// <reference types="vitest" />
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
@@ -9,23 +10,33 @@ export default defineConfig({
     alias: {
       '@': resolve(__dirname, './src'),
       '@components': resolve(__dirname, './src/components'),
-      '@pages': resolve(__dirname, './src/pages'),
       '@hooks': resolve(__dirname, './src/hooks'),
-      '@contexts': resolve(__dirname, './src/contexts'),
-      '@utils': resolve(__dirname, './src/utils'),
-      '@styles': resolve(__dirname, './src/styles'),
-      '@assets': resolve(__dirname, './src/assets'),
       '@services': resolve(__dirname, './src/services'),
+      '@utils': resolve(__dirname, './src/utils'),
+      '@pages': resolve(__dirname, './src/pages'),
+      '@config': resolve(__dirname, './src/config'),
+      '@lib': resolve(__dirname, './src/lib'),
       '@types': resolve(__dirname, './src/types'),
       '@layouts': resolve(__dirname, './src/layouts'),
+      '@edunexia/auth': resolve(__dirname, './src/types/auth'),
+      '@edunexia/api-client': resolve(__dirname, './src/types/api-client')
     },
   },
   server: {
-    port: 3003,
-    open: true,
+    port: 5173,
+    host: true,
   },
   build: {
     outDir: 'dist',
     sourcemap: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom', 'react-router-dom'],
+          auth: ['@edunexia/auth'],
+          api: ['@edunexia/api-client']
+        }
+      }
+    }
   },
 }); 

@@ -51,6 +51,7 @@
   },
   "devDependencies": {
     "@supabase/supabase-js": "^2.49.4",
+    "@vitejs/plugin-react": "^4.2.1",
     "dotenv": "^16.4.7",
     "eslint": "^8.45.0",
     "madge": "^8.0.0",
@@ -59,7 +60,8 @@
     "tsup": "^8.4.0",
     "tsx": "^4.19.3",
     "turbo": "^1.11.3",
-    "typescript": "^5.0.2"
+    "typescript": "^5.0.2",
+    "vite": "^5.1.3"
   },
   "overridesInfo": "Os overrides a seguir são usados para forçar versões específicas de dependências em todo o monorepo para resolver conflitos e vulnerabilidades",
   "overrides": {
@@ -83,6 +85,9 @@
     "rimraf": "^5.0.0",
     "// React e React DOM devem ser sempre consistentes": "",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "// Vite e plugins devem ser consistentes": "",
+    "vite": "^5.1.3",
+    "@vitejs/plugin-react": "^4.2.1"
   }
 }
