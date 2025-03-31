@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card } from '@edunexia/ui-components';
+import { Card } from '../mock-components';
 
 export default function AnalyticsPage() {
   return (

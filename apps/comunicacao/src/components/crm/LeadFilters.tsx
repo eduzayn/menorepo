@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Input, Button, Select } from '@edunexia/ui-components';
+import { Input, Button, Select } from '../../mock-components';
 
 // Tipo para status de lead
 export type LeadStatus = 'NOVO' | 'EM_CONTATO' | 'QUALIFICADO' | 'CONVERTIDO' | 'PERDIDO';

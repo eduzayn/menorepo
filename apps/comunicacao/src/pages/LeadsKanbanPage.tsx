@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import { useLeads } from '../hooks/useLeads';
-import { KanbanColumn } from '../components/crm/KanbanColumn';
+import { LeadCard } from '../components/crm/LeadCard';
 import { LeadFilters } from '../components/crm/LeadFilters';
-import { LeadForm } from '../components/crm/LeadForm';
 import { LeadMetrics } from '../components/crm/LeadMetrics';
-import { Button } from '@edunexia/ui-components';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@edunexia/ui-components';
+import { Button } from '../mock-components';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../mock-components';
 import { useComunicacao } from '../contexts/ComunicacaoContext';
 import type { Lead, LeadStatus } from '../types/comunicacao';
 import { UserPlusIcon, ArrowsPointingOutIcon } from '@heroicons/react/24/outline';

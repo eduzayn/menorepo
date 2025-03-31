@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Input, Label, Textarea } from '@edunexia/ui-components';
+import { Button, Input, Label, Textarea } from '../../mock-components';
 import { Interacao } from '../../types/comunicacao';
 import { toast } from 'sonner';
 

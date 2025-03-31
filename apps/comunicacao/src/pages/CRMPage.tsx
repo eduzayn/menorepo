@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Button } from '@edunexia/ui-components';
+import { Card, Button } from '../mock-components';
 
 export default function CRMPage() {
   return (

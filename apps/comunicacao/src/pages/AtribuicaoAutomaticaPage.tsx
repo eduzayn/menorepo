@@ -48,6 +48,31 @@ import {
   AlertTitle
 } from '@edunexia/ui-components';
 import { useForm } from 'react-hook-form';
+import { AtribuicaoAutomatica } from '../components/automacoes/AtribuicaoAutomatica';
+import {
+  CheckIcon,
+  PencilSquareIcon,
+  TrashIcon,
+  PlusIcon,
+} from 'lucide-react';
+import { useAtribuicaoAutomatica } from '../hooks/useAtribuicaoAutomatica';
+import { Container, Button } from '../mock-components';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '../mock-components';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '../mock-components';
 
 interface FormDados {
   departamento_id: string;

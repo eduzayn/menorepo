@@ -2,19 +2,19 @@ import React from 'react';
 import { useState } from 'react';
 import { Interacao } from '../../types/comunicacao';
 import {
-  EnvelopeIcon,
   PhoneIcon,
-  ClipboardDocumentCheckIcon,
-  ChatBubbleLeftEllipsisIcon,
-  EllipsisHorizontalIcon,
-} from '@heroicons/react/24/outline';
-import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
-import { Badge } from '@edunexia/ui-components';
-import { 
+  EnvelopeIcon, 
   ChatBubbleOvalLeftIcon, 
   UserIcon, 
   AcademicCapIcon
+} from '@heroicons/react/24/outline';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
+import { Badge } from '../../mock-components';
+import {
+  ClipboardDocumentCheckIcon,
+  ChatBubbleLeftEllipsisIcon,
+  EllipsisHorizontalIcon,
 } from '@heroicons/react/24/outline';
 
 // Mapeamento de tipos de interação para ícones e cores

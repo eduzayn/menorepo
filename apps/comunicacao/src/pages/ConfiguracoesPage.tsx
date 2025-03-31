@@ -1,5 +1,5 @@
 import React from 'react';
-import { PageHeader, Card } from '@edunexia/ui-components';
+import { PageHeader, Card } from '../mock-components';
 
 export default function ConfiguracoesPage() {
   return (

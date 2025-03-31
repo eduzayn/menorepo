@@ -1,6 +1,5 @@
 import React from 'react';
-import { PageHeader } from '@edunexia/ui-components';
-import { Card } from '@edunexia/ui-components';
+import { PageHeader, Card } from '../mock-components';
 import { NotificationExample } from '../components/notificacoes/NotificationExample';
 
 export const NotificacaoExemploPage: React.FC = () => {

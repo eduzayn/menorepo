@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { NotificationCard } from '@edunexia/ui-components';
-import { Button } from '@edunexia/ui-components';
+import { NotificationCard, Button } from '../../mock-components';
 import { toast } from 'sonner';
 
 export const NotificationExample: React.FC = () => {

@@ -1,6 +1,6 @@
 import React from 'react';
 import { BaseConhecimento } from '../components/conhecimento/BaseConhecimento';
-import { Container } from '@edunexia/ui-components';
+import { Container } from '../mock-components';
 
 function BaseConhecimentoPage() {
   return (

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useEffect, useState } from 'react';
 import type { Lead, Interacao } from '@/types/comunicacao';
-import { Card } from '@edunexia/ui-components';
+import { Card } from '../../mock-components';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import {
