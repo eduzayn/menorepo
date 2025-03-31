@@ -288,3 +288,22 @@ Cada pacote contém sua própria configuração de testes, mas seguimos convenç
 - Cobertura de código adequada, especialmente para funções críticas
 
 Para mais detalhes sobre o uso da configuração de testes centralizada, consulte a documentação em `/docs/using-test-config.md`.
+
+## Implantações na Vercel
+
+Os seguintes módulos estão implantados e disponíveis para acesso:
+
+| Módulo | URL de Produção | Status |
+|--------|-----------------|--------|
+| Site Edunéxia | [site-edunexia-edunexia.vercel.app](https://site-edunexia-edunexia.vercel.app) | ✅ Ativo |
+| Comunicação | [comunicacao-edunexia.vercel.app](https://comunicacao-edunexia.vercel.app) | ✅ Ativo |
+| Matrículas | [matriculas-edunexia.vercel.app](https://matriculas-edunexia.vercel.app) | ✅ Ativo |
+
+### Implantação Automatizada
+
+Todos os módulos estão configurados para implantação automática via GitHub:
+
+- **Push na branch `main`**: Atualiza o ambiente de produção
+- **Pull Requests**: Geram ambientes de preview para testes
+
+Para mais detalhes sobre o processo de implantação, consulte o [Guia de Implantação na Vercel](docs/vercel-deployment-guide.md).

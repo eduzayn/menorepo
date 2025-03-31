@@ -1,0 +1,19 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "github": {
+    "enabled": true,
+    "silent": false
+  },
+  "git": {
+    "deploymentEnabled": {
+      "main": true,
+      "dev": true,
+      "feature/**": true
+    }
+  },
+  "ignoreCommand": "git diff --quiet HEAD^ HEAD ./",
+  "buildCommand": null,
+  "outputDirectory": null,
+  "installCommand": "pnpm install",
+  "public": false
+} 
