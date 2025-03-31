@@ -9,6 +9,57 @@ interface LoginFormData {
   password: string;
 }
 
+// Usuários de teste para login direto (cópia dos dados no AuthContext)
+const TEST_USERS = [
+  {
+    email: 'admin@edunexia.com.br',
+    password: 'admin123',
+    user: {
+      id: '1',
+      name: 'Administrador',
+      role: 'admin',
+      permissions: {
+        'matriculas.view': { read: true, write: true, delete: true },
+        'portal-aluno.view': { read: true, write: true, delete: true },
+        'material-didatico.view': { read: true, write: true, delete: true },
+        'comunicacao.view': { read: true, write: true, delete: true },
+        'financeiro.view': { read: true, write: true, delete: true },
+        'relatorios.view': { read: true, write: true, delete: true },
+        'configuracoes.view': { read: true, write: true, delete: true },
+        'dashboard.view': { read: true, write: true, delete: true }
+      }
+    }
+  },
+  {
+    email: 'professor@edunexia.com.br',
+    password: 'prof123',
+    user: {
+      id: '2',
+      name: 'Professor Teste',
+      role: 'teacher',
+      permissions: {
+        'matriculas.view': { read: true, write: false, delete: false },
+        'portal-aluno.view': { read: true, write: true, delete: false },
+        'material-didatico.view': { read: true, write: true, delete: true },
+        'comunicacao.view': { read: true, write: true, delete: false },
+      }
+    }
+  },
+  {
+    email: 'aluno@edunexia.com.br',
+    password: 'aluno123',
+    user: {
+      id: '3',
+      name: 'Aluno Teste',
+      role: 'student',
+      permissions: {
+        'portal-aluno.view': { read: true, write: false, delete: false },
+        'material-didatico.view': { read: true, write: false, delete: false },
+      }
+    }
+  }
+];
+
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -64,6 +115,25 @@ const LoginPage: React.FC = () => {
     return true;
   };
 
+  // Função de login direta, sem usar o contexto
+  const handleDirectLogin = async (email: string, password: string) => {
+    console.log('Tentando login direto com:', email);
+    
+    // Verifica se as credenciais correspondem a um usuário de teste
+    const foundUser = TEST_USERS.find(
+      u => u.email === email && u.password === password
+    );
+    
+    // Se encontrou o usuário, salva no localStorage e retorna sucesso
+    if (foundUser) {
+      console.log('Login bem-sucedido para:', foundUser.user.name);
+      localStorage.setItem('edunexia-user', JSON.stringify(foundUser.user));
+      return { success: true, user: foundUser.user };
+    }
+    
+    return { success: false, error: 'Credenciais inválidas' };
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -73,16 +143,21 @@ const LoginPage: React.FC = () => {
 
     setIsSubmitting(true);
     setFormError(null);
-    console.log('Tentando fazer login com:', formData.email);
+    console.log('Iniciando processo de login...');
 
     try {
-      await signIn(formData.email, formData.password);
-      // Redirecionar imediatamente após login bem-sucedido
-      console.log('Login bem-sucedido, redirecionando para portal-selector');
-      navigate('/portal-selector', { replace: true });
+      // Tenta o login direto primeiro
+      const result = await handleDirectLogin(formData.email, formData.password);
+      
+      if (result.success) {
+        console.log('Login bem-sucedido, redirecionando para portal-selector');
+        navigate('/portal-selector', { replace: true });
+      } else {
+        setFormError('Credenciais inválidas. Por favor, tente novamente.');
+      }
     } catch (error) {
       console.error('Erro no login:', error);
-      setFormError('Credenciais inválidas. Por favor, tente novamente.');
+      setFormError('Ocorreu um erro durante o login. Por favor, tente novamente.');
     } finally {
       setIsSubmitting(false);
     }

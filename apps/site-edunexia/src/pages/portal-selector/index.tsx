@@ -1,10 +1,18 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
 import { MODULES } from '../../constants/modules';
 import './portal-selector.css';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '../../components/ui/tabs';
 import { BookOpen, GraduationCap, MessageSquare, CreditCard, BarChart, Settings, Layout, LogOut } from 'lucide-react';
+
+// Definição do tipo User
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  permissions?: Record<string, { read: boolean; write: boolean; delete: boolean }>;
+}
 
 /**
  * Página dedicada ao seletor de portais
@@ -12,33 +20,48 @@ import { BookOpen, GraduationCap, MessageSquare, CreditCard, BarChart, Settings,
  */
 const PortalSelectorPage: React.FC = () => {
   const navigate = useNavigate();
-  const { user, isLoading, signOut } = useAuth();
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   
-  // Redireciona para o login se não estiver autenticado
-  React.useEffect(() => {
-    console.log('PortalSelector - Auth state:', { user, isLoading });
+  // Carregar usuário do localStorage
+  useEffect(() => {
+    const loadUser = () => {
+      setIsLoading(true);
+      try {
+        const savedUser = localStorage.getItem('edunexia-user');
+        
+        if (savedUser) {
+          setUser(JSON.parse(savedUser));
+        } else {
+          // Se não houver usuário, redirecionar para o login
+          console.log('Nenhum usuário encontrado no localStorage, redirecionando para login');
+          navigate('/login', { replace: true });
+        }
+      } catch (err) {
+        console.error('Erro ao carregar usuário:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
     
-    if (!isLoading && !user) {
-      console.log('Usuário não autenticado, redirecionando para login');
-      navigate('/login', { replace: true });
-    } else if (!isLoading && user) {
-      console.log('Usuário autenticado no seletor de portais:', user.name);
-    }
-  }, [user, isLoading, navigate]);
+    loadUser();
+  }, [navigate]);
   
   const handlePortalSelect = (route: string) => {
     navigate(route);
   };
   
   const handleLogout = async () => {
-    await signOut();
+    // Remover usuário do localStorage
+    localStorage.removeItem('edunexia-user');
     navigate('/login', { replace: true });
   };
   
   // Obtém módulos que o usuário tem acesso
   const accessibleModules = MODULES.filter(module => {
+    if (!user || !user.permissions) return false;
     const permission = module.requiredPermission;
-    return user?.permissions?.[permission]?.read;
+    return user.permissions[permission]?.read;
   });
   
   // Definindo a interface para os cards de módulos
