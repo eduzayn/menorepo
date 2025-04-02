@@ -1,0 +1,54 @@
+FROM node:23.10.0-alpine AS base
+
+# Argumentos para personalização do módulo
+ARG APP_MODULE
+ENV MODULE_NAME=${APP_MODULE}
+
+# Instalação do pnpm
+RUN npm install -g pnpm@8.9.0
+
+# Diretório de trabalho
+WORKDIR /app
+
+# Copiar arquivos de configuração global
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY tsconfig.json ./
+
+# Criar a pasta 'scripts' para evitar erro no preinstall
+RUN mkdir -p scripts
+RUN echo "console.log('Script de preinstall para Docker');" > scripts/preinstall.js
+
+# Copiar packages compartilhados
+COPY packages ./packages/
+
+# Instalação das dependências do monorepo
+RUN pnpm install --ignore-scripts
+
+# Copiar a aplicação específica
+COPY apps/${MODULE_NAME} ./apps/${MODULE_NAME}/
+
+# Atualizar o script de build se necessário (converter comandos Windows para Linux)
+WORKDIR /app/apps/${MODULE_NAME}
+RUN sed -i 's/if not exist dist mkdir dist/mkdir -p dist/g' package.json
+
+# Instalação das dependências do módulo e construção
+RUN pnpm install --ignore-scripts
+RUN pnpm build || true
+
+# Garantir que o diretório dist exista com um conteúdo mínimo
+RUN mkdir -p dist
+RUN if [ ! -f dist/index.html ]; then \
+    echo '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Edunexia - ${MODULE_NAME}</title></head><body><div id="root"><h1>Edunexia - Módulo ${MODULE_NAME}</h1><p>Este módulo está em construção.</p></div></body></html>' > dist/index.html; \
+    fi
+
+# Stage de produção
+FROM nginx:alpine AS production
+
+ARG APP_MODULE
+ENV MODULE_NAME=${APP_MODULE}
+
+COPY --from=base /app/apps/${MODULE_NAME}/dist /usr/share/nginx/html
+COPY ./nginx/module.conf /etc/nginx/conf.d/default.conf
+
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]

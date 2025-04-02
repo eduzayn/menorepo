@@ -99,7 +99,7 @@ const HomePage: React.FC = () => {
                       </h3>
                       <p className="text-gray-600 mb-4">{post.excerpt}</p>
                       <div className="flex items-center justify-between text-sm text-gray-500">
-                        <span>{post.author.name}</span>
+                        <span>{post.author?.name || 'Autor desconhecido'}</span>
                         <span>{new Date(post.published_at).toLocaleDateString()}</span>
                       </div>
                     </div>

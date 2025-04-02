@@ -13,12 +13,12 @@ function App() {
   return (
     <ApiProvider>
       <ThemeProvider defaultTheme="light" storageKey="edunexia-ui-theme">
-        <Router>
-          <AuthProvider>
+        <AuthProvider>
+          <Router>
             <ScrollToTop />
             <AppRoutes />
-          </AuthProvider>
-        </Router>
+          </Router>
+        </AuthProvider>
       </ThemeProvider>
     </ApiProvider>
   );
