@@ -1,0 +1,27 @@
+services:
+  # Proxy reverso para rotear o tráfego para os diferentes serviços
+  nginx-proxy:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/proxy.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - site-edunexia
+    networks:
+      - edunexia-network
+
+  # Aplicação principal em modo de produção
+  site-edunexia:
+    build:
+      context: .
+      dockerfile: ./apps/site-edunexia/Dockerfile.prod
+    environment:
+      - NODE_ENV=production
+    networks:
+      - edunexia-network
+
+networks:
+  edunexia-network:
+    driver: bridge 

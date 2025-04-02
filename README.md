@@ -307,3 +307,23 @@ Todos os módulos estão configurados para implantação automática via GitHub:
 - **Pull Requests**: Geram ambientes de preview para testes
 
 Para mais detalhes sobre o processo de implantação, consulte o [Guia de Implantação na Vercel](docs/vercel-deployment-guide.md).
+
+## Executando com Docker
+
+Foi adicionado suporte para Docker no projeto, permitindo a execução em ambientes de desenvolvimento e produção.
+
+### Ambiente de Desenvolvimento
+
+```bash
+# Iniciar em modo desenvolvimento
+docker-compose up -d
+```
+
+### Ambiente de Produção
+
+```bash
+# Iniciar em modo produção
+docker-compose -f docker-compose.prod.yml up -d
+```
+
+Para mais detalhes, consulte o [README do Docker](./README-docker.md).
